@@ -1,0 +1,347 @@
+Создай веб-приложение на React/Next.js в стиле промышленного минимализма (Teenage Engineering).
+Визуал: > - Фон: #1A1A1A (угольный).
+Акцент: #FF5722 (оранжевый).
+Шрифт: IBM Plex Mono.
+Интерфейс должен выглядеть как физический прибор: сетки, тонкие линии, тактильные кнопки.
+Логика:
+Приложение должно работать как стейт-машина на основе этого JSON-сценария: [{
+  "scenario_id": "re_chain_onboarding_v1",
+  "theme": "teenage_engineering_industrial",
+  "color_palette": {
+    "primary": "#E0E0E0",
+    "accent": "#FF5722",
+    "dark": "#1A1A1A"
+  },
+  "typography": {
+    "family": "IBM Plex Mono",
+    "weights": [400, 500, 700]
+  },
+  "steps": [
+    {
+      "id": "step_0",
+      "type": "animation",
+      "duration": 4000,
+      "title": null,
+      "message": null,
+      "ui_specs": {
+        "animation_name": "nfc_xray",
+        "description": "Оранжевые линии (#FF5722) последовательно прорисовывают контур NFC-антенны на прозрачной карте. Эффект рентгена. Фон: угольный черный (#1A1A1A). Карта находится в руках пользователя (фотореалистичная 3D-модель).",
+        "technical_log": {
+          "lines": [
+            "READING PHYSICAL LAYER...",
+            "PROTOCOL: LIBERTÀ ACTIVATED",
+            "NFC HANDSHAKE: OK"
+          ],
+          "font_size": "12px",
+          "color": "#FF5722",
+          "position": "bottom-left",
+          "typewriter_effect": true
+        },
+        "auto_transition": true
+      },
+      "actions": []
+    },
+    {
+      "id": "step_1",
+      "type": "question",
+      "title": "ОПРЕДЕЛЕНИЕ КООРДИНАТ",
+      "message": "Свобода для тебя — это...",
+      "ui_specs": {
+        "layout": "centered",
+        "title_style": {
+          "font_size": "14px",
+          "color": "#FF5722",
+          "letter_spacing": "2px",
+          "margin_bottom": "24px"
+        },
+        "message_style": {
+          "font_size": "24px",
+          "color": "#E0E0E0",
+          "line_height": "1.4"
+        },
+        "background": "#1A1A1A",
+        "grid_overlay": {
+          "enabled": true,
+          "opacity": 0.1,
+          "color": "#E0E0E0"
+        }
+      },
+      "actions": [
+        {
+          "id": "action_1a",
+          "label": "Право не спрашивать разрешения",
+          "style": "primary",
+          "score_impact": {
+            "independence_score": 10
+          },
+          "ui_style": {
+            "background": "#FF5722",
+            "color": "#1A1A1A",
+            "border": "none",
+            "padding": "16px 32px",
+            "font_weight": 500,
+            "hover_effect": "tactile_press"
+          }
+        },
+        {
+          "id": "action_1b",
+          "label": "Удобный сервис",
+          "style": "secondary",
+          "score_impact": {
+            "independence_score": 0
+          },
+          "ui_style": {
+            "background": "transparent",
+            "color": "#E0E0E0",
+            "border": "1px solid #E0E0E0",
+            "padding": "16px 32px",
+            "font_weight": 400,
+            "hover_effect": "border_glow"
+          }
+        }
+      ]
+    },
+    {
+      "id": "step_2",
+      "type": "question",
+      "title": "ФИНАНСОВАЯ РЕАЛЬНОСТЬ",
+      "message": "Чьи деньги лежат на твоём банковском счету?",
+      "ui_specs": {
+        "layout": "centered",
+        "title_style": {
+          "font_size": "14px",
+          "color": "#FF5722",
+          "letter_spacing": "2px",
+          "margin_bottom": "24px"
+        },
+        "message_style": {
+          "font_size": "24px",
+          "color": "#E0E0E0",
+          "line_height": "1.4"
+        },
+        "background": "#1A1A1A",
+        "oscilloscope": {
+          "enabled": true,
+          "position": "top",
+          "waveform": "sine",
+          "color": "#FF5722",
+          "opacity": 0.3,
+          "animation": "pulse"
+        }
+      },
+      "actions": [
+        {
+          "id": "action_2a",
+          "label": "Мои собственные",
+          "style": "primary",
+          "score_impact": {
+            "independence_score": 0
+          },
+          "reveal_truth": true,
+          "ui_style": {
+            "background": "#E0E0E0",
+            "color": "#1A1A1A",
+            "border": "none",
+            "padding": "16px 32px",
+            "font_weight": 500,
+            "hover_effect": "tactile_press"
+          }
+        },
+        {
+          "id": "action_2b",
+          "label": "Собственность банка",
+          "style": "secondary",
+          "score_impact": {
+            "independence_score": 10
+          },
+          "reveal_truth": true,
+          "ui_style": {
+            "background": "transparent",
+            "color": "#E0E0E0",
+            "border": "1px solid #E0E0E0",
+            "padding": "16px 32px",
+            "font_weight": 400,
+            "hover_effect": "border_glow"
+          }
+        }
+      ],
+      "post_action": {
+        "type": "satoshi_annotation",
+        "message": "Банк — лишь посредник. Он контролирует доступ к твоим средствам и может заморозить их в любой момент. Ты не владеешь деньгами на счету — ты владеешь обещанием банка.",
+        "ui_specs": {
+          "appearance": "slide_from_right",
+          "font_size": "16px",
+          "color": "#FF5722",
+          "background": "rgba(255, 87, 34, 0.1)",
+          "border_left": "3px solid #FF5722",
+          "padding": "16px",
+          "duration": 6000
+        }
+      }
+    },
+    {
+      "id": "step_3",
+      "type": "manifest",
+      "title": "ПРОТОКОЛ САТОШИ",
+      "message": null,
+      "ui_specs": {
+        "layout": "split_screen",
+        "left_panel": {
+          "type": "avatar",
+          "character": "satoshi",
+          "visual": "silhouette_with_glow",
+          "color": "#FF5722",
+          "animation": "fade_in"
+        },
+        "right_panel": {
+          "type": "text_block",
+          "content": [
+            "Карта в твоих руках — это не просто пластик.",
+            "",
+            "Это инструмент, позволяющий выйти из системы, где каждая транзакция требует одобрения.",
+            "",
+            "Система Lightning работает без посредников. Без разрешений. Без границ.",
+            "",
+            "Ты больше не клиент. Ты — узел в сети свободы."
+          ],
+          "font_size": "18px",
+          "color": "#E0E0E0",
+          "line_height": "1.8",
+          "typewriter_effect": true,
+          "typewriter_speed": 50
+        },
+        "background": "#1A1A1A",
+        "audio": {
+          "voice": "calm_engineering",
+          "tone": "honest_authoritative",
+          "enabled": false
+        }
+      },
+      "actions": [
+        {
+          "id": "action_3_continue",
+          "label": "ПРОДОЛЖИТЬ",
+          "style": "primary",
+          "score_impact": {},
+          "ui_style": {
+            "background": "#FF5722",
+            "color": "#1A1A1A",
+            "border": "none",
+            "padding": "16px 48px",
+            "font_weight": 700,
+            "position": "bottom-center",
+            "hover_effect": "pulse"
+          }
+        }
+      ]
+    },
+    {
+      "id": "step_4",
+      "type": "activation",
+      "title": "АКТИВАЦИЯ УЗЛА",
+      "message": "Протокол готов. Твой первый узел в сети свободы активирован.",
+      "ui_specs": {
+        "layout": "centered",
+        "title_style": {
+          "font_size": "14px",
+          "color": "#FF5722",
+          "letter_spacing": "2px",
+          "margin_bottom": "32px"
+        },
+        "message_style": {
+          "font_size": "28px",
+          "color": "#E0E0E0",
+          "line_height": "1.4",
+          "text_align": "center"
+        },
+        "background": "#1A1A1A",
+        "visual_effect": {
+          "type": "network_nodes",
+          "description": "Анимация распространения сигнала от центра (пользователь) к краям экрана через узлы сети. Оранжевые точки (#FF5722) соединяются линиями.",
+          "animation_duration": 3000,
+          "loop": false
+        },
+        "technical_readout": {
+          "enabled": true,
+          "lines": [
+            "NODE_ID: #RE_CHAIN_" + "XXXX",
+            "STATUS: ACTIVE",
+            "NETWORK: LIGHTNING",
+            "PEERS: CONNECTING..."
+          ],
+          "position": "bottom-left",
+          "font_size": "11px",
+          "color": "#FF5722",
+          "opacity": 0.7
+        }
+      },
+      "actions": [
+        {
+          "id": "action_4_accept",
+          "label": "ПРИНЯТЬ САТОШИ",
+          "style": "primary",
+          "score_impact": {
+            "independence_score": 15
+          },
+          "trigger_reward": true,
+          "ui_style": {
+            "background": "#FF5722",
+            "color": "#1A1A1A",
+            "border": "none",
+            "padding": "20px 64px",
+            "font_weight": 700,
+            "font_size": "16px",
+            "letter_spacing": "1px",
+            "hover_effect": "tactile_press_strong",
+            "glow": {
+              "enabled": true,
+              "color": "#FF5722",
+              "intensity": "medium"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "reward_config": {
+    "amount": 500,
+    "currency": "sats",
+    "trigger_step": "step_4",
+    "trigger_action": "action_4_accept",
+    "ui_specs": {
+      "animation": "lightning_strike",
+      "message": "+500 SATS",
+      "font_size": "48px",
+      "color": "#FF5722",
+      "duration": 2000,
+      "sound_effect": "electric_zap"
+    }
+  },
+  "scoring_system": {
+    "independence_score": {
+      "min": 0,
+      "max": 35,
+      "thresholds": {
+        "low": {
+          "range": [0, 10],
+          "label": "Наблюдатель"
+        },
+        "medium": {
+          "range": [11, 25],
+          "label": "Исследователь"
+        },
+        "high": {
+          "range": [26, 35],
+          "label": "Суверен"
+        }
+      }
+    }
+  }
+}
+].
+Step 0: Реализуй анимацию 'рентгена' NFC-антенны. Так как физических карт еще нет, добавь скрытую кнопку 'SIMULATE NFC' в центре экрана для запуска процесса.
+Реализуй переходы между экранами с эффектом затухания (fade-in/out).
+Добавь шкалу 'Independence Score', которая заполняется в зависимости от ответов пользователя.
+Технически:
+Используй Tailwind CSS для стилизации.
+Для анимаций используй Framer Motion (это сделает движения 'дорогими' и плавными).
