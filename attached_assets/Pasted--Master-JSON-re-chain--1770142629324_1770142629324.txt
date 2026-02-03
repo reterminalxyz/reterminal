@@ -1,0 +1,525 @@
+«У меня есть обновленный Master JSON для нашего проекта re_chain. Нам нужно полностью перестроить логику приложения, сохранив текущий визуальный стиль (светлый алюминий и медь).
+Вот основные задачи по обновлению:
+Новая структура (Логика 30/70): > - Теперь проект делится на две четкие фазы.
+Фаза 1: Быстрый тест из 3 вопросов (дает 30% прогресса).
+Фаза 2: Чат-обучение с Сатоши (дает оставшиеся 70%).
+Визуал 'Сборка микросхемы': > - В первой фазе (3 вопроса) убери все старые анимации. Вместо них за каждым ответом должно следовать появление элемента медной микросхемы на фоне. К 3-му вопросу плата должна быть собрана.
+Сделай кнопки выбора абсолютно одинаковыми по размеру.
+Механика перехода (Horizontal Split): > - После 3-го вопроса покажи собранную плату и кнопку 'АКТИВИРОВАТЬ'.
+При нажатии реализуй анимацию: экран должен раздвинуться по горизонтали в стороны, как механические створки, открывая под собой интерфейс чата.
+Интерфейс чата и навигация:
+Перенеси шкалу 'НЕЗАВИСИМОСТЬ' в самый низ экрана (сделай её горизонтальной и медной).
+Все обучение теперь идет в формате терминала/чата с эффектом печати.
+Используй этот новый JSON для контента и логики: > [{
+  "scenario_id": "re_chain_dual_phase_v2",
+  "theme": "copper_aluminum_minimal",
+  "color_palette": {
+    "primary": "#F5F5F5",
+    "accent": "#B87333",
+    "dark": "#2A2A2A",
+    "aluminum": "#E8E8E8"
+  },
+  "typography": {
+    "family": "IBM Plex Mono",
+    "weights": [400, 500, 600]
+  },
+  "reward_distribution": {
+    "phase_1": 0.30,
+    "phase_2": 0.70,
+    "total_sats": 500
+  },
+  "phases": [
+    {
+      "phase_id": "phase_1_assembly",
+      "title": "СБОРКА ПРОТОКОЛА",
+      "reward_percentage": 30,
+      "reward_amount": 150,
+      "ui_specs": {
+        "background": "#F5F5F5",
+        "circuit_board": {
+          "enabled": true,
+          "description": "Медные дорожки (#B87333) постепенно появляются на матовом алюминиевом фоне. Каждый ответ добавляет новые элементы микросхемы: дорожки, контакты, узлы.",
+          "layers": [
+            {
+              "question": 1,
+              "elements": "horizontal_traces_left"
+            },
+            {
+              "question": 2,
+              "elements": "vertical_connections_center"
+            },
+            {
+              "question": 3,
+              "elements": "complete_node_right"
+            }
+          ],
+          "animation": "fade_draw",
+          "duration": 800
+        }
+      },
+      "questions": [
+        {
+          "id": "q1",
+          "order": 1,
+          "title": "СВОБОДА",
+          "ui_specs": {
+            "layout": "centered",
+            "title_style": {
+              "font_size": "14px",
+              "color": "#B87333",
+              "letter_spacing": "3px",
+              "margin_bottom": "48px",
+              "font_weight": 600
+            },
+            "button_container": {
+              "display": "flex",
+              "gap": "16px",
+              "justify_content": "center"
+            }
+          },
+          "actions": [
+            {
+              "id": "q1_a1",
+              "label": "ПРАВО",
+              "score_impact": {
+                "independence_score": 10
+              },
+              "ui_style": {
+                "width": "160px",
+                "height": "56px",
+                "background": "transparent",
+                "color": "#2A2A2A",
+                "border": "2px solid #B87333",
+                "font_size": "14px",
+                "font_weight": 500,
+                "letter_spacing": "1px",
+                "hover": {
+                  "background": "#B87333",
+                  "color": "#F5F5F5"
+                },
+                "transition": "all 0.2s ease"
+              }
+            },
+            {
+              "id": "q1_a2",
+              "label": "СЕРВИС",
+              "score_impact": {
+                "independence_score": 0
+              },
+              "ui_style": {
+                "width": "160px",
+                "height": "56px",
+                "background": "transparent",
+                "color": "#2A2A2A",
+                "border": "2px solid #B87333",
+                "font_size": "14px",
+                "font_weight": 500,
+                "letter_spacing": "1px",
+                "hover": {
+                  "background": "#B87333",
+                  "color": "#F5F5F5"
+                },
+                "transition": "all 0.2s ease"
+              }
+            }
+          ],
+          "circuit_animation": {
+            "trigger": "on_answer",
+            "pattern": "horizontal_traces_left",
+            "color": "#B87333",
+            "opacity": 0.6
+          }
+        },
+        {
+          "id": "q2",
+          "order": 2,
+          "title": "СОБСТВЕННОСТЬ",
+          "ui_specs": {
+            "layout": "centered",
+            "title_style": {
+              "font_size": "14px",
+              "color": "#B87333",
+              "letter_spacing": "3px",
+              "margin_bottom": "48px",
+              "font_weight": 600
+            },
+            "button_container": {
+              "display": "flex",
+              "gap": "16px",
+              "justify_content": "center"
+            }
+          },
+          "actions": [
+            {
+              "id": "q2_a1",
+              "label": "БАНК",
+              "score_impact": {
+                "independence_score": 10
+              },
+              "ui_style": {
+                "width": "160px",
+                "height": "56px",
+                "background": "transparent",
+                "color": "#2A2A2A",
+                "border": "2px solid #B87333",
+                "font_size": "14px",
+                "font_weight": 500,
+                "letter_spacing": "1px",
+                "hover": {
+                  "background": "#B87333",
+                  "color": "#F5F5F5"
+                },
+                "transition": "all 0.2s ease"
+              }
+            },
+            {
+              "id": "q2_a2",
+              "label": "Я",
+              "score_impact": {
+                "independence_score": 0
+              },
+              "ui_style": {
+                "width": "160px",
+                "height": "56px",
+                "background": "transparent",
+                "color": "#2A2A2A",
+                "border": "2px solid #B87333",
+                "font_size": "14px",
+                "font_weight": 500,
+                "letter_spacing": "1px",
+                "hover": {
+                  "background": "#B87333",
+                  "color": "#F5F5F5"
+                },
+                "transition": "all 0.2s ease"
+              }
+            }
+          ],
+          "circuit_animation": {
+            "trigger": "on_answer",
+            "pattern": "vertical_connections_center",
+            "color": "#B87333",
+            "opacity": 0.6
+          }
+        },
+        {
+          "id": "q3",
+          "order": 3,
+          "title": "СУВЕРЕНИТЕТ",
+          "ui_specs": {
+            "layout": "centered",
+            "title_style": {
+              "font_size": "14px",
+              "color": "#B87333",
+              "letter_spacing": "3px",
+              "margin_bottom": "48px",
+              "font_weight": 600
+            },
+            "button_container": {
+              "display": "flex",
+              "gap": "16px",
+              "justify_content": "center"
+            }
+          },
+          "actions": [
+            {
+              "id": "q3_a1",
+              "label": "ИНСТРУМЕНТ",
+              "score_impact": {
+                "independence_score": 10
+              },
+              "ui_style": {
+                "width": "160px",
+                "height": "56px",
+                "background": "transparent",
+                "color": "#2A2A2A",
+                "border": "2px solid #B87333",
+                "font_size": "14px",
+                "font_weight": 500,
+                "letter_spacing": "1px",
+                "hover": {
+                  "background": "#B87333",
+                  "color": "#F5F5F5"
+                },
+                "transition": "all 0.2s ease"
+              }
+            },
+            {
+              "id": "q3_a2",
+              "label": "РИСК",
+              "score_impact": {
+                "independence_score": 0
+              },
+              "ui_style": {
+                "width": "160px",
+                "height": "56px",
+                "background": "transparent",
+                "color": "#2A2A2A",
+                "border": "2px solid #B87333",
+                "font_size": "14px",
+                "font_weight": 500,
+                "letter_spacing": "1px",
+                "hover": {
+                  "background": "#B87333",
+                  "color": "#F5F5F5"
+                },
+                "transition": "all 0.2s ease"
+              }
+            }
+          ],
+          "circuit_animation": {
+            "trigger": "on_answer",
+            "pattern": "complete_node_right",
+            "color": "#B87333",
+            "opacity": 0.8,
+            "completion_effect": true
+          }
+        }
+      ],
+      "completion_screen": {
+        "id": "phase_1_complete",
+        "ui_specs": {
+          "background": "#F5F5F5",
+          "circuit_display": {
+            "state": "complete",
+            "pulse_effect": true,
+            "color": "#B87333"
+          },
+          "message": {
+            "text": "ПРОТОКОЛ СОБРАН",
+            "font_size": "18px",
+            "color": "#B87333",
+            "letter_spacing": "2px",
+            "margin_bottom": "32px"
+          },
+          "reward_display": {
+            "text": "+150 SATS",
+            "font_size": "28px",
+            "color": "#B87333",
+            "font_weight": 600,
+            "animation": "fade_in",
+            "duration": 1500
+          }
+        },
+        "cta": {
+          "label": "АКТИВИРОВАТЬ СУВЕРЕНИТЕТ",
+          "ui_style": {
+            "width": "320px",
+            "height": "64px",
+            "background": "#B87333",
+            "color": "#F5F5F5",
+            "border": "none",
+            "font_size": "14px",
+            "font_weight": 600,
+            "letter_spacing": "2px",
+            "margin_top": "48px",
+            "hover": {
+              "background": "#A66829",
+              "transform": "translateY(-2px)",
+              "box_shadow": "0 4px 12px rgba(184, 115, 51, 0.3)"
+            },
+            "transition": "all 0.3s ease"
+          },
+          "action": "trigger_phase_2_transition"
+        }
+      }
+    },
+    {
+      "phase_id": "phase_2_chat",
+      "title": "ДИАЛОГ С САТОШИ",
+      "reward_percentage": 70,
+      "reward_amount": 350,
+      "transition": {
+        "type": "horizontal_split",
+        "description": "Экран раздвигается от центра влево и вправо, открывая терминальный интерфейс чата",
+        "duration": 1200,
+        "easing": "ease-in-out"
+      },
+      "ui_specs": {
+        "background": "#2A2A2A",
+        "terminal_style": true,
+        "header": {
+          "text": "TERMINAL: SATOSHI_PROTOCOL",
+          "font_size": "12px",
+          "color": "#B87333",
+          "letter_spacing": "2px",
+          "padding": "16px"
+        },
+        "chat_area": {
+          "background": "#1E1E1E",
+          "border": "1px solid #B87333",
+          "padding": "24px",
+          "font_size": "14px",
+          "line_height": "1.8"
+        },
+        "message_style": {
+          "satoshi": {
+            "color": "#B87333",
+            "prefix": "SATOSHI >",
+            "typewriter_speed": 30
+          },
+          "user": {
+            "color": "#E8E8E8",
+            "prefix": "YOU >",
+            "instant": true
+          }
+        }
+      },
+      "dialogue_blocks": [
+        {
+          "id": "dialogue_1",
+          "speaker": "satoshi",
+          "message": "Протокол активирован. Ты собрал схему, теперь пора понять, как она работает.",
+          "typewriter": true,
+          "delay": 500,
+          "reward": 50,
+          "user_prompt": {
+            "enabled": false
+          }
+        },
+        {
+          "id": "dialogue_2",
+          "speaker": "satoshi",
+          "message": "Банк — это чёрный ящик. Ты не знаешь, что внутри. Ты доверяешь обещанию, записанному в их базе данных.",
+          "typewriter": true,
+          "delay": 800,
+          "reward": 50,
+          "user_prompt": {
+            "enabled": false
+          }
+        },
+        {
+          "id": "dialogue_3",
+          "speaker": "satoshi",
+          "message": "Bitcoin работает иначе. Каждая транзакция видна. Каждый блок проверен тысячами узлов. Никаких обещаний — только математика.",
+          "typewriter": true,
+          "delay": 800,
+          "reward": 50,
+          "user_prompt": {
+            "enabled": true,
+            "options": [
+              {
+                "id": "d3_opt1",
+                "label": "Но это сложно",
+                "next": "dialogue_4a"
+              },
+              {
+                "id": "d3_opt2",
+                "label": "Это честно",
+                "next": "dialogue_4b"
+              }
+            ]
+          }
+        },
+        {
+          "id": "dialogue_4a",
+          "speaker": "satoshi",
+          "message": "Сложность — это цена свободы. Но тебе не нужно знать всё. Достаточно понять принцип: никто не контролирует твои деньги, кроме тебя.",
+          "typewriter": true,
+          "delay": 800,
+          "reward": 50,
+          "branch": "complexity",
+          "user_prompt": {
+            "enabled": false
+          },
+          "next": "dialogue_5"
+        },
+        {
+          "id": "dialogue_4b",
+          "speaker": "satoshi",
+          "message": "Именно. Честность — это фундамент. Когда правила прозрачны и неизменны, доверие становится не нужным. Система работает без него.",
+          "typewriter": true,
+          "delay": 800,
+          "reward": 50,
+          "branch": "honesty",
+          "user_prompt": {
+            "enabled": false
+          },
+          "next": "dialogue_5"
+        },
+        {
+          "id": "dialogue_5",
+          "speaker": "satoshi",
+          "message": "Lightning Network — это второй уровень. Мгновенные транзакции. Минимальные комиссии. Карта в твоих руках подключена к этой сети.",
+          "typewriter": true,
+          "delay": 800,
+          "reward": 50,
+          "user_prompt": {
+            "enabled": false
+          }
+        },
+        {
+          "id": "dialogue_6",
+          "speaker": "satoshi",
+          "message": "Ты не клиент. Ты — участник сети. Каждая транзакция укрепляет протокол. Каждый узел делает систему устойчивее.",
+          "typewriter": true,
+          "delay": 800,
+          "reward": 50,
+          "user_prompt": {
+            "enabled": false
+          }
+        },
+        {
+          "id": "dialogue_7",
+          "speaker": "satoshi",
+          "message": "Суверенитет начинается с выбора. Ты уже сделал первый шаг. Остальное — вопрос практики.",
+          "typewriter": true,
+          "delay": 800,
+          "reward": 50,
+          "user_prompt": {
+            "enabled": true,
+            "options": [
+              {
+                "id": "d7_opt1",
+                "label": "Я готов",
+                "action": "complete_phase_2"
+              }
+            ]
+          }
+        }
+      ],
+      "completion": {
+        "message": "ПРОТОКОЛ ЗАВЕРШЁН. ТЫ АКТИВИРОВАН.",
+        "reward_display": {
+          "text": "+350 SATS",
+          "font_size": "32px",
+          "color": "#B87333",
+          "animation": "pulse",
+          "duration": 2000
+        },
+        "final_score_display": true
+      }
+    }
+  ],
+  "independence_indicator": {
+    "position": "bottom_fixed",
+    "ui_specs": {
+      "width": "100%",
+      "height": "8px",
+      "background": "#E8E8E8",
+      "fill_color": "#B87333",
+      "border_top": "1px solid #B87333",
+      "label": {
+        "text": "НЕЗАВИСИМОСТЬ",
+        "font_size": "10px",
+        "color": "#B87333",
+        "letter_spacing": "2px",
+        "position": "center_above",
+        "padding_bottom": "8px"
+      },
+      "animation": "smooth_fill",
+      "transition_duration": 600
+    },
+    "scoring": {
+      "min": 0,
+      "max": 30,
+      "display_percentage": true
+    }
+  },
+  "total_rewards": {
+    "phase_1": 150,
+    "phase_2": 350,
+    "total": 500,
+    "currency": "sats"
+  }
+}]
