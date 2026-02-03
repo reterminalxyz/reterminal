@@ -29,8 +29,8 @@ export function Oscilloscope() {
       
       ctx.clearRect(0, 0, width, height);
       
-      // Draw grid
-      ctx.strokeStyle = "rgba(255, 87, 34, 0.08)";
+      // Draw grid - copper color
+      ctx.strokeStyle = "rgba(184, 115, 51, 0.08)";
       ctx.lineWidth = 0.5;
       for (let x = 0; x <= width; x += 20) {
         ctx.beginPath();
@@ -45,18 +45,18 @@ export function Oscilloscope() {
         ctx.stroke();
       }
       
-      // Draw main wave
+      // Draw main wave - copper
       ctx.beginPath();
-      ctx.strokeStyle = "rgba(255, 87, 34, 0.7)";
-      ctx.lineWidth = 2;
-      ctx.shadowBlur = 10;
-      ctx.shadowColor = "rgba(255, 87, 34, 0.5)";
+      ctx.strokeStyle = "rgba(184, 115, 51, 0.7)";
+      ctx.lineWidth = 1.5;
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = "rgba(184, 115, 51, 0.4)";
 
       for (let x = 0; x <= width; x++) {
         const y = height / 2 + 
-          Math.sin((x + offset) * 0.02) * 20 + 
-          Math.sin((x + offset) * 0.05) * 10 +
-          Math.sin((x + offset) * 0.01) * 15;
+          Math.sin((x + offset) * 0.02) * 18 + 
+          Math.sin((x + offset) * 0.05) * 8 +
+          Math.sin((x + offset) * 0.01) * 12;
         
         if (x === 0) {
           ctx.moveTo(x, y);
@@ -69,13 +69,13 @@ export function Oscilloscope() {
       
       // Draw secondary wave (ghost)
       ctx.beginPath();
-      ctx.strokeStyle = "rgba(255, 87, 34, 0.2)";
-      ctx.lineWidth = 1;
+      ctx.strokeStyle = "rgba(184, 115, 51, 0.2)";
+      ctx.lineWidth = 0.5;
 
       for (let x = 0; x <= width; x++) {
         const y = height / 2 + 
-          Math.sin((x + offset * 0.8) * 0.03) * 15 + 
-          Math.cos((x + offset) * 0.02) * 12;
+          Math.sin((x + offset * 0.8) * 0.03) * 12 + 
+          Math.cos((x + offset) * 0.02) * 10;
         
         if (x === 0) {
           ctx.moveTo(x, y);
@@ -85,7 +85,7 @@ export function Oscilloscope() {
       }
       ctx.stroke();
 
-      offset += 2;
+      offset += 1.5;
       animationFrameId = requestAnimationFrame(draw);
     };
 
@@ -106,17 +106,16 @@ export function Oscilloscope() {
         />
       </div>
       
-      {/* Labels */}
-      <div className="absolute top-1 left-2 text-[8px] text-primary/50 tracking-widest">FREQ: 440Hz</div>
-      <div className="absolute top-1 right-2 text-[8px] text-primary/50 tracking-widest">AMP: 0.8</div>
+      <div className="absolute top-1 left-2 text-[8px] text-[#B87333]/50 tracking-widest eink-text">FREQ: 440Hz</div>
+      <div className="absolute top-1 right-2 text-[8px] text-[#B87333]/50 tracking-widest eink-text">AMP: 0.8</div>
       
       <motion.div 
         className="absolute bottom-1 left-2 flex items-center gap-1"
         animate={{ opacity: [0.4, 1, 0.4] }}
         transition={{ duration: 1.5, repeat: Infinity }}
       >
-        <div className="w-1 h-1 rounded-full bg-green-500" />
-        <span className="text-[8px] text-green-500/70">SYNC</span>
+        <div className="w-1 h-1 rounded-full bg-green-600" />
+        <span className="text-[8px] text-green-600/70 eink-text">SYNC</span>
       </motion.div>
     </div>
   );

@@ -33,7 +33,6 @@ export function NetworkNodes() {
     window.addEventListener("resize", resize);
     resize();
 
-    // Create initial ripple
     const createRipple = () => {
       ripples.push({
         x: centerX,
@@ -44,7 +43,6 @@ export function NetworkNodes() {
       });
     };
 
-    // Start with a ripple
     createRipple();
     const rippleInterval = setInterval(createRipple, 2000);
 
@@ -54,36 +52,34 @@ export function NetworkNodes() {
       if (!ctx || !canvas) return;
       ctx.clearRect(0, 0, canvas.offsetWidth, canvas.offsetHeight);
 
-      // Draw ripples
+      // Draw ripples - copper color
       ripples.forEach((ripple, index) => {
-        ripple.radius += 2;
-        ripple.alpha = 0.6 * (1 - ripple.radius / ripple.maxRadius);
+        ripple.radius += 1.5;
+        ripple.alpha = 0.5 * (1 - ripple.radius / ripple.maxRadius);
 
         if (ripple.alpha <= 0) {
           ripples.splice(index, 1);
           return;
         }
 
-        // Outer ring
         ctx.beginPath();
         ctx.arc(ripple.x, ripple.y, ripple.radius, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(255, 87, 34, ${ripple.alpha * 0.5})`;
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = `rgba(184, 115, 51, ${ripple.alpha * 0.5})`;
+        ctx.lineWidth = 0.5;
         ctx.stroke();
 
-        // Inner glow ring
         ctx.beginPath();
-        ctx.arc(ripple.x, ripple.y, ripple.radius * 0.8, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(255, 87, 34, ${ripple.alpha * 0.3})`;
+        ctx.arc(ripple.x, ripple.y, ripple.radius * 0.7, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(184, 115, 51, ${ripple.alpha * 0.25})`;
         ctx.lineWidth = 0.5;
         ctx.stroke();
       });
 
-      // Draw center node with glow
+      // Center node with copper gradient
       const gradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, 30);
-      gradient.addColorStop(0, "rgba(255, 87, 34, 0.8)");
-      gradient.addColorStop(0.5, "rgba(255, 87, 34, 0.2)");
-      gradient.addColorStop(1, "rgba(255, 87, 34, 0)");
+      gradient.addColorStop(0, "rgba(184, 115, 51, 0.6)");
+      gradient.addColorStop(0.5, "rgba(184, 115, 51, 0.15)");
+      gradient.addColorStop(1, "rgba(184, 115, 51, 0)");
       
       ctx.beginPath();
       ctx.arc(centerX, centerY, 30, 0, Math.PI * 2);
@@ -93,27 +89,27 @@ export function NetworkNodes() {
       // Core dot
       ctx.beginPath();
       ctx.arc(centerX, centerY, 4, 0, Math.PI * 2);
-      ctx.fillStyle = "#FF5722";
+      ctx.fillStyle = "#B87333";
       ctx.fill();
 
-      // Small orbiting dots
+      // Orbiting dots
       const time = Date.now() / 1000;
       for (let i = 0; i < 3; i++) {
-        const angle = (time * 0.5 + (i * Math.PI * 2) / 3);
-        const orbitRadius = 50 + i * 20;
+        const angle = (time * 0.4 + (i * Math.PI * 2) / 3);
+        const orbitRadius = 45 + i * 18;
         const x = centerX + Math.cos(angle) * orbitRadius;
         const y = centerY + Math.sin(angle) * orbitRadius;
         
         ctx.beginPath();
         ctx.arc(x, y, 2, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255, 87, 34, ${0.5 - i * 0.1})`;
+        ctx.fillStyle = `rgba(184, 115, 51, ${0.4 - i * 0.08})`;
         ctx.fill();
         
-        // Connection line to center
+        // Connection line
         ctx.beginPath();
         ctx.moveTo(centerX, centerY);
         ctx.lineTo(x, y);
-        ctx.strokeStyle = `rgba(255, 87, 34, ${0.15 - i * 0.03})`;
+        ctx.strokeStyle = `rgba(184, 115, 51, ${0.12 - i * 0.02})`;
         ctx.lineWidth = 0.5;
         ctx.stroke();
       }
@@ -131,8 +127,7 @@ export function NetworkNodes() {
   }, []);
 
   return (
-    <div className="relative w-full h-48 md:h-56">
-      {/* Glass container */}
+    <div className="relative w-full h-44 md:h-52">
       <div className="absolute inset-0 glass-panel rounded-lg overflow-hidden">
         <canvas 
           ref={canvasRef} 
@@ -141,18 +136,16 @@ export function NetworkNodes() {
         />
       </div>
       
-      {/* Corner decorations */}
-      <div className="absolute top-2 left-2 text-[8px] text-primary/40 tracking-widest">SIGNAL</div>
-      <div className="absolute top-2 right-2 text-[8px] text-primary/40 tracking-widest">ACTIVE</div>
+      <div className="absolute top-2 left-3 text-[8px] text-[#B87333]/50 tracking-widest eink-text">SIGNAL</div>
+      <div className="absolute top-2 right-3 text-[8px] text-[#B87333]/50 tracking-widest eink-text">ACTIVE</div>
       
-      {/* Pulsing indicator */}
       <motion.div 
-        className="absolute bottom-2 right-2 flex items-center gap-1"
+        className="absolute bottom-2 right-3 flex items-center gap-1"
         animate={{ opacity: [0.5, 1, 0.5] }}
         transition={{ duration: 2, repeat: Infinity }}
       >
-        <div className="w-1 h-1 rounded-full bg-primary" />
-        <span className="text-[8px] text-primary/60">TRANSMITTING</span>
+        <div className="w-1 h-1 rounded-full bg-[#B87333]" />
+        <span className="text-[8px] text-[#B87333]/60 eink-text">TRANSMITTING</span>
       </motion.div>
     </div>
   );

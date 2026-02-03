@@ -68,75 +68,126 @@ export default function Home() {
 
   // --- Step Components ---
 
-  const Step0_NFC = () => (
-    <motion.div 
-      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-      className="flex flex-col items-center justify-center space-y-8 w-full h-full relative"
-    >
-      {/* NFC Card visualization */}
+  const Step0_NFC = () => {
+    const [isScanning, setIsScanning] = useState(false);
+    const [scanComplete, setScanComplete] = useState(false);
+
+    const handleScan = () => {
+      setIsScanning(true);
+      setTimeout(() => {
+        setScanComplete(true);
+        setTimeout(() => {
+          handleTransition("step_1");
+        }, 800);
+      }, 2500);
+    };
+
+    return (
       <motion.div 
-        className="relative w-72 h-44 glass-panel rounded-2xl flex items-center justify-center overflow-hidden"
-        animate={{ rotateY: [0, 5, 0, -5, 0] }}
-        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        className="flex flex-col items-center justify-center space-y-8 w-full h-full relative"
       >
-        {/* Scanning beam */}
+        {/* NFC Card with Light Scan */}
         <motion.div 
-          className="absolute inset-0 bg-gradient-to-b from-primary/20 via-primary/5 to-transparent"
-          initial={{ top: "-100%" }}
-          animate={{ top: ["0%", "100%", "0%"] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-        />
-        
-        {/* Card interior */}
-        <div className="relative w-56 h-32 border border-primary/20 rounded-xl flex items-center justify-center bg-gradient-to-br from-white/5 to-transparent">
-          <div className="text-[9px] text-primary/60 absolute top-2 right-2 tracking-widest">NFC</div>
-          <div className="text-[9px] text-foreground/40 absolute bottom-2 left-2 tracking-wider">LIBERTÀ CARD</div>
-          
-          {/* NFC chip animation */}
-          <motion.div 
-            className="w-14 h-14 rounded-full border border-primary/40 flex items-center justify-center"
-            animate={{ 
-              boxShadow: [
-                "0 0 0 0 rgba(255,87,34,0)",
-                "0 0 0 15px rgba(255,87,34,0.1)",
-                "0 0 0 30px rgba(255,87,34,0)"
-              ]
-            }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
+          className="relative w-80 h-52 glass-panel rounded-xl flex items-center justify-center overflow-hidden floating-shadow"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2 }}
+        >
+          {/* Vertical Light Scan Beam */}
+          {isScanning && (
             <motion.div 
-              className="w-8 h-8 rounded-full border border-primary/60"
-              animate={{ scale: [1, 1.1, 1], opacity: [0.6, 1, 0.6] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
+              className="absolute left-0 top-0 w-1 h-full z-20"
+              style={{
+                background: "linear-gradient(90deg, transparent 0%, rgba(184,115,51,0.4) 30%, rgba(184,115,51,0.9) 50%, rgba(184,115,51,0.4) 70%, transparent 100%)",
+                boxShadow: "0 0 40px rgba(184,115,51,0.6), 0 0 80px rgba(184,115,51,0.3)",
+                width: "8px"
+              }}
+              initial={{ left: "-10px" }}
+              animate={{ left: "calc(100% + 10px)" }}
+              transition={{ duration: 2.5, ease: "easeInOut" }}
             />
-          </motion.div>
+          )}
+          
+          {/* Antenna Schematic - Revealed by scan */}
+          <div className={`absolute inset-4 transition-opacity duration-500 ${isScanning || scanComplete ? 'opacity-100' : 'opacity-10'}`}>
+            {/* Circuit traces */}
+            <svg className="w-full h-full" viewBox="0 0 280 160" fill="none">
+              {/* NFC Coil */}
+              <rect x="90" y="40" width="100" height="80" rx="8" stroke="#B87333" strokeWidth="0.5" strokeDasharray={isScanning ? "none" : "4 4"} className={scanComplete ? "opacity-100" : "opacity-60"} />
+              <rect x="100" y="50" width="80" height="60" rx="6" stroke="#B87333" strokeWidth="0.5" strokeDasharray={isScanning ? "none" : "4 4"} className={scanComplete ? "opacity-100" : "opacity-60"} />
+              <rect x="110" y="60" width="60" height="40" rx="4" stroke="#B87333" strokeWidth="0.5" strokeDasharray={isScanning ? "none" : "4 4"} className={scanComplete ? "opacity-100" : "opacity-60"} />
+              
+              {/* Connection lines */}
+              <line x1="40" y1="80" x2="90" y2="80" stroke="#B87333" strokeWidth="0.5" className={scanComplete ? "opacity-100" : "opacity-40"} />
+              <line x1="190" y1="80" x2="240" y2="80" stroke="#B87333" strokeWidth="0.5" className={scanComplete ? "opacity-100" : "opacity-40"} />
+              
+              {/* Chip */}
+              <rect x="125" y="70" width="30" height="20" fill="rgba(184,115,51,0.1)" stroke="#B87333" strokeWidth="0.5" className={scanComplete ? "opacity-100" : "opacity-60"} />
+              <line x1="130" y1="75" x2="150" y2="75" stroke="#B87333" strokeWidth="0.3" />
+              <line x1="130" y1="80" x2="150" y2="80" stroke="#B87333" strokeWidth="0.3" />
+              <line x1="130" y1="85" x2="150" y2="85" stroke="#B87333" strokeWidth="0.3" />
+              
+              {/* Corner markers */}
+              <path d="M20 20 L20 35 M20 20 L35 20" stroke="#B87333" strokeWidth="0.5" />
+              <path d="M260 20 L260 35 M260 20 L245 20" stroke="#B87333" strokeWidth="0.5" />
+              <path d="M20 140 L20 125 M20 140 L35 140" stroke="#B87333" strokeWidth="0.5" />
+              <path d="M260 140 L260 125 M260 140 L245 140" stroke="#B87333" strokeWidth="0.5" />
+            </svg>
+          </div>
+          
+          {/* Labels */}
+          <div className="absolute top-3 left-4 text-[9px] text-[#B87333]/70 tracking-[0.2em] eink-text">NFC-A</div>
+          <div className="absolute top-3 right-4 text-[9px] text-[#B87333]/70 tracking-[0.2em] eink-text">13.56MHz</div>
+          <div className="absolute bottom-3 left-4 text-[9px] text-[#3E3129]/60 tracking-wider eink-text">LIBERTÀ CARD</div>
+          <div className="absolute bottom-3 right-4 text-[9px] text-[#3E3129]/40 tracking-wider eink-text">v2.1</div>
+          
+          {/* Scan complete indicator */}
+          {scanComplete && (
+            <motion.div 
+              className="absolute inset-0 flex items-center justify-center bg-[#B87333]/5"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+            >
+              <motion.div 
+                className="text-[#B87333] text-sm tracking-[0.3em] font-semibold eink-text"
+                initial={{ scale: 0.8, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+              >
+                VERIFIED
+              </motion.div>
+            </motion.div>
+          )}
+        </motion.div>
+
+        {/* Technical log */}
+        <div className="absolute bottom-20 left-8">
+          <TechnicalReadout 
+            lines={
+              isScanning 
+                ? ["SCANNING PHYSICAL LAYER...", "PROTOCOL: LIBERTÀ", "HANDSHAKE: PENDING..."]
+                : scanComplete 
+                  ? ["SCAN COMPLETE", "PROTOCOL: LIBERTÀ ACTIVATED", "NFC HANDSHAKE: OK"]
+                  : ["AWAITING NFC CARD...", "PROTOCOL: STANDBY"]
+            } 
+            delay={300}
+          />
+        </div>
+
+        {/* Simulate button */}
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 translate-y-24">
+          <TactileButton 
+            onClick={handleScan}
+            disabled={isScanning || scanComplete}
+            className={`text-xs ${isScanning || scanComplete ? 'opacity-30' : ''}`}
+            data-testid="button-simulate-nfc"
+          >
+            {isScanning ? "SCANNING..." : scanComplete ? "COMPLETE" : "SIMULATE NFC"}
+          </TactileButton>
         </div>
       </motion.div>
-
-      {/* Technical log */}
-      <div className="absolute bottom-16 left-6">
-        <TechnicalReadout 
-          lines={[
-            "READING PHYSICAL LAYER...", 
-            "PROTOCOL: LIBERTÀ ACTIVATED", 
-            "NFC HANDSHAKE: OK"
-          ]} 
-          delay={500}
-        />
-      </div>
-
-      {/* Hidden simulate button */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 translate-y-16">
-        <TactileButton 
-          onClick={() => handleTransition("step_1")}
-          className="opacity-30 hover:opacity-100 transition-opacity text-xs"
-          data-testid="button-simulate-nfc"
-        >
-          SIMULATE NFC
-        </TactileButton>
-      </div>
-    </motion.div>
-  );
+    );
+  };
 
   const Step1_Freedom = () => (
     <motion.div 
@@ -145,20 +196,20 @@ export default function Home() {
     >
       {/* Glass card container */}
       <motion.div 
-        className="glass-panel rounded-xl p-8 w-full"
+        className="glass-panel rounded-xl p-8 w-full floating-shadow"
         initial={{ scale: 0.95 }}
         animate={{ scale: 1 }}
         transition={{ delay: 0.2 }}
       >
         <div className="space-y-6">
           <motion.h2 
-            className="text-xs text-primary tracking-[0.25em] font-medium"
+            className="text-xs text-[#B87333] tracking-[0.25em] font-medium eink-text"
             animate={{ opacity: [0.7, 1, 0.7] }}
             transition={{ duration: 3, repeat: Infinity }}
           >
             ОПРЕДЕЛЕНИЕ КООРДИНАТ
           </motion.h2>
-          <h1 className="text-xl md:text-2xl font-light leading-relaxed text-foreground/90">
+          <h1 className="text-xl md:text-2xl font-light leading-relaxed text-[#3E3129] eink-text">
             Свобода для тебя — это...
           </h1>
         </div>
@@ -209,20 +260,20 @@ export default function Home() {
         <Oscilloscope />
 
         <motion.div 
-          className="glass-panel rounded-xl p-8 w-full"
+          className="glass-panel rounded-xl p-8 w-full floating-shadow"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
         >
           <div className="text-center space-y-4 mb-8">
             <motion.h2 
-              className="text-xs text-primary tracking-[0.25em]"
+              className="text-xs text-[#B87333] tracking-[0.25em] eink-text"
               animate={{ opacity: [0.7, 1, 0.7] }}
               transition={{ duration: 3, repeat: Infinity }}
             >
               ФИНАНСОВАЯ РЕАЛЬНОСТЬ
             </motion.h2>
-            <h1 className="text-lg md:text-xl font-light leading-relaxed">
+            <h1 className="text-lg md:text-xl font-light leading-relaxed text-[#3E3129] eink-text">
               Чьи деньги лежат на твоём банковском счету?
             </h1>
           </div>
@@ -254,21 +305,21 @@ export default function Home() {
                 key="reveal"
                 initial={{ x: 30, opacity: 0 }}
                 animate={{ x: 0, opacity: 1 }}
-                className="p-5 border-l-2 border-primary bg-primary/5 rounded-r-lg"
+                className="p-5 border-l-2 border-[#B87333] bg-[#B87333]/5 rounded-r-lg"
               >
-                <p className="text-sm md:text-base leading-relaxed text-foreground/80">
+                <p className="text-sm md:text-base leading-relaxed text-[#3E3129]/80 eink-text">
                   Банк — лишь посредник. Он контролирует доступ к твоим средствам и может заморозить их в любой момент.
                 </p>
-                <p className="text-sm md:text-base leading-relaxed text-primary mt-3 font-medium">
+                <p className="text-sm md:text-base leading-relaxed text-[#B87333] mt-3 font-medium eink-text">
                   Ты не владеешь деньгами на счету — ты владеешь обещанием банка.
                 </p>
                 
                 <motion.div 
-                  className="mt-5 flex items-center gap-2 text-xs text-foreground/40"
+                  className="mt-5 flex items-center gap-2 text-xs text-[#3E3129]/40 eink-text"
                   animate={{ opacity: [0.3, 0.7, 0.3] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
                 >
-                  <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  <div className="w-1.5 h-1.5 rounded-full bg-[#B87333]" />
                   <span className="uppercase tracking-widest">Processing...</span>
                 </motion.div>
               </motion.div>
@@ -291,37 +342,37 @@ export default function Home() {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ delay: 0.3 }}
       >
-        <div className="absolute inset-0 bg-primary/10 rounded-full blur-[60px] breathe-glow" />
-        <div className="relative w-full h-full glass-panel rounded-full flex items-center justify-center overflow-hidden">
+        <div className="absolute inset-0 bg-[#B87333]/10 rounded-full blur-[60px]" />
+        <div className="relative w-full h-full glass-panel rounded-full flex items-center justify-center overflow-hidden floating-shadow">
           <motion.div 
-            className="w-3/4 h-3/4 bg-gradient-to-br from-primary/60 to-primary/20 rounded-full"
+            className="w-3/4 h-3/4 bg-gradient-to-br from-[#B87333]/60 to-[#B87333]/20 rounded-full"
             animate={{ scale: [1, 1.05, 1] }}
             transition={{ duration: 3, repeat: Infinity }}
           />
-          <div className="absolute inset-4 border border-primary/20 rounded-full" />
+          <div className="absolute inset-4 border-[0.5px] border-[#B87333]/30 rounded-full" />
         </div>
       </motion.div>
 
       {/* Right Panel - Text */}
       <motion.div 
-        className="flex-1 glass-panel rounded-xl p-6 md:p-8"
+        className="flex-1 glass-panel rounded-xl p-6 md:p-8 floating-shadow"
         initial={{ x: 30, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ delay: 0.4 }}
       >
         <motion.h2 
-          className="text-xs text-primary tracking-[0.25em] mb-6"
+          className="text-xs text-[#B87333] tracking-[0.25em] mb-6 eink-text"
           animate={{ opacity: [0.7, 1, 0.7] }}
           transition={{ duration: 3, repeat: Infinity }}
         >
           ПРОТОКОЛ САТОШИ
         </motion.h2>
         
-        <div className="space-y-4 text-sm md:text-base leading-relaxed text-foreground/80">
+        <div className="space-y-4 text-sm md:text-base leading-relaxed text-[#3E3129]/80 eink-text">
           <p>Карта в твоих руках — это не просто пластик.</p>
           <p>Это инструмент, позволяющий выйти из системы, где каждая транзакция требует одобрения.</p>
           <p>Система Lightning работает без посредников. Без разрешений. Без границ.</p>
-          <p className="text-primary font-medium text-base md:text-lg">
+          <p className="text-[#B87333] font-medium text-base md:text-lg">
             Ты больше не клиент. Ты — узел в сети свободы.
           </p>
         </div>
@@ -353,7 +404,7 @@ export default function Home() {
       toast({
         title: "SATS RECEIVED",
         description: "+500 SATS deposited to your node.",
-        className: "glass-panel border-primary/30 text-foreground font-mono"
+        className: "glass-panel border-[#B87333]/30 text-[#3E3129] font-mono"
       });
     };
 
@@ -365,19 +416,19 @@ export default function Home() {
         <NetworkNodes />
 
         <motion.div 
-          className="glass-panel rounded-xl p-8 w-full"
+          className="glass-panel rounded-xl p-8 w-full floating-shadow"
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
         >
           <motion.h2 
-            className="text-xs text-primary tracking-[0.25em] mb-4"
+            className="text-xs text-[#B87333] tracking-[0.25em] mb-4 eink-text"
             animate={{ opacity: [0.7, 1, 0.7] }}
             transition={{ duration: 3, repeat: Infinity }}
           >
             АКТИВАЦИЯ УЗЛА
           </motion.h2>
-          <h1 className="text-lg md:text-xl font-light leading-relaxed mb-8">
+          <h1 className="text-lg md:text-xl font-light leading-relaxed mb-8 text-[#3E3129] eink-text">
             Протокол готов. Твой первый узел в сети свободы активирован.
           </h1>
 
@@ -387,7 +438,7 @@ export default function Home() {
                 <TactileButton 
                   variant="primary"
                   onClick={handleAccept}
-                  className="shadow-[0_0_30px_rgba(255,87,34,0.4)] font-bold"
+                  className="font-bold"
                   data-testid="button-accept-sats"
                 >
                   <span className="flex items-center gap-2">
@@ -404,22 +455,22 @@ export default function Home() {
                 className="flex flex-col items-center space-y-4"
               >
                 <motion.div 
-                  className="flex items-baseline gap-1 text-primary"
+                  className="flex items-baseline gap-1 text-[#B87333]"
                   animate={{ 
                     textShadow: [
-                      "0 0 10px rgba(255,87,34,0.5)",
-                      "0 0 30px rgba(255,87,34,0.8)",
-                      "0 0 10px rgba(255,87,34,0.5)"
+                      "0 0 10px rgba(184,115,51,0.3)",
+                      "0 0 30px rgba(184,115,51,0.5)",
+                      "0 0 10px rgba(184,115,51,0.3)"
                     ]
                   }}
                   transition={{ duration: 1.5, repeat: Infinity }}
                 >
-                  <span className="text-5xl md:text-6xl font-bold">+500</span>
-                  <span className="text-xl tracking-widest">SATS</span>
+                  <span className="text-5xl md:text-6xl font-bold eink-text">+500</span>
+                  <span className="text-xl tracking-widest eink-text">SATS</span>
                 </motion.div>
                 
                 <motion.div 
-                  className="glass-panel px-4 py-2 rounded-md text-xs text-primary/70 tracking-wider"
+                  className="glass-panel px-4 py-2 rounded-md text-xs text-[#B87333]/70 tracking-wider eink-text"
                   initial={{ y: 10, opacity: 0 }}
                   animate={{ y: 0, opacity: 1 }}
                   transition={{ delay: 0.5 }}
@@ -432,7 +483,7 @@ export default function Home() {
         </motion.div>
 
         {/* Technical readout */}
-        <div className="absolute bottom-16 left-6 text-left">
+        <div className="absolute bottom-20 left-8 text-left">
           <TechnicalReadout 
             lines={[
               `NODE_ID: ${session?.nodeId || "CONNECTING..."}`,
@@ -454,10 +505,10 @@ export default function Home() {
             animate={{ rotate: 360 }}
             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
           >
-            <Loader2 className="w-8 h-8 text-primary" />
+            <Loader2 className="w-8 h-8 text-[#B87333]" />
           </motion.div>
           <motion.div 
-            className="text-xs tracking-[0.3em] text-primary/70"
+            className="text-xs tracking-[0.3em] text-[#B87333]/70 eink-text"
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           >
@@ -477,14 +528,14 @@ export default function Home() {
 
       {/* Score Indicator */}
       <motion.div 
-        className="fixed top-6 right-6 z-40 glass-panel px-3 py-2 rounded-md"
+        className="fixed top-6 right-24 z-40 glass-panel px-3 py-2 rounded-md floating-shadow"
         initial={{ opacity: 0, x: 20 }}
         animate={{ opacity: 1, x: 0 }}
       >
         <div className="flex items-center gap-2">
-          <span className="text-[9px] tracking-wider text-foreground/50 uppercase">IND_SCORE</span>
+          <span className="text-[9px] tracking-wider text-[#3E3129]/50 uppercase eink-text">IND_SCORE</span>
           <motion.span 
-            className="text-sm font-bold text-primary font-mono"
+            className="text-sm font-bold text-[#B87333] font-mono eink-text"
             key={localScore}
             initial={{ scale: 1.3 }}
             animate={{ scale: 1 }}

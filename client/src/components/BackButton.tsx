@@ -11,14 +11,12 @@ export function BackButton({ onClick }: BackButtonProps) {
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
       exit={{ opacity: 0, x: -20 }}
-      whileHover={{ x: -3 }}
-      whileTap={{ scale: 0.95 }}
       onClick={onClick}
-      className="fixed top-20 left-6 z-40 flex items-center gap-1 glass-panel px-3 py-2 rounded-md text-xs tracking-wider text-foreground/70 hover:text-primary hover:border-primary/30 transition-colors group"
+      className="fixed top-24 left-6 z-40 flex items-center gap-1 btn-physical px-3 py-2 rounded-md text-xs tracking-wider text-[#3E3129]/70 hover:text-[#B87333] transition-colors group"
       data-testid="button-back"
     >
-      <ChevronLeft className="w-4 h-4 group-hover:text-primary transition-colors" />
-      <span className="uppercase">Back</span>
+      <ChevronLeft className="w-4 h-4 group-hover:text-[#B87333] transition-colors" />
+      <span className="uppercase eink-text">Back</span>
     </motion.button>
   );
 }
