@@ -1,38 +1,42 @@
-import { type User, type InsertUser } from "@shared/schema";
-import { randomUUID } from "crypto";
-
-// modify the interface with any CRUD methods
-// you might need
+import { db } from "./db";
+import { sessions, type Session, type InsertSession } from "@shared/schema";
+import { eq, sql } from "drizzle-orm";
 
 export interface IStorage {
-  getUser(id: string): Promise<User | undefined>;
-  getUserByUsername(username: string): Promise<User | undefined>;
-  createUser(user: InsertUser): Promise<User>;
+  createSession(session: InsertSession): Promise<Session>;
+  getSession(id: number): Promise<Session | undefined>;
+  updateSession(id: number, actionId: string, scoreDelta: number, nextStepId: string): Promise<Session>;
 }
 
-export class MemStorage implements IStorage {
-  private users: Map<string, User>;
-
-  constructor() {
-    this.users = new Map();
+export class DatabaseStorage implements IStorage {
+  async createSession(insertSession: InsertSession): Promise<Session> {
+    const [session] = await db
+      .insert(sessions)
+      .values(insertSession)
+      .returning();
+    return session;
   }
 
-  async getUser(id: string): Promise<User | undefined> {
-    return this.users.get(id);
+  async getSession(id: number): Promise<Session | undefined> {
+    const [session] = await db
+      .select()
+      .from(sessions)
+      .where(eq(sessions.id, id));
+    return session;
   }
 
-  async getUserByUsername(username: string): Promise<User | undefined> {
-    return Array.from(this.users.values()).find(
-      (user) => user.username === username,
-    );
-  }
-
-  async createUser(insertUser: InsertUser): Promise<User> {
-    const id = randomUUID();
-    const user: User = { ...insertUser, id };
-    this.users.set(id, user);
-    return user;
+  async updateSession(id: number, actionId: string, scoreDelta: number, nextStepId: string): Promise<Session> {
+    const [session] = await db
+      .update(sessions)
+      .set({
+        independenceScore: sql`${sessions.independenceScore} + ${scoreDelta}`,
+        currentStepId: nextStepId,
+        history: sql`${sessions.history} || ${JSON.stringify([actionId])}::jsonb`
+      })
+      .where(eq(sessions.id, id))
+      .returning();
+    return session;
   }
 }
 
-export const storage = new MemStorage();
+export const storage = new DatabaseStorage();
