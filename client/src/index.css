@@ -5,7 +5,7 @@
 @tailwind utilities;
 
 :root {
-  --background: 0 0% 10%; /* #1A1A1A */
+  --background: 220 10% 12%; /* Lighter charcoal with slight blue tint */
   --foreground: 0 0% 88%; /* #E0E0E0 */
   
   --primary: 14 100% 57%; /* #FF5722 */
@@ -14,7 +14,7 @@
   --secondary: 0 0% 88%;
   --secondary-foreground: 0 0% 10%;
   
-  --muted: 0 0% 20%;
+  --muted: 220 8% 22%;
   --muted-foreground: 0 0% 60%;
   
   --accent: 14 100% 57%;
@@ -23,19 +23,89 @@
   --destructive: 0 84% 60%;
   --destructive-foreground: 0 0% 98%;
 
-  --border: 0 0% 20%;
-  --input: 0 0% 20%;
+  --border: 220 8% 25%;
+  --input: 220 8% 22%;
   --ring: 14 100% 57%;
   
-  --radius: 0px; /* Sharp corners for industrial look */
+  --card: 220 10% 16%;
+  --card-foreground: 0 0% 88%;
+  --card-border: 220 8% 28%;
+  
+  --popover: 220 10% 16%;
+  --popover-foreground: 0 0% 88%;
+  --popover-border: 220 8% 28%;
+  
+  --sidebar: 220 10% 14%;
+  --sidebar-foreground: 0 0% 88%;
+  --sidebar-border: 220 8% 22%;
+  --sidebar-primary: 14 100% 57%;
+  --sidebar-primary-foreground: 0 0% 10%;
+  --sidebar-accent: 220 8% 22%;
+  --sidebar-accent-foreground: 0 0% 88%;
+  --sidebar-ring: 14 100% 57%;
+  
+  --chart-1: 14 100% 57%;
+  --chart-2: 200 80% 50%;
+  --chart-3: 160 70% 45%;
+  --chart-4: 280 70% 55%;
+  --chart-5: 40 90% 55%;
+  
+  --radius: 8px;
+  
+  --button-outline: rgba(255,255,255, .08);
+  --badge-outline: rgba(255,255,255, .05);
+  --opaque-button-border-intensity: 9;
+  --elevate-1: rgba(255,255,255, .04);
+  --elevate-2: rgba(255,255,255, .09);
+}
+
+.dark {
+  --background: 220 10% 12%;
+  --foreground: 0 0% 88%;
+  --primary: 14 100% 57%;
+  --primary-foreground: 0 0% 10%;
+  --secondary: 0 0% 88%;
+  --secondary-foreground: 0 0% 10%;
+  --muted: 220 8% 22%;
+  --muted-foreground: 0 0% 60%;
+  --accent: 14 100% 57%;
+  --accent-foreground: 0 0% 10%;
+  --destructive: 0 84% 60%;
+  --destructive-foreground: 0 0% 98%;
+  --border: 220 8% 25%;
+  --input: 220 8% 22%;
+  --ring: 14 100% 57%;
+  --card: 220 10% 16%;
+  --card-foreground: 0 0% 88%;
+  --card-border: 220 8% 28%;
+  --popover: 220 10% 16%;
+  --popover-foreground: 0 0% 88%;
+  --popover-border: 220 8% 28%;
+  --sidebar: 220 10% 14%;
+  --sidebar-foreground: 0 0% 88%;
+  --sidebar-border: 220 8% 22%;
+  --sidebar-primary: 14 100% 57%;
+  --sidebar-primary-foreground: 0 0% 10%;
+  --sidebar-accent: 220 8% 22%;
+  --sidebar-accent-foreground: 0 0% 88%;
+  --sidebar-ring: 14 100% 57%;
+  --chart-1: 14 100% 57%;
+  --chart-2: 200 80% 50%;
+  --chart-3: 160 70% 45%;
+  --chart-4: 280 70% 55%;
+  --chart-5: 40 90% 55%;
 }
 
 @layer base {
+  * {
+    @apply border-border;
+  }
+  
   body {
     @apply bg-background text-foreground antialiased selection:bg-primary/30 selection:text-primary;
     font-family: 'IBM Plex Mono', monospace;
-    background-color: #1A1A1A;
-    overflow: hidden; /* Prevent scroll for app-like feel */
+    background: linear-gradient(135deg, hsl(220 10% 10%) 0%, hsl(220 12% 14%) 50%, hsl(220 8% 12%) 100%);
+    overflow: hidden;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -44,16 +114,45 @@
 }
 
 @layer components {
+  /* Frosted Glass Panel */
+  .glass-panel {
+    background: rgba(40, 44, 52, 0.6);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 
+      0 4px 30px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  }
+  
+  /* Translucent Card */
+  .translucent-card {
+    background: linear-gradient(
+      135deg,
+      rgba(50, 55, 65, 0.7) 0%,
+      rgba(35, 40, 48, 0.5) 100%
+    );
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
   /* Industrial Grid Background */
   .bg-grid-pattern {
     background-size: 40px 40px;
     background-image: 
-      linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-    mask-image: radial-gradient(circle at center, black 60%, transparent 100%);
+      linear-gradient(to right, rgba(255, 87, 34, 0.03) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 87, 34, 0.03) 1px, transparent 1px);
+    mask-image: radial-gradient(ellipse at center, black 40%, transparent 80%);
+  }
+  
+  /* Subtle dot pattern */
+  .bg-dot-pattern {
+    background-image: radial-gradient(rgba(255, 87, 34, 0.15) 1px, transparent 1px);
+    background-size: 20px 20px;
   }
 
-  /* CRT Scanline Effect */
+  /* CRT Scanline Effect - very subtle */
   .scanlines::before {
     content: " ";
     display: block;
@@ -62,15 +161,81 @@
     left: 0;
     bottom: 0;
     right: 0;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.05) 50%);
     z-index: 50;
-    background-size: 100% 2px, 3px 100%;
+    background-size: 100% 3px;
     pointer-events: none;
   }
 
   /* Tactile Button Base */
   .btn-tactile {
     @apply relative overflow-hidden transition-all duration-100 active:scale-[0.98];
+  }
+  
+  /* Pulsing indicator */
+  .pulse-indicator {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+  
+  @keyframes pulse-glow {
+    0%, 100% { 
+      box-shadow: 0 0 5px rgba(255, 87, 34, 0.3);
+      opacity: 0.7;
+    }
+    50% { 
+      box-shadow: 0 0 20px rgba(255, 87, 34, 0.6);
+      opacity: 1;
+    }
+  }
+  
+  /* Ticker animation */
+  .ticker {
+    animation: ticker 0.1s steps(1) infinite;
+  }
+  
+  @keyframes ticker {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0.3; }
+  }
+  
+  /* Floating animation */
+  .float {
+    animation: float 3s ease-in-out infinite;
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+  }
+  
+  /* Breathing glow */
+  .breathe-glow {
+    animation: breathe 4s ease-in-out infinite;
+  }
+  
+  @keyframes breathe {
+    0%, 100% { 
+      filter: drop-shadow(0 0 3px rgba(255, 87, 34, 0.3));
+    }
+    50% { 
+      filter: drop-shadow(0 0 15px rgba(255, 87, 34, 0.6));
+    }
+  }
+  
+  /* Signal wave animation */
+  .signal-wave {
+    animation: signal 2s ease-out infinite;
+  }
+  
+  @keyframes signal {
+    0% { 
+      transform: scale(0.8);
+      opacity: 0.8;
+    }
+    100% { 
+      transform: scale(2);
+      opacity: 0;
+    }
   }
 }
 
@@ -79,11 +244,72 @@
   width: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #1A1A1A; 
+  background: hsl(220 10% 12%); 
 }
 ::-webkit-scrollbar-thumb {
-  background: #333; 
+  background: hsl(220 8% 28%); 
+  border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: #FF5722; 
+}
+
+@layer utilities {
+  .no-default-hover-elevate {}
+  .no-default-active-elevate {}
+
+  .toggle-elevate::before,
+  .toggle-elevate-2::before {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    inset: 0px;
+    border-radius: inherit;
+    z-index: -1;
+  }
+
+  .toggle-elevate.toggle-elevated::before {
+    background-color: var(--elevate-2);
+  }
+
+  .border.toggle-elevate::before {
+    inset: -1px;
+  }
+
+  .hover-elevate:not(.no-default-hover-elevate),
+  .active-elevate:not(.no-default-active-elevate),
+  .hover-elevate-2:not(.no-default-hover-elevate),
+  .active-elevate-2:not(.no-default-active-elevate) {
+    position: relative;
+    z-index: 0;
+  }
+
+  .hover-elevate:not(.no-default-hover-elevate)::after,
+  .active-elevate:not(.no-default-active-elevate)::after,
+  .hover-elevate-2:not(.no-default-hover-elevate)::after,
+  .active-elevate-2:not(.no-default-active-elevate)::after {
+    content: "";
+    pointer-events: none;
+    position: absolute;
+    inset: 0px;
+    border-radius: inherit;
+    z-index: 999;
+  }
+
+  .hover-elevate:hover:not(.no-default-hover-elevate)::after,
+  .active-elevate:active:not(.no-default-active-elevate)::after {
+    background-color: var(--elevate-1);
+  }
+
+  .hover-elevate-2:hover:not(.no-default-hover-elevate)::after,
+  .active-elevate-2:active:not(.no-default-active-elevate)::after {
+    background-color: var(--elevate-2);
+  }
+
+  .border.hover-elevate:not(.no-hover-interaction-elevate)::after,
+  .border.active-elevate:not(.no-active-interaction-elevate)::after,
+  .border.hover-elevate-2:not(.no-hover-interaction-elevate)::after,
+  .border.active-elevate-2:not(.no-active-interaction-elevate)::after {
+    inset: -1px;
+  }
 }

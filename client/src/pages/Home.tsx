@@ -1,30 +1,29 @@
 import { useEffect, useState } from "react";
-import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { Layout } from "@/components/Layout";
 import { TactileButton } from "@/components/TactileButton";
 import { TechnicalReadout } from "@/components/TechnicalReadout";
 import { Oscilloscope } from "@/components/Oscilloscope";
 import { NetworkNodes } from "@/components/NetworkNodes";
+import { BackButton } from "@/components/BackButton";
 import { useCreateSession, useUpdateSession, useSession } from "@/hooks/use-sessions";
-import { Loader2 } from "lucide-react";
+import { Loader2, Zap } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 type StepId = "step_0" | "step_1" | "step_2" | "step_3" | "step_4";
 
+const STEP_ORDER: StepId[] = ["step_0", "step_1", "step_2", "step_3", "step_4"];
+
 export default function Home() {
-  // State
   const [sessionId, setSessionId] = useState<number | null>(null);
   const [currentStep, setCurrentStep] = useState<StepId>("step_0");
-  const [stepData, setStepData] = useState<any>(null); // To store temporary UI state like revealed truths
+  const [localScore, setLocalScore] = useState(0);
   
-  // Queries & Mutations
   const { data: session, isLoading: isSessionLoading } = useSession(sessionId);
   const createSession = useCreateSession();
   const updateSession = useUpdateSession();
   const { toast } = useToast();
 
-  // Create session on mount if not exists
   useEffect(() => {
     if (!sessionId) {
       createSession.mutate({ nodeId: "#RE_CHAIN_" + Math.floor(Math.random() * 9999) }, {
@@ -36,20 +35,19 @@ export default function Home() {
     }
   }, []);
 
-  // Sync step with backend session if available
   useEffect(() => {
     if (session) {
       setCurrentStep(session.currentStepId as StepId);
+      setLocalScore(session.independenceScore);
     }
   }, [session]);
 
   const handleTransition = (nextStep: StepId, actionId: string = "nav", scoreDelta: number = 0) => {
     if (!sessionId) return;
     
-    // Optimistic update for UI responsiveness
     setCurrentStep(nextStep);
+    setLocalScore(prev => prev + scoreDelta);
     
-    // Background sync
     updateSession.mutate({
       id: sessionId,
       actionId,
@@ -58,6 +56,16 @@ export default function Home() {
     });
   };
 
+  const handleBack = () => {
+    const currentIndex = STEP_ORDER.indexOf(currentStep);
+    if (currentIndex > 0) {
+      const prevStep = STEP_ORDER[currentIndex - 1];
+      handleTransition(prevStep, "nav_back", 0);
+    }
+  };
+
+  const canGoBack = STEP_ORDER.indexOf(currentStep) > 0;
+
   // --- Step Components ---
 
   const Step0_NFC = () => (
@@ -65,25 +73,48 @@ export default function Home() {
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="flex flex-col items-center justify-center space-y-8 w-full h-full relative"
     >
-      <div className="relative w-64 h-40 border-2 border-primary/30 rounded-xl flex items-center justify-center overflow-hidden">
-        {/* X-Ray Scan Animation */}
+      {/* NFC Card visualization */}
+      <motion.div 
+        className="relative w-72 h-44 glass-panel rounded-2xl flex items-center justify-center overflow-hidden"
+        animate={{ rotateY: [0, 5, 0, -5, 0] }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+      >
+        {/* Scanning beam */}
         <motion.div 
-          className="absolute inset-0 bg-primary/10"
+          className="absolute inset-0 bg-gradient-to-b from-primary/20 via-primary/5 to-transparent"
           initial={{ top: "-100%" }}
-          animate={{ top: "100%" }}
-          transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          animate={{ top: ["0%", "100%", "0%"] }}
+          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
         />
-        <div className="border border-primary/50 w-48 h-28 rounded-lg flex items-center justify-center relative">
-          <div className="text-[10px] text-primary absolute top-2 right-2">NFC</div>
+        
+        {/* Card interior */}
+        <div className="relative w-56 h-32 border border-primary/20 rounded-xl flex items-center justify-center bg-gradient-to-br from-white/5 to-transparent">
+          <div className="text-[9px] text-primary/60 absolute top-2 right-2 tracking-widest">NFC</div>
+          <div className="text-[9px] text-foreground/40 absolute bottom-2 left-2 tracking-wider">LIBERTÀ CARD</div>
+          
+          {/* NFC chip animation */}
           <motion.div 
-            className="w-12 h-12 rounded-full border-2 border-primary"
-            animate={{ scale: [1, 1.2, 1], opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-          />
+            className="w-14 h-14 rounded-full border border-primary/40 flex items-center justify-center"
+            animate={{ 
+              boxShadow: [
+                "0 0 0 0 rgba(255,87,34,0)",
+                "0 0 0 15px rgba(255,87,34,0.1)",
+                "0 0 0 30px rgba(255,87,34,0)"
+              ]
+            }}
+            transition={{ duration: 2, repeat: Infinity }}
+          >
+            <motion.div 
+              className="w-8 h-8 rounded-full border border-primary/60"
+              animate={{ scale: [1, 1.1, 1], opacity: [0.6, 1, 0.6] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
+            />
+          </motion.div>
         </div>
-      </div>
+      </motion.div>
 
-      <div className="absolute bottom-12 left-0">
+      {/* Technical log */}
+      <div className="absolute bottom-16 left-6">
         <TechnicalReadout 
           lines={[
             "READING PHYSICAL LAYER...", 
@@ -94,11 +125,12 @@ export default function Home() {
         />
       </div>
 
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+      {/* Hidden simulate button */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 translate-y-16">
         <TactileButton 
           onClick={() => handleTransition("step_1")}
-          className="opacity-0 hover:opacity-100 transition-opacity"
-          aria-label="Simulate NFC Tap"
+          className="opacity-30 hover:opacity-100 transition-opacity text-xs"
+          data-testid="button-simulate-nfc"
         >
           SIMULATE NFC
         </TactileButton>
@@ -111,98 +143,138 @@ export default function Home() {
       initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
       className="flex flex-col items-center justify-center w-full max-w-lg text-center space-y-12"
     >
-      <div className="space-y-4">
-        <h2 className="text-sm text-primary tracking-[0.2em]">ОПРЕДЕЛЕНИЕ КООРДИНАТ</h2>
-        <h1 className="text-2xl md:text-3xl font-light leading-snug">
-          Свобода для тебя — это...
-        </h1>
-      </div>
+      {/* Glass card container */}
+      <motion.div 
+        className="glass-panel rounded-xl p-8 w-full"
+        initial={{ scale: 0.95 }}
+        animate={{ scale: 1 }}
+        transition={{ delay: 0.2 }}
+      >
+        <div className="space-y-6">
+          <motion.h2 
+            className="text-xs text-primary tracking-[0.25em] font-medium"
+            animate={{ opacity: [0.7, 1, 0.7] }}
+            transition={{ duration: 3, repeat: Infinity }}
+          >
+            ОПРЕДЕЛЕНИЕ КООРДИНАТ
+          </motion.h2>
+          <h1 className="text-xl md:text-2xl font-light leading-relaxed text-foreground/90">
+            Свобода для тебя — это...
+          </h1>
+        </div>
 
-      <div className="flex flex-col gap-4 w-full">
-        <TactileButton 
-          variant="primary" 
-          fullWidth
-          onClick={() => handleTransition("step_2", "action_1a", 10)}
-        >
-          Право не спрашивать разрешения
-        </TactileButton>
-        <TactileButton 
-          variant="secondary" 
-          fullWidth
-          onClick={() => handleTransition("step_2", "action_1b", 0)}
-        >
-          Удобный сервис
-        </TactileButton>
-      </div>
+        <div className="flex flex-col gap-4 w-full mt-10">
+          <TactileButton 
+            variant="primary" 
+            fullWidth
+            onClick={() => handleTransition("step_2", "action_1a", 10)}
+            data-testid="button-choice-1a"
+          >
+            Право не спрашивать разрешения
+          </TactileButton>
+          <TactileButton 
+            variant="secondary" 
+            fullWidth
+            onClick={() => handleTransition("step_2", "action_1b", 0)}
+            data-testid="button-choice-1b"
+          >
+            Удобный сервис
+          </TactileButton>
+        </div>
+      </motion.div>
     </motion.div>
   );
 
   const Step2_Money = () => {
     const [revealed, setRevealed] = useState(false);
-    const [choice, setChoice] = useState<"a" | "b" | null>(null);
 
-    const handleChoice = (selected: "a" | "b", score: number, actionId: string) => {
+    const handleChoice = (score: number, actionId: string) => {
       setRevealed(true);
-      setChoice(selected);
-      // Wait to read the reveal, then auto-advance or show continue button?
-      // Scenario implies immediate reveal, then maybe user clicks continue or auto advances.
-      // Let's perform mutation but stay on screen for reveal duration.
+      setLocalScore(prev => prev + score);
+      
       if (sessionId) {
-        updateSession.mutate({ id: sessionId, actionId, scoreDelta: score, nextStepId: "step_2" }); // Keep step_2 locally for now
+        updateSession.mutate({ id: sessionId, actionId, scoreDelta: score, nextStepId: "step_2" });
       }
 
-      // Auto advance after reading time (e.g. 6s)
       setTimeout(() => {
         handleTransition("step_3", "step_2_complete", 0);
-      }, 7000);
+      }, 6000);
     };
 
     return (
       <motion.div 
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-        className="flex flex-col items-center w-full max-w-lg space-y-8"
+        className="flex flex-col items-center w-full max-w-lg space-y-6"
       >
-        <div className="w-full">
-          <Oscilloscope />
-        </div>
+        <Oscilloscope />
 
-        <div className="text-center space-y-4">
-          <h2 className="text-sm text-primary tracking-[0.2em]">ФИНАНСОВАЯ РЕАЛЬНОСТЬ</h2>
-          <h1 className="text-xl md:text-2xl font-light leading-snug">
-            Чьи деньги лежат на твоём банковском счету?
-          </h1>
-        </div>
-
-        {!revealed ? (
-          <div className="flex flex-col gap-4 w-full">
-            <TactileButton 
-              variant="primary" fullWidth
-              onClick={() => handleChoice("a", 0, "action_2a")}
+        <motion.div 
+          className="glass-panel rounded-xl p-8 w-full"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
+        >
+          <div className="text-center space-y-4 mb-8">
+            <motion.h2 
+              className="text-xs text-primary tracking-[0.25em]"
+              animate={{ opacity: [0.7, 1, 0.7] }}
+              transition={{ duration: 3, repeat: Infinity }}
             >
-              Мои собственные
-            </TactileButton>
-            <TactileButton 
-              variant="secondary" fullWidth
-              onClick={() => handleChoice("b", 10, "action_2b")}
-            >
-              Собственность банка
-            </TactileButton>
+              ФИНАНСОВАЯ РЕАЛЬНОСТЬ
+            </motion.h2>
+            <h1 className="text-lg md:text-xl font-light leading-relaxed">
+              Чьи деньги лежат на твоём банковском счету?
+            </h1>
           </div>
-        ) : (
-          <motion.div 
-            initial={{ x: 50, opacity: 0 }}
-            animate={{ x: 0, opacity: 1 }}
-            className="w-full p-6 border-l-4 border-primary bg-primary/5 text-primary-foreground/90 text-sm md:text-base leading-relaxed mt-4"
-          >
-            Банк — лишь посредник. Он контролирует доступ к твоим средствам и может заморозить их в любой момент. 
-            <br/><br/>
-            Ты не владеешь деньгами на счету — ты владеешь обещанием банка.
-            
-            <div className="mt-4 text-xs opacity-50 uppercase tracking-widest">
-              CONTINUING SEQUENCE...
-            </div>
-          </motion.div>
-        )}
+
+          <AnimatePresence mode="wait">
+            {!revealed ? (
+              <motion.div 
+                key="choices"
+                className="flex flex-col gap-4 w-full"
+                exit={{ opacity: 0, y: -20 }}
+              >
+                <TactileButton 
+                  variant="primary" fullWidth
+                  onClick={() => handleChoice(0, "action_2a")}
+                  data-testid="button-choice-2a"
+                >
+                  Мои собственные
+                </TactileButton>
+                <TactileButton 
+                  variant="secondary" fullWidth
+                  onClick={() => handleChoice(10, "action_2b")}
+                  data-testid="button-choice-2b"
+                >
+                  Собственность банка
+                </TactileButton>
+              </motion.div>
+            ) : (
+              <motion.div 
+                key="reveal"
+                initial={{ x: 30, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                className="p-5 border-l-2 border-primary bg-primary/5 rounded-r-lg"
+              >
+                <p className="text-sm md:text-base leading-relaxed text-foreground/80">
+                  Банк — лишь посредник. Он контролирует доступ к твоим средствам и может заморозить их в любой момент.
+                </p>
+                <p className="text-sm md:text-base leading-relaxed text-primary mt-3 font-medium">
+                  Ты не владеешь деньгами на счету — ты владеешь обещанием банка.
+                </p>
+                
+                <motion.div 
+                  className="mt-5 flex items-center gap-2 text-xs text-foreground/40"
+                  animate={{ opacity: [0.3, 0.7, 0.3] }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                >
+                  <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                  <span className="uppercase tracking-widest">Processing...</span>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
       </motion.div>
     );
   };
@@ -213,32 +285,57 @@ export default function Home() {
       className="flex flex-col md:flex-row items-center w-full max-w-4xl gap-8 md:gap-12"
     >
       {/* Left Panel - Avatar */}
-      <div className="w-32 h-32 md:w-64 md:h-64 flex-shrink-0 relative">
-        <div className="absolute inset-0 bg-primary/20 rounded-full blur-3xl animate-pulse" />
-        <div className="relative w-full h-full border-2 border-primary/50 rounded-full flex items-center justify-center bg-black/50 overflow-hidden">
-          <div className="w-3/4 h-3/4 bg-primary rounded-full opacity-80 blur-sm" />
-          <div className="absolute inset-0 bg-grid-pattern opacity-50" />
+      <motion.div 
+        className="w-32 h-32 md:w-48 md:h-48 flex-shrink-0 relative float"
+        initial={{ scale: 0.8, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ delay: 0.3 }}
+      >
+        <div className="absolute inset-0 bg-primary/10 rounded-full blur-[60px] breathe-glow" />
+        <div className="relative w-full h-full glass-panel rounded-full flex items-center justify-center overflow-hidden">
+          <motion.div 
+            className="w-3/4 h-3/4 bg-gradient-to-br from-primary/60 to-primary/20 rounded-full"
+            animate={{ scale: [1, 1.05, 1] }}
+            transition={{ duration: 3, repeat: Infinity }}
+          />
+          <div className="absolute inset-4 border border-primary/20 rounded-full" />
         </div>
-      </div>
+      </motion.div>
 
       {/* Right Panel - Text */}
-      <div className="flex-1 space-y-8">
-        <h2 className="text-sm text-primary tracking-[0.2em]">ПРОТОКОЛ САТОШИ</h2>
-        <div className="space-y-4 text-sm md:text-lg leading-relaxed text-[#E0E0E0]/90">
+      <motion.div 
+        className="flex-1 glass-panel rounded-xl p-6 md:p-8"
+        initial={{ x: 30, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ delay: 0.4 }}
+      >
+        <motion.h2 
+          className="text-xs text-primary tracking-[0.25em] mb-6"
+          animate={{ opacity: [0.7, 1, 0.7] }}
+          transition={{ duration: 3, repeat: Infinity }}
+        >
+          ПРОТОКОЛ САТОШИ
+        </motion.h2>
+        
+        <div className="space-y-4 text-sm md:text-base leading-relaxed text-foreground/80">
           <p>Карта в твоих руках — это не просто пластик.</p>
           <p>Это инструмент, позволяющий выйти из системы, где каждая транзакция требует одобрения.</p>
           <p>Система Lightning работает без посредников. Без разрешений. Без границ.</p>
-          <p className="text-primary font-bold">Ты больше не клиент. Ты — узел в сети свободы.</p>
+          <p className="text-primary font-medium text-base md:text-lg">
+            Ты больше не клиент. Ты — узел в сети свободы.
+          </p>
         </div>
 
-        <TactileButton 
-          variant="primary"
-          onClick={() => handleTransition("step_4", "action_3_continue")}
-          className="mt-4"
-        >
-          ПРОДОЛЖИТЬ
-        </TactileButton>
-      </div>
+        <div className="mt-8">
+          <TactileButton 
+            variant="primary"
+            onClick={() => handleTransition("step_4", "action_3_continue")}
+            data-testid="button-continue"
+          >
+            ПРОДОЛЖИТЬ
+          </TactileButton>
+        </div>
+      </motion.div>
     </motion.div>
   );
 
@@ -247,60 +344,96 @@ export default function Home() {
 
     const handleAccept = () => {
       setRewardTriggered(true);
+      setLocalScore(prev => prev + 15);
+      
       if (sessionId) {
-        updateSession.mutate({ id: sessionId, actionId: "action_4_accept", scoreDelta: 15, nextStepId: "step_4" }); // Stay on step 4
+        updateSession.mutate({ id: sessionId, actionId: "action_4_accept", scoreDelta: 15, nextStepId: "step_4" });
       }
       
-      // Play sound effect logic here if we had sounds
       toast({
         title: "SATS RECEIVED",
         description: "+500 SATS deposited to your node.",
-        className: "border-primary text-primary bg-black font-mono"
+        className: "glass-panel border-primary/30 text-foreground font-mono"
       });
     };
 
     return (
       <motion.div 
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-        className="flex flex-col items-center w-full max-w-lg space-y-8 text-center"
+        className="flex flex-col items-center w-full max-w-lg space-y-6 text-center"
       >
-        <div className="w-full">
-          <NetworkNodes />
-        </div>
+        <NetworkNodes />
 
-        <div className="space-y-4">
-          <h2 className="text-sm text-primary tracking-[0.2em]">АКТИВАЦИЯ УЗЛА</h2>
-          <h1 className="text-xl md:text-2xl font-light leading-snug">
+        <motion.div 
+          className="glass-panel rounded-xl p-8 w-full"
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.3 }}
+        >
+          <motion.h2 
+            className="text-xs text-primary tracking-[0.25em] mb-4"
+            animate={{ opacity: [0.7, 1, 0.7] }}
+            transition={{ duration: 3, repeat: Infinity }}
+          >
+            АКТИВАЦИЯ УЗЛА
+          </motion.h2>
+          <h1 className="text-lg md:text-xl font-light leading-relaxed mb-8">
             Протокол готов. Твой первый узел в сети свободы активирован.
           </h1>
-        </div>
 
-        {!rewardTriggered ? (
-          <TactileButton 
-            variant="primary"
-            onClick={handleAccept}
-            className="shadow-[0_0_20px_rgba(255,87,34,0.3)] hover:shadow-[0_0_40px_rgba(255,87,34,0.6)] font-bold text-lg py-6"
-          >
-            ПРИНЯТЬ САТОШИ
-          </TactileButton>
-        ) : (
-          <motion.div 
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="flex flex-col items-center space-y-2"
-          >
-            <div className="text-6xl md:text-8xl font-bold text-primary animate-pulse font-mono">
-              +500
-            </div>
-            <div className="text-xl tracking-widest text-[#E0E0E0]">SATS</div>
-            <div className="mt-8 text-xs text-primary/60 border border-primary/30 px-4 py-2 rounded">
-              TRANSACTION VERIFIED ON LIGHTNING NETWORK
-            </div>
-          </motion.div>
-        )}
+          <AnimatePresence mode="wait">
+            {!rewardTriggered ? (
+              <motion.div key="accept" exit={{ opacity: 0, scale: 0.9 }}>
+                <TactileButton 
+                  variant="primary"
+                  onClick={handleAccept}
+                  className="shadow-[0_0_30px_rgba(255,87,34,0.4)] font-bold"
+                  data-testid="button-accept-sats"
+                >
+                  <span className="flex items-center gap-2">
+                    <Zap className="w-4 h-4" />
+                    ПРИНЯТЬ САТОШИ
+                  </span>
+                </TactileButton>
+              </motion.div>
+            ) : (
+              <motion.div 
+                key="reward"
+                initial={{ scale: 0.5, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                className="flex flex-col items-center space-y-4"
+              >
+                <motion.div 
+                  className="flex items-baseline gap-1 text-primary"
+                  animate={{ 
+                    textShadow: [
+                      "0 0 10px rgba(255,87,34,0.5)",
+                      "0 0 30px rgba(255,87,34,0.8)",
+                      "0 0 10px rgba(255,87,34,0.5)"
+                    ]
+                  }}
+                  transition={{ duration: 1.5, repeat: Infinity }}
+                >
+                  <span className="text-5xl md:text-6xl font-bold">+500</span>
+                  <span className="text-xl tracking-widest">SATS</span>
+                </motion.div>
+                
+                <motion.div 
+                  className="glass-panel px-4 py-2 rounded-md text-xs text-primary/70 tracking-wider"
+                  initial={{ y: 10, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                >
+                  VERIFIED ON LIGHTNING NETWORK
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </motion.div>
 
-        <div className="absolute bottom-12 left-6 text-left">
-           <TechnicalReadout 
+        {/* Technical readout */}
+        <div className="absolute bottom-16 left-6 text-left">
+          <TechnicalReadout 
             lines={[
               `NODE_ID: ${session?.nodeId || "CONNECTING..."}`,
               "STATUS: ACTIVE",
@@ -316,9 +449,20 @@ export default function Home() {
   if (!sessionId || isSessionLoading) {
     return (
       <Layout>
-        <div className="flex flex-col items-center gap-4 text-primary">
-          <Loader2 className="w-8 h-8 animate-spin" />
-          <div className="text-xs tracking-[0.3em] animate-pulse">INITIALIZING SYSTEM...</div>
+        <div className="flex flex-col items-center gap-4">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+          >
+            <Loader2 className="w-8 h-8 text-primary" />
+          </motion.div>
+          <motion.div 
+            className="text-xs tracking-[0.3em] text-primary/70"
+            animate={{ opacity: [0.5, 1, 0.5] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          >
+            INITIALIZING SYSTEM...
+          </motion.div>
         </div>
       </Layout>
     );
@@ -326,10 +470,29 @@ export default function Home() {
 
   return (
     <Layout>
-      {/* Session Score Indicator */}
-      <div className="fixed top-6 right-6 font-mono text-xs text-primary/50 border border-primary/20 px-2 py-1 z-40">
-        IND_SCORE: {String(session?.independenceScore || 0).padStart(2, '0')}
-      </div>
+      {/* Back Button */}
+      <AnimatePresence>
+        {canGoBack && <BackButton onClick={handleBack} />}
+      </AnimatePresence>
+
+      {/* Score Indicator */}
+      <motion.div 
+        className="fixed top-6 right-6 z-40 glass-panel px-3 py-2 rounded-md"
+        initial={{ opacity: 0, x: 20 }}
+        animate={{ opacity: 1, x: 0 }}
+      >
+        <div className="flex items-center gap-2">
+          <span className="text-[9px] tracking-wider text-foreground/50 uppercase">IND_SCORE</span>
+          <motion.span 
+            className="text-sm font-bold text-primary font-mono"
+            key={localScore}
+            initial={{ scale: 1.3 }}
+            animate={{ scale: 1 }}
+          >
+            {String(localScore).padStart(2, '0')}
+          </motion.span>
+        </div>
+      </motion.div>
 
       <AnimatePresence mode="wait">
         {currentStep === "step_0" && <Step0_NFC key="step0" />}
