@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, X } from "lucide-react";
+import { Send } from "lucide-react";
 
 interface DialogueBlock {
   id: string;
@@ -17,12 +17,11 @@ interface TerminalChatProps {
   onClose?: () => void;
 }
 
-export function TerminalChat({ dialogues, onDialogueComplete, onComplete, onClose }: TerminalChatProps) {
+export function TerminalChat({ dialogues, onDialogueComplete, onComplete }: TerminalChatProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [displayedMessages, setDisplayedMessages] = useState<{ speaker: string; text: string }[]>([]);
   const [typingText, setTypingText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [showOptions, setShowOptions] = useState(false);
   const [branchPath, setBranchPath] = useState<string | null>(null);
   const [inputValue, setInputValue] = useState("");
   const [inputEnabled, setInputEnabled] = useState(false);
@@ -57,7 +56,6 @@ export function TerminalChat({ dialogues, onDialogueComplete, onComplete, onClos
 
   const typeMessage = async (dialogue: DialogueBlock) => {
     setIsTyping(true);
-    setShowOptions(false);
     setInputEnabled(false);
     const text = dialogue.message;
     
@@ -71,64 +69,50 @@ export function TerminalChat({ dialogues, onDialogueComplete, onComplete, onClos
     setTypingText("");
     onDialogueComplete(dialogue.reward);
     
-    if (dialogue.options && dialogue.options.length > 0) {
-      await new Promise(resolve => setTimeout(resolve, 500));
-      setShowOptions(true);
-      setInputEnabled(true);
-    } else {
-      await new Promise(resolve => setTimeout(resolve, 800));
-      setCurrentIndex(prev => prev + 1);
-    }
+    // Enable input after message, let user type response
+    await new Promise(resolve => setTimeout(resolve, 500));
+    setInputEnabled(true);
+    inputRef.current?.focus();
   };
 
-  const handleOptionClick = (option: { id: string; label: string; next?: string; action?: string }) => {
-    sendUserMessage(option.label, option);
-  };
-
-  const sendUserMessage = (text: string, option?: { id: string; label: string; next?: string; action?: string }) => {
+  const sendUserMessage = (text: string) => {
+    if (!text.trim()) return;
+    
     setDisplayedMessages(prev => [...prev, { speaker: "ТЫ", text }]);
-    setShowOptions(false);
     setInputEnabled(false);
     setInputValue("");
     
-    if (option?.action === "complete_phase_2") {
-      onComplete();
-      return;
+    const currentDialogue = allDialogues[currentIndex];
+    
+    // Check if this dialogue has options with actions
+    if (currentDialogue?.options) {
+      const completeOption = currentDialogue.options.find(o => o.action === "complete_phase_2");
+      if (completeOption) {
+        onComplete();
+        return;
+      }
+      
+      // Check for branch paths
+      const branchOption = currentDialogue.options.find(o => o.next);
+      if (branchOption?.next) {
+        setBranchPath(branchOption.next);
+        const nextIndex = allDialogues.findIndex(d => d.id === branchOption.next);
+        if (nextIndex !== -1) {
+          setCurrentIndex(nextIndex);
+          return;
+        }
+      }
     }
     
-    if (option?.next) {
-      setBranchPath(option.next);
-      const nextIndex = allDialogues.findIndex(d => d.id === option.next);
-      if (nextIndex !== -1) {
-        setCurrentIndex(nextIndex);
-      } else {
-        setCurrentIndex(prev => prev + 1);
-      }
-    } else {
-      setCurrentIndex(prev => prev + 1);
-    }
+    // Default: move to next dialogue
+    setCurrentIndex(prev => prev + 1);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputValue.trim() || !inputEnabled) return;
-    
-    const currentDialogue = allDialogues[currentIndex];
-    if (currentDialogue?.options && currentDialogue.options.length > 0) {
-      const matchedOption = currentDialogue.options.find(opt => 
-        inputValue.toLowerCase().includes(opt.label.toLowerCase().slice(0, 5))
-      );
-      if (matchedOption) {
-        sendUserMessage(inputValue, matchedOption);
-      } else {
-        sendUserMessage(inputValue, currentDialogue.options[0]);
-      }
-    } else {
-      sendUserMessage(inputValue);
-    }
+    sendUserMessage(inputValue);
   };
-
-  const currentDialogue = allDialogues[currentIndex];
 
   return (
     <div className="flex flex-col h-full bg-[#2A2A2A]">
@@ -144,24 +128,13 @@ export function TerminalChat({ dialogues, onDialogueComplete, onComplete, onClos
             SATOSHI_PROTOCOL
           </span>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-[8px] text-[#E8E8E8]/40 tracking-wider font-mono">
-            ENCRYPTED
-          </span>
-          {onClose && (
-            <button
-              onClick={onClose}
-              className="p-1 text-[#E8E8E8]/50 hover:text-[#E8E8E8] transition-colors"
-              data-testid="button-close-chat"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          )}
-        </div>
+        <span className="text-[8px] text-[#E8E8E8]/40 tracking-wider font-mono">
+          ENCRYPTED
+        </span>
       </div>
       
-      {/* Chat area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#1E1E1E]">
+      {/* Chat area - extra padding at bottom to avoid independence bar overlap */}
+      <div className="flex-1 overflow-y-auto p-4 pb-24 space-y-4 bg-[#1E1E1E]">
         {/* System initialization message */}
         <motion.div
           initial={{ opacity: 0 }}
@@ -200,38 +173,13 @@ export function TerminalChat({ dialogues, onDialogueComplete, onComplete, onClos
           </div>
         )}
         
-        {/* Options */}
-        <AnimatePresence>
-          {showOptions && currentDialogue?.options && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              className="flex flex-col sm:flex-row flex-wrap gap-3 pt-4"
-            >
-              {currentDialogue.options.map((option) => (
-                <button
-                  key={option.id}
-                  onClick={() => handleOptionClick(option)}
-                  className="flex-1 min-w-[140px] h-12 border-2 border-[#B87333] text-[#E8E8E8] 
-                           text-[12px] tracking-wider font-mono
-                           hover:bg-[#B87333] hover:text-[#1E1E1E] transition-all duration-200"
-                  data-testid={`chat-option-${option.id}`}
-                >
-                  {option.label}
-                </button>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
-        
         <div ref={chatEndRef} />
       </div>
       
-      {/* Input area */}
+      {/* Input area - positioned above independence bar */}
       <form 
         onSubmit={handleSubmit}
-        className="p-3 border-t border-[#B87333]/40 bg-[#2A2A2A]"
+        className="p-3 pb-20 border-t border-[#B87333]/40 bg-[#2A2A2A]"
       >
         <div className="flex items-center gap-2 border border-[#B87333]/50 bg-[#1E1E1E] px-3 py-2">
           <span className="text-[#4ADE80] text-xs font-mono">&gt;</span>

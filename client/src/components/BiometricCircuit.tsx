@@ -10,58 +10,53 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
   const showChip = revealProgress >= 100;
   const isClickable = showChip && onChipClick;
   
-  // PCB-style microchip traces with 90-degree angles
-  // Lines stay in EDGES/CORNERS of screen, avoiding center content area
-  // Content area roughly: x=80-320, y=120-320 (where questions appear)
+  // PCB-style traces that START from edges and CONVERGE to the central chip
+  // Chip center: (200, 200), Chip area: x=155-245, y=170-230
+  // Content area (questions) roughly: y=120-280 center, avoid this
+  // Lines run along edges then turn toward chip, avoiding center content
   
-  const animDuration = 0.4;
+  const animDuration = 0.5;
   
-  // TOP-LEFT CORNER traces (25%) - PCB style with 90° angles
-  const topLeftPaths = [
-    // Outer trace - runs along top edge then down left edge
-    { d: "M 0 0 L 60 0 L 60 20 L 20 20 L 20 80 L 0 80", delay: 0 },
-    // Inner parallel trace
-    { d: "M 0 30 L 40 30 L 40 60 L 10 60 L 10 100 L 0 100", delay: 0.05 },
-    // Horizontal bus at top
-    { d: "M 0 50 L 25 50 L 25 40 L 50 40", delay: 0.08 },
-    // Vertical trace near corner
-    { d: "M 35 0 L 35 35 L 15 35 L 15 70", delay: 0.03 },
+  // Q1 - TOP traces (25%) - from top edge, converging to chip top
+  const topPaths = [
+    // Left side - from top-left corner, runs down left edge, then to chip
+    { d: "M 0 0 L 0 60 L 30 60 L 30 140 L 100 140 L 100 170 L 155 170", delay: 0 },
+    // Right side - from top-right corner, runs down right edge, then to chip  
+    { d: "M 400 0 L 400 60 L 370 60 L 370 140 L 300 140 L 300 170 L 245 170", delay: 0.05 },
+    // Center top - short trace from top edge
+    { d: "M 200 0 L 200 50 L 180 50 L 180 100", delay: 0.1 },
+    { d: "M 200 0 L 200 50 L 220 50 L 220 100", delay: 0.12 },
   ];
   
-  // TOP-RIGHT CORNER traces (50%) - mirror of top-left
-  const topRightPaths = [
-    // Outer trace
-    { d: "M 400 0 L 340 0 L 340 20 L 380 20 L 380 80 L 400 80", delay: 0 },
-    // Inner parallel trace
-    { d: "M 400 30 L 360 30 L 360 60 L 390 60 L 390 100 L 400 100", delay: 0.04 },
-    // Horizontal bus
-    { d: "M 400 50 L 375 50 L 375 40 L 350 40", delay: 0.07 },
-    // Vertical trace
-    { d: "M 365 0 L 365 35 L 385 35 L 385 70", delay: 0.02 },
+  // Q2 - RIGHT traces (50%) - from right edge, converging to chip right
+  const rightPaths = [
+    // Upper right - from right edge to chip
+    { d: "M 400 150 L 350 150 L 350 185 L 245 185", delay: 0 },
+    // Middle right
+    { d: "M 400 200 L 320 200 L 320 200 L 245 200", delay: 0.04 },
+    // Lower right
+    { d: "M 400 250 L 350 250 L 350 215 L 245 215", delay: 0.08 },
   ];
   
-  // BOTTOM-LEFT CORNER traces (75%)
-  const bottomLeftPaths = [
-    // Outer trace - runs along bottom edge then up left edge
-    { d: "M 0 400 L 60 400 L 60 380 L 20 380 L 20 320 L 0 320", delay: 0 },
-    // Inner parallel trace
-    { d: "M 0 370 L 40 370 L 40 340 L 10 340 L 10 300 L 0 300", delay: 0.05 },
-    // Horizontal bus at bottom
-    { d: "M 0 350 L 25 350 L 25 360 L 50 360", delay: 0.06 },
-    // Vertical trace
-    { d: "M 35 400 L 35 365 L 15 365 L 15 330", delay: 0.03 },
+  // Q3 - BOTTOM traces (75%) - from bottom edge, converging to chip bottom
+  const bottomPaths = [
+    // Left side - from bottom-left corner, runs up left edge, then to chip
+    { d: "M 0 400 L 0 340 L 30 340 L 30 260 L 100 260 L 100 230 L 155 230", delay: 0 },
+    // Right side - from bottom-right corner
+    { d: "M 400 400 L 400 340 L 370 340 L 370 260 L 300 260 L 300 230 L 245 230", delay: 0.05 },
+    // Center bottom - short trace
+    { d: "M 200 400 L 200 350 L 180 350 L 180 300", delay: 0.1 },
+    { d: "M 200 400 L 200 350 L 220 350 L 220 300", delay: 0.12 },
   ];
   
-  // BOTTOM-RIGHT CORNER traces (100%)
-  const bottomRightPaths = [
-    // Outer trace
-    { d: "M 400 400 L 340 400 L 340 380 L 380 380 L 380 320 L 400 320", delay: 0 },
-    // Inner parallel trace
-    { d: "M 400 370 L 360 370 L 360 340 L 390 340 L 390 300 L 400 300", delay: 0.04 },
-    // Horizontal bus
-    { d: "M 400 350 L 375 350 L 375 360 L 350 360", delay: 0.05 },
-    // Vertical trace
-    { d: "M 365 400 L 365 365 L 385 365 L 385 330", delay: 0.02 },
+  // Q4 - LEFT traces (100%) - from left edge, converging to chip left
+  const leftPaths = [
+    // Upper left - from left edge to chip
+    { d: "M 0 150 L 50 150 L 50 185 L 155 185", delay: 0 },
+    // Middle left
+    { d: "M 0 200 L 80 200 L 80 200 L 155 200", delay: 0.04 },
+    // Lower left
+    { d: "M 0 250 L 50 250 L 50 215 L 155 215", delay: 0.08 },
   ];
 
   const renderPaths = (paths: {d: string, delay: number}[], minProgress: number) => (
@@ -70,14 +65,14 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
         key={`${minProgress}-${i}`}
         d={path.d}
         stroke="#B87333"
-        strokeWidth={1.5}
+        strokeWidth={2}
         strokeLinecap="square"
         strokeLinejoin="miter"
         fill="none"
         initial={{ pathLength: 0, opacity: 0 }}
         animate={{ 
           pathLength: revealProgress >= minProgress ? 1 : 0,
-          opacity: revealProgress >= minProgress ? 0.7 : 0
+          opacity: revealProgress >= minProgress ? 0.85 : 0
         }}
         transition={{ 
           duration: animDuration,
@@ -88,31 +83,31 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
     ))
   );
 
-  // Small connection pads (vias) at trace endpoints
+  // Small connection pads at key junctions
   const renderVias = (positions: {x: number, y: number}[], minProgress: number) => (
     positions.map((pos, i) => (
       <motion.rect
         key={`via-${minProgress}-${i}`}
-        x={pos.x - 2}
-        y={pos.y - 2}
-        width={4}
-        height={4}
+        x={pos.x - 3}
+        y={pos.y - 3}
+        width={6}
+        height={6}
         fill="#B87333"
         initial={{ opacity: 0, scale: 0 }}
         animate={{ 
-          opacity: revealProgress >= minProgress ? 0.8 : 0,
+          opacity: revealProgress >= minProgress ? 0.9 : 0,
           scale: revealProgress >= minProgress ? 1 : 0
         }}
-        transition={{ duration: 0.2, delay: 0.3 }}
+        transition={{ duration: 0.3, delay: 0.4 }}
       />
     ))
   );
 
-  // Via positions for each corner
-  const topLeftVias = [{ x: 50, y: 40 }, { x: 15, y: 70 }, { x: 35, y: 35 }];
-  const topRightVias = [{ x: 350, y: 40 }, { x: 385, y: 70 }, { x: 365, y: 35 }];
-  const bottomLeftVias = [{ x: 50, y: 360 }, { x: 15, y: 330 }, { x: 35, y: 365 }];
-  const bottomRightVias = [{ x: 350, y: 360 }, { x: 385, y: 330 }, { x: 365, y: 365 }];
+  // Via positions where traces meet chip
+  const topVias = [{ x: 155, y: 170 }, { x: 245, y: 170 }];
+  const rightVias = [{ x: 245, y: 185 }, { x: 245, y: 200 }, { x: 245, y: 215 }];
+  const bottomVias = [{ x: 155, y: 230 }, { x: 245, y: 230 }];
+  const leftVias = [{ x: 155, y: 185 }, { x: 155, y: 200 }, { x: 155, y: 215 }];
 
   return (
     <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-0 overflow-hidden">
@@ -121,30 +116,30 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
         viewBox="0 0 400 400"
         preserveAspectRatio="xMidYMid slice"
       >
-        {/* TOP-LEFT corner traces - 25% */}
-        {renderPaths(topLeftPaths, 25)}
-        {renderVias(topLeftVias, 25)}
+        {/* TOP paths - Q1 (25%) */}
+        {renderPaths(topPaths, 25)}
+        {renderVias(topVias, 25)}
         
-        {/* TOP-RIGHT corner traces - 50% */}
-        {renderPaths(topRightPaths, 50)}
-        {renderVias(topRightVias, 50)}
+        {/* RIGHT paths - Q2 (50%) */}
+        {renderPaths(rightPaths, 50)}
+        {renderVias(rightVias, 50)}
         
-        {/* BOTTOM-LEFT corner traces - 75% */}
-        {renderPaths(bottomLeftPaths, 75)}
-        {renderVias(bottomLeftVias, 75)}
+        {/* BOTTOM paths - Q3 (75%) */}
+        {renderPaths(bottomPaths, 75)}
+        {renderVias(bottomVias, 75)}
         
-        {/* BOTTOM-RIGHT corner traces - 100% */}
-        {renderPaths(bottomRightPaths, 100)}
-        {renderVias(bottomRightVias, 100)}
+        {/* LEFT paths - Q4 (100%) */}
+        {renderPaths(leftPaths, 100)}
+        {renderVias(leftVias, 100)}
         
-        {/* Central BLACK SHINY chip */}
+        {/* Central BLACK SHINY chip - appears after all paths */}
         {showChip && (
           <motion.g
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
           >
-            {/* Outer glow ring - copper pulse */}
+            {/* Outer glow ring */}
             <motion.rect
               x="148"
               y="163"
@@ -178,7 +173,7 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
               </linearGradient>
             </defs>
             
-            {/* Main chip frame - BLACK SHINY with STRONG PULSATION when clickable */}
+            {/* Main chip frame */}
             <motion.rect
               x="155"
               y="170"
@@ -208,7 +203,7 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
               style={{ pointerEvents: "none" }}
             />
             
-            {/* Chip pins - top - copper colored */}
+            {/* Chip pins - top */}
             {[165, 178, 191, 204, 217, 230].map((x, i) => (
               <motion.rect
                 key={`top-pin-${i}`}
@@ -232,7 +227,7 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
               />
             ))}
             
-            {/* Internal chip die - small copper square */}
+            {/* Internal chip die */}
             <motion.rect
               x="175" y="183" width="50" height="34" rx="2"
               fill="none"
@@ -256,10 +251,9 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
               <line x1="210" y1="185" x2="210" y2="215" stroke="#B87333" strokeWidth="0.5" />
             </motion.g>
             
-            {/* STRONG pulsating glow when clickable */}
+            {/* Pulsating glow when clickable */}
             {isClickable && (
               <>
-                {/* Inner pulse */}
                 <motion.rect
                   x="155" y="170" width="90" height="60" rx="3"
                   stroke="#B87333" strokeWidth="4" fill="none"
@@ -269,20 +263,11 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
                   }}
                   transition={{ duration: 0.8, repeat: Infinity }}
                 />
-                {/* Expanding pulse ring 1 */}
                 <motion.rect
                   x="155" y="170" width="90" height="60" rx="3"
                   stroke="#B87333" strokeWidth="2" fill="none"
                   animate={{ scale: [1, 1.3, 1.5], opacity: [0.8, 0.3, 0] }}
                   transition={{ duration: 1.2, repeat: Infinity }}
-                  style={{ transformOrigin: "200px 200px" }}
-                />
-                {/* Expanding pulse ring 2 */}
-                <motion.rect
-                  x="155" y="170" width="90" height="60" rx="3"
-                  stroke="#B87333" strokeWidth="1.5" fill="none"
-                  animate={{ scale: [1, 1.4, 1.7], opacity: [0.6, 0.2, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity, delay: 0.4 }}
                   style={{ transformOrigin: "200px 200px" }}
                 />
               </>

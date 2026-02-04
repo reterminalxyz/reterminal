@@ -185,14 +185,14 @@ export default function Home() {
         <GridBackground intensity={bgIntensity} />
         <BiometricCircuit revealProgress={circuitReveal} />
         
-        {/* Error notification - dark terminal style, TOP toast */}
+        {/* Error notification - dark terminal style, TOP toast, properly centered */}
         <AnimatePresence>
           {showError && (
             <motion.div
               initial={{ opacity: 0, y: -50 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -50 }}
-              className="fixed top-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
+              className="fixed top-4 left-0 right-0 z-50 pointer-events-none flex justify-center"
             >
               <div className="bg-[#1E1E1E] text-[#B87333] px-6 py-3 
                             text-[13px] tracking-[3px] font-mono font-bold
@@ -291,17 +291,17 @@ export default function Home() {
         {/* Back button */}
         <BackButton onClick={handleBack} isDark={false} />
         
-        {/* Label under chip - STATIC, no pulsation */}
+        {/* Label under chip - STATIC, positioned higher to avoid overlap */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
-          className="absolute bottom-28 left-1/2 -translate-x-1/2 text-center z-10"
+          className="absolute bottom-36 left-1/2 -translate-x-1/2 text-center z-10"
         >
-          <p className="text-[24px] text-[#B87333] tracking-[4px] font-mono font-bold">
+          <p className="text-[22px] text-[#B87333] tracking-[3px] font-mono font-bold">
             НАЖМИТЕ НА ЧИП
           </p>
-          <p className="text-[12px] text-[#3E3129]/70 tracking-wider font-mono mt-2 font-medium">
+          <p className="text-[11px] text-[#3E3129]/60 tracking-wider font-mono mt-1">
             для активации суверенитета
           </p>
         </motion.div>
@@ -381,27 +381,23 @@ export default function Home() {
     );
   }
 
-  // Phase 2: Chat
+  // Phase 2: Chat - NO back button, text input only
   if (phase === "phase_2") {
     return (
       <div className="min-h-screen bg-[#2A2A2A] relative">
         {/* Animated dark background with orbs */}
         <GridBackground intensity="low" variant="dark" />
         
-        {/* Back button in phase 2 */}
-        <BackButton onClick={handleBack} isDark={true} />
-        
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="h-screen pb-20 pt-14 relative z-10"
+          className="h-screen pt-2 relative z-10"
         >
           <TerminalChat 
             dialogues={DIALOGUES}
             onDialogueComplete={handleDialogueReward}
             onComplete={handlePhase2Complete}
-            onClose={handleCloseChat}
           />
         </motion.div>
         
