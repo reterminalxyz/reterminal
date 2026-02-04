@@ -12,10 +12,10 @@ type QuestionId = 1 | 2 | 3 | 4;
 
 // 4 questions - each gives 5% independence (5→10→15→20%)
 const QUESTIONS = [
-  { id: 1, title: "СВОБОДА", options: [{ label: "ПРАВО", correct: true }, { label: "СЕРВИС", correct: false }] },
-  { id: 2, title: "СОБСТВЕННОСТЬ", options: [{ label: "БАНК", correct: false }, { label: "Я", correct: true }] },
-  { id: 3, title: "СУВЕРЕНИТЕТ", options: [{ label: "ИНСТРУМЕНТ", correct: true }, { label: "РИСК", correct: false }] },
-  { id: 4, title: "КОНТРОЛЬ", options: [{ label: "СИСТЕМА", correct: false }, { label: "ТЫ", correct: true }] },
+  { id: 1, title: "Хочешь стать свободнее?", options: [{ label: "ДА", correct: true }, { label: "НЕТ", correct: false }] },
+  { id: 2, title: "ВОПРОС 1", options: [{ label: "ОТВЕТ 1", correct: true }, { label: "ОТВЕТ 2", correct: false }] },
+  { id: 3, title: "ВОПРОС 2", options: [{ label: "ОТВЕТ 1", correct: true }, { label: "ОТВЕТ 2", correct: false }] },
+  { id: 4, title: "ВОПРОС 3", options: [{ label: "ОТВЕТ 1", correct: true }, { label: "ОТВЕТ 2", correct: false }] },
 ];
 
 
@@ -169,12 +169,12 @@ export default function Home() {
           <BackButton onClick={handleBack} isDark={false} />
         )}
         
-        {/* Header with background */}
+        {/* Header - background only on Q2+ */}
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col items-center gap-0.5 bg-[#F5F5F5]/90 px-4 py-2 border border-[#B87333]/20"
+            className={`flex flex-col items-center gap-0.5 px-4 py-2 ${currentQuestion > 1 ? 'bg-[#F5F5F5]/90 border border-[#B87333]/20' : ''}`}
           >
             <span className="text-[8px] text-[#B87333]/60 tracking-[2px] font-mono font-bold">
               DIGITAL RESISTANCE
@@ -195,9 +195,9 @@ export default function Home() {
               exit={{ opacity: 0, y: -20 }}
               className="flex flex-col items-center"
             >
-              {/* Title with background to avoid line overlap */}
+              {/* Title - background only on Q2+ */}
               <motion.h1 
-                className="text-[16px] text-[#B87333] tracking-[4px] font-bold mb-16 -mt-24 bg-[#F5F5F5]/90 px-6 py-2 border border-[#B87333]/20"
+                className={`text-[16px] text-[#B87333] tracking-[4px] font-bold mb-16 -mt-24 px-6 py-2 ${currentQuestion > 1 ? 'bg-[#F5F5F5]/90 border border-[#B87333]/20' : ''}`}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
@@ -205,7 +205,7 @@ export default function Home() {
                 {question.title}
               </motion.h1>
               
-              <div className="flex gap-3 bg-[#F5F5F5]/90 p-3 border border-[#B87333]/20">
+              <div className={`flex gap-3 p-3 ${currentQuestion > 1 ? 'bg-[#F5F5F5]/90 border border-[#B87333]/20' : ''}`}>
                 {question.options.map((option, idx) => (
                   <motion.button
                     key={option.label}
@@ -227,7 +227,7 @@ export default function Home() {
           </AnimatePresence>
         </div>
 
-        <IndependenceBar progress={progress} phase="phase_1" />
+        <IndependenceBar progress={progress} phase="phase_1" showBackground={currentQuestion > 1} />
       </motion.div>
     );
   }
@@ -252,7 +252,7 @@ export default function Home() {
         {/* Back button */}
         <BackButton onClick={handleBack} isDark={false} />
         
-        {/* Label under chip - with background */}
+        {/* Label under chip - with background, no subtitle */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -261,9 +261,6 @@ export default function Home() {
         >
           <p className="text-[22px] text-[#B87333] tracking-[3px] font-mono font-bold">
             НАЖМИТЕ НА ЧИП
-          </p>
-          <p className="text-[11px] text-[#3E3129]/60 tracking-wider font-mono mt-1">
-            для активации суверенитета
           </p>
         </motion.div>
 

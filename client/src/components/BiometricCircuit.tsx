@@ -489,21 +489,21 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
               <line x1={215} y1={325} x2={215} y2={375} stroke="#B87333" strokeWidth={0.5} />
             </motion.g>
             
-            {/* FREEDOM text - flickering */}
+            {/* FREEDOM text - centered, smaller, flickering */}
             <motion.text
               x={200}
-              y={355}
+              y={350}
               textAnchor="middle"
               dominantBaseline="middle"
               fill="#B87333"
-              fontSize={14}
+              fontSize={10}
               fontFamily="monospace"
               fontWeight="bold"
-              letterSpacing={2}
+              letterSpacing={1}
               initial={{ opacity: 0 }}
-              animate={{ opacity: [0.4, 1, 0.4, 0.8, 1, 0.5, 1] }}
+              animate={{ opacity: [0.3, 1, 0.3, 0.9, 1, 0.4, 1] }}
               transition={{ 
-                duration: 2,
+                duration: 1.5,
                 repeat: Infinity,
                 repeatType: "loop",
                 delay: 0.9
@@ -512,20 +512,30 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
               FREEDOM
             </motion.text>
             
-            {/* Pulse effect when clickable */}
+            {/* Pulse effect when clickable - MUCH MORE VISIBLE */}
             {isClickable && (
               <>
+                {/* Inner glow pulse */}
                 <motion.rect
                   x={147} y={302} width={106} height={96} rx={5}
-                  fill="none" stroke="#B87333" strokeWidth={3}
-                  animate={{ opacity: [0.4, 0.9, 0.4], strokeWidth: [2, 4, 2] }}
-                  transition={{ duration: 1, repeat: Infinity }}
+                  fill="none" stroke="#B87333" strokeWidth={4}
+                  animate={{ opacity: [0.3, 1, 0.3], strokeWidth: [3, 6, 3] }}
+                  transition={{ duration: 0.8, repeat: Infinity }}
                 />
+                {/* Outer expanding ring 1 */}
+                <motion.rect
+                  x={150} y={305} width={100} height={90} rx={4}
+                  fill="none" stroke="#B87333" strokeWidth={3}
+                  animate={{ scale: [1, 1.15, 1.25], opacity: [0.8, 0.4, 0] }}
+                  transition={{ duration: 1, repeat: Infinity }}
+                  style={{ transformOrigin: "200px 350px" }}
+                />
+                {/* Outer expanding ring 2 - offset */}
                 <motion.rect
                   x={150} y={305} width={100} height={90} rx={4}
                   fill="none" stroke="#B87333" strokeWidth={2}
-                  animate={{ scale: [1, 1.08, 1.15], opacity: [0.6, 0.3, 0] }}
-                  transition={{ duration: 1.2, repeat: Infinity }}
+                  animate={{ scale: [1, 1.2, 1.35], opacity: [0.6, 0.2, 0] }}
+                  transition={{ duration: 1, repeat: Infinity, delay: 0.5 }}
                   style={{ transformOrigin: "200px 350px" }}
                 />
               </>

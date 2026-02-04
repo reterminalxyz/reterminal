@@ -3,13 +3,14 @@ import { motion } from "framer-motion";
 interface IndependenceBarProps {
   progress: number;
   phase: "phase_1" | "phase_2" | "complete";
+  showBackground?: boolean;
 }
 
-export function IndependenceBar({ progress, phase }: IndependenceBarProps) {
+export function IndependenceBar({ progress, phase, showBackground = false }: IndependenceBarProps) {
   const isDark = phase === "phase_2" || phase === "complete";
   
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-6 pt-3">
+    <div className={`fixed bottom-0 left-0 right-0 z-50 px-4 pb-6 pt-3 ${showBackground ? 'bg-[#F5F5F5]/90' : ''}`}>
       <motion.div 
         className="flex flex-col items-center gap-2.5 max-w-md mx-auto"
         animate={phase === "phase_2" ? { opacity: [0.85, 1, 0.85] } : {}}
