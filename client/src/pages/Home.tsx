@@ -381,7 +381,7 @@ export default function Home() {
     );
   }
 
-  // Phase 2: Chat - NO back button, text input only
+  // Phase 2: Chat - text input only
   if (phase === "phase_2") {
     return (
       <div className="min-h-screen bg-[#2A2A2A] relative">
@@ -394,11 +394,7 @@ export default function Home() {
           transition={{ delay: 0.3 }}
           className="h-screen pt-2 relative z-10"
         >
-          <TerminalChat 
-            dialogues={DIALOGUES}
-            onDialogueComplete={handleDialogueReward}
-            onComplete={handlePhase2Complete}
-          />
+          <TerminalChat onComplete={handlePhase2Complete} />
         </motion.div>
         
         <IndependenceBar progress={progress} phase="phase_2" />

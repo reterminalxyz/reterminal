@@ -1,117 +1,70 @@
 import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { Send } from "lucide-react";
 
-interface DialogueBlock {
-  id: string;
-  speaker: "satoshi" | "user";
-  message: string;
-  reward: number;
-  options?: { id: string; label: string; next?: string; action?: string }[];
-}
-
 interface TerminalChatProps {
-  dialogues: DialogueBlock[];
-  onDialogueComplete: (reward: number) => void;
-  onComplete: () => void;
-  onClose?: () => void;
+  onComplete?: () => void;
 }
 
-export function TerminalChat({ dialogues, onDialogueComplete, onComplete }: TerminalChatProps) {
-  const [currentIndex, setCurrentIndex] = useState(0);
+export function TerminalChat({ onComplete }: TerminalChatProps) {
   const [displayedMessages, setDisplayedMessages] = useState<{ speaker: string; text: string }[]>([]);
   const [typingText, setTypingText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [branchPath, setBranchPath] = useState<string | null>(null);
   const [inputValue, setInputValue] = useState("");
   const [inputEnabled, setInputEnabled] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
-  const allDialogues = dialogues;
+  const hasStarted = useRef(false);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [displayedMessages, typingText]);
 
+  // Start the conversation when component mounts
   useEffect(() => {
-    if (currentIndex >= allDialogues.length) {
-      onComplete();
-      return;
-    }
-
-    const dialogue = allDialogues[currentIndex];
+    if (hasStarted.current) return;
+    hasStarted.current = true;
     
-    if (branchPath && dialogue.id !== branchPath && !dialogue.id.includes(branchPath.split("_")[0])) {
-      if (dialogue.id.startsWith("dialogue_4") && !dialogue.id.includes(branchPath.slice(-1))) {
-        setCurrentIndex(prev => prev + 1);
-        return;
-      }
-    }
-
-    if (dialogue.speaker === "satoshi") {
-      typeMessage(dialogue);
-    }
-  }, [currentIndex, branchPath]);
-
-  const typeMessage = async (dialogue: DialogueBlock) => {
-    setIsTyping(true);
-    setInputEnabled(false);
-    const text = dialogue.message;
-    
-    for (let i = 0; i <= text.length; i++) {
-      await new Promise(resolve => setTimeout(resolve, 25));
-      setTypingText(text.slice(0, i));
-    }
-    
-    setIsTyping(false);
-    setDisplayedMessages(prev => [...prev, { speaker: "SATOSHI", text }]);
-    setTypingText("");
-    onDialogueComplete(dialogue.reward);
-    
-    // Enable input after message, let user type response
-    await new Promise(resolve => setTimeout(resolve, 500));
-    setInputEnabled(true);
-    inputRef.current?.focus();
-  };
-
-  const sendUserMessage = (text: string) => {
-    if (!text.trim()) return;
-    
-    setDisplayedMessages(prev => [...prev, { speaker: "ТЫ", text }]);
-    setInputEnabled(false);
-    setInputValue("");
-    
-    const currentDialogue = allDialogues[currentIndex];
-    
-    // Check if this dialogue has options with actions
-    if (currentDialogue?.options) {
-      const completeOption = currentDialogue.options.find(o => o.action === "complete_phase_2");
-      if (completeOption) {
-        onComplete();
-        return;
+    const startChat = async () => {
+      // Wait a moment before starting
+      await new Promise(resolve => setTimeout(resolve, 800));
+      
+      // Type out Satoshi's message
+      setIsTyping(true);
+      const message = "Привет, я Сатоши";
+      
+      for (let i = 0; i <= message.length; i++) {
+        await new Promise(resolve => setTimeout(resolve, 50));
+        setTypingText(message.slice(0, i));
       }
       
-      // Check for branch paths
-      const branchOption = currentDialogue.options.find(o => o.next);
-      if (branchOption?.next) {
-        setBranchPath(branchOption.next);
-        const nextIndex = allDialogues.findIndex(d => d.id === branchOption.next);
-        if (nextIndex !== -1) {
-          setCurrentIndex(nextIndex);
-          return;
-        }
-      }
-    }
+      setIsTyping(false);
+      setDisplayedMessages([{ speaker: "SATOSHI", text: message }]);
+      setTypingText("");
+      
+      // Enable input after message completes
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setInputEnabled(true);
+      inputRef.current?.focus();
+    };
     
-    // Default: move to next dialogue
-    setCurrentIndex(prev => prev + 1);
-  };
+    startChat();
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputValue.trim() || !inputEnabled) return;
-    sendUserMessage(inputValue);
+    
+    // Add user message to chat
+    setDisplayedMessages(prev => [...prev, { speaker: "ТЫ", text: inputValue }]);
+    setInputValue("");
+    setInputEnabled(false);
+    
+    // Could continue conversation here or call onComplete
+    setTimeout(() => {
+      setInputEnabled(true);
+      inputRef.current?.focus();
+    }, 500);
   };
 
   return (
@@ -133,9 +86,9 @@ export function TerminalChat({ dialogues, onDialogueComplete, onComplete }: Term
         </span>
       </div>
       
-      {/* Chat area - extra padding at bottom to avoid independence bar overlap */}
-      <div className="flex-1 overflow-y-auto p-4 pb-24 space-y-4 bg-[#1E1E1E]">
-        {/* System initialization message */}
+      {/* Chat area */}
+      <div className="flex-1 overflow-y-auto p-4 pb-28 space-y-4 bg-[#1E1E1E]">
+        {/* System message */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -144,21 +97,20 @@ export function TerminalChat({ dialogues, onDialogueComplete, onComplete }: Term
           [SYSTEM] Connection established. Digital resistance protocol active.
         </motion.div>
         
-        <AnimatePresence>
-          {displayedMessages.map((msg, i) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="font-mono text-[13px] leading-relaxed"
-            >
-              <span className={msg.speaker === "SATOSHI" ? "text-[#B87333]" : "text-[#4ADE80]"}>
-                [{msg.speaker}]
-              </span>
-              <span className="text-[#E8E8E8]/80 ml-2">{msg.text}</span>
-            </motion.div>
-          ))}
-        </AnimatePresence>
+        {/* Displayed messages */}
+        {displayedMessages.map((msg, i) => (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="font-mono text-[13px] leading-relaxed"
+          >
+            <span className={msg.speaker === "SATOSHI" ? "text-[#B87333]" : "text-[#4ADE80]"}>
+              [{msg.speaker}]
+            </span>
+            <span className="text-[#E8E8E8]/80 ml-2">{msg.text}</span>
+          </motion.div>
+        ))}
         
         {/* Currently typing */}
         {isTyping && typingText && (
@@ -176,10 +128,10 @@ export function TerminalChat({ dialogues, onDialogueComplete, onComplete }: Term
         <div ref={chatEndRef} />
       </div>
       
-      {/* Input area - positioned above independence bar */}
+      {/* Input area */}
       <form 
         onSubmit={handleSubmit}
-        className="p-3 pb-20 border-t border-[#B87333]/40 bg-[#2A2A2A]"
+        className="p-3 pb-24 border-t border-[#B87333]/40 bg-[#2A2A2A]"
       >
         <div className="flex items-center gap-2 border border-[#B87333]/50 bg-[#1E1E1E] px-3 py-2">
           <span className="text-[#4ADE80] text-xs font-mono">&gt;</span>
