@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Send } from "lucide-react";
 
 interface DialogueBlock {
   id: string;
@@ -22,7 +23,10 @@ export function TerminalChat({ dialogues, onDialogueComplete, onComplete }: Term
   const [isTyping, setIsTyping] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
   const [branchPath, setBranchPath] = useState<string | null>(null);
+  const [inputValue, setInputValue] = useState("");
+  const [inputEnabled, setInputEnabled] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const allDialogues = dialogues;
 
@@ -53,6 +57,7 @@ export function TerminalChat({ dialogues, onDialogueComplete, onComplete }: Term
   const typeMessage = async (dialogue: DialogueBlock) => {
     setIsTyping(true);
     setShowOptions(false);
+    setInputEnabled(false);
     const text = dialogue.message;
     
     for (let i = 0; i <= text.length; i++) {
@@ -68,6 +73,7 @@ export function TerminalChat({ dialogues, onDialogueComplete, onComplete }: Term
     if (dialogue.options && dialogue.options.length > 0) {
       await new Promise(resolve => setTimeout(resolve, 500));
       setShowOptions(true);
+      setInputEnabled(true);
     } else {
       await new Promise(resolve => setTimeout(resolve, 800));
       setCurrentIndex(prev => prev + 1);
@@ -75,15 +81,21 @@ export function TerminalChat({ dialogues, onDialogueComplete, onComplete }: Term
   };
 
   const handleOptionClick = (option: { id: string; label: string; next?: string; action?: string }) => {
-    setDisplayedMessages(prev => [...prev, { speaker: "YOU", text: option.label }]);
+    sendUserMessage(option.label, option);
+  };
+
+  const sendUserMessage = (text: string, option?: { id: string; label: string; next?: string; action?: string }) => {
+    setDisplayedMessages(prev => [...prev, { speaker: "ТЫ", text }]);
     setShowOptions(false);
+    setInputEnabled(false);
+    setInputValue("");
     
-    if (option.action === "complete_phase_2") {
+    if (option?.action === "complete_phase_2") {
       onComplete();
       return;
     }
     
-    if (option.next) {
+    if (option?.next) {
       setBranchPath(option.next);
       const nextIndex = allDialogues.findIndex(d => d.id === option.next);
       if (nextIndex !== -1) {
@@ -96,19 +108,57 @@ export function TerminalChat({ dialogues, onDialogueComplete, onComplete }: Term
     }
   };
 
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inputValue.trim() || !inputEnabled) return;
+    
+    const currentDialogue = allDialogues[currentIndex];
+    if (currentDialogue?.options && currentDialogue.options.length > 0) {
+      const matchedOption = currentDialogue.options.find(opt => 
+        inputValue.toLowerCase().includes(opt.label.toLowerCase().slice(0, 5))
+      );
+      if (matchedOption) {
+        sendUserMessage(inputValue, matchedOption);
+      } else {
+        sendUserMessage(inputValue, currentDialogue.options[0]);
+      }
+    } else {
+      sendUserMessage(inputValue);
+    }
+  };
+
   const currentDialogue = allDialogues[currentIndex];
 
   return (
     <div className="flex flex-col h-full bg-[#2A2A2A]">
       {/* Header */}
-      <div className="px-4 py-3 border-b border-[#B87333]/40">
-        <span className="text-[12px] text-[#B87333] tracking-[2px] font-medium">
-          TERMINAL: SATOSHI_PROTOCOL
+      <div className="px-4 py-3 border-b border-[#B87333]/40 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <motion.div 
+            className="w-2 h-2 rounded-full bg-[#B87333]"
+            animate={{ opacity: [0.4, 1, 0.4] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          />
+          <span className="text-[11px] text-[#B87333] tracking-[2px] font-mono">
+            TERMINAL://SATOSHI_PROTOCOL
+          </span>
+        </div>
+        <span className="text-[9px] text-[#E8E8E8]/40 tracking-wider font-mono">
+          ENCRYPTED
         </span>
       </div>
       
       {/* Chat area */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-4 bg-[#1E1E1E] border border-[#B87333]/30 m-2 rounded">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#1E1E1E] border-x border-[#B87333]/20 mx-2">
+        {/* System initialization message */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-[10px] text-[#B87333]/50 font-mono mb-4"
+        >
+          [SYSTEM] Connection established. Digital resistance protocol active.
+        </motion.div>
+        
         <AnimatePresence>
           {displayedMessages.map((msg, i) => (
             <motion.div
@@ -117,10 +167,10 @@ export function TerminalChat({ dialogues, onDialogueComplete, onComplete }: Term
               animate={{ opacity: 1, y: 0 }}
               className="font-mono text-sm leading-relaxed"
             >
-              <span className={msg.speaker === "SATOSHI" ? "text-[#B87333]" : "text-[#E8E8E8]"}>
-                {msg.speaker} &gt;{" "}
+              <span className={msg.speaker === "SATOSHI" ? "text-[#B87333]" : "text-[#4ADE80]"}>
+                [{msg.speaker}]
               </span>
-              <span className="text-[#E8E8E8]/80">{msg.text}</span>
+              <span className="text-[#E8E8E8]/80 ml-2">{msg.text}</span>
             </motion.div>
           ))}
         </AnimatePresence>
@@ -128,10 +178,10 @@ export function TerminalChat({ dialogues, onDialogueComplete, onComplete }: Term
         {/* Currently typing */}
         {isTyping && typingText && (
           <div className="font-mono text-sm leading-relaxed">
-            <span className="text-[#B87333]">SATOSHI &gt; </span>
-            <span className="text-[#E8E8E8]/80">{typingText}</span>
+            <span className="text-[#B87333]">[SATOSHI]</span>
+            <span className="text-[#E8E8E8]/80 ml-2">{typingText}</span>
             <motion.span
-              className="inline-block w-2 h-4 bg-[#B87333] ml-1"
+              className="inline-block w-2 h-4 bg-[#B87333] ml-1 align-middle"
               animate={{ opacity: [1, 0] }}
               transition={{ duration: 0.5, repeat: Infinity }}
             />
@@ -151,7 +201,7 @@ export function TerminalChat({ dialogues, onDialogueComplete, onComplete }: Term
                 <button
                   key={option.id}
                   onClick={() => handleOptionClick(option)}
-                  className="px-6 py-3 border-2 border-[#B87333] text-[#E8E8E8] text-sm tracking-wider font-medium
+                  className="w-40 h-14 border-2 border-[#B87333] text-[#E8E8E8] text-[13px] tracking-wider font-mono
                            hover:bg-[#B87333] hover:text-[#1E1E1E] transition-all duration-200"
                   data-testid={`chat-option-${option.id}`}
                 >
@@ -164,6 +214,35 @@ export function TerminalChat({ dialogues, onDialogueComplete, onComplete }: Term
         
         <div ref={chatEndRef} />
       </div>
+      
+      {/* Input area */}
+      <form 
+        onSubmit={handleSubmit}
+        className="px-2 py-3 border-t border-[#B87333]/40 bg-[#2A2A2A]"
+      >
+        <div className="flex items-center gap-2 border border-[#B87333]/50 bg-[#1E1E1E] px-3 py-2">
+          <span className="text-[#4ADE80] text-xs font-mono">&gt;</span>
+          <input
+            ref={inputRef}
+            type="text"
+            value={inputValue}
+            onChange={(e) => setInputValue(e.target.value)}
+            placeholder={inputEnabled ? "Введите ответ..." : "Ожидание..."}
+            disabled={!inputEnabled}
+            className="flex-1 bg-transparent text-[#E8E8E8] text-sm font-mono 
+                     placeholder:text-[#E8E8E8]/30 focus:outline-none disabled:opacity-50"
+            data-testid="input-chat"
+          />
+          <button
+            type="submit"
+            disabled={!inputEnabled || !inputValue.trim()}
+            className="p-1 text-[#B87333] hover:text-[#D4956A] disabled:opacity-30 transition-colors"
+            data-testid="button-send"
+          >
+            <Send className="w-4 h-4" />
+          </button>
+        </div>
+      </form>
     </div>
   );
 }

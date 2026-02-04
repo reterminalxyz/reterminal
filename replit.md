@@ -1,7 +1,7 @@
 # RE_CHAIN Onboarding App
 
 ## Overview
-A state-machine driven onboarding flow for a Bitcoin Lightning Network card product. Features a two-phase structure: Phase 1 is a quick 3-question test (30% of rewards), Phase 2 is an interactive chat with Satoshi (70% of rewards).
+A state-machine driven onboarding flow for a Bitcoin Lightning Network card product. Features a two-phase structure: Phase 1 is a quick 3-question test (20% of independence), Phase 2 is an interactive chat with Satoshi (80% of independence). The experience is designed as a continuation of scanning the physical NFC card.
 
 ## Tech Stack
 - **Frontend**: React + Vite + TypeScript
@@ -19,66 +19,89 @@ A state-machine driven onboarding flow for a Bitcoin Lightning Network card prod
 - **Primary Accent**: Copper (#B87333)
 - **Text Light**: E-ink dark brown (#3E3129)
 - **Text Dark**: Light aluminum (#E8E8E8)
-- **Aluminum**: #E8E8E8
+- **Success Text**: Green (#4ADE80) for user messages
 
 ### Visual Elements
-- **Circuit Board**: SVG animation with 3 progressive layers
-- **Glass Panels**: Frosted glass with blur effects
-- **Horizontal Split**: Mechanical doors transition animation
-- **Typewriter Effect**: Character-by-character text reveal
+- **Grid Background**: Animated grid pattern with scan lines (digital resistance vibe)
+- **NFC Circuit**: Antenna loops that connect to central chip (like physical card)
+- **Vertical Transition**: Top/bottom panels slide apart to reveal Phase 2
+- **Typewriter Effect**: Character-by-character text reveal (25ms/char)
 
 ## App Flow (Two-Phase Structure)
 
-### Phase 1: СБОРКА ПРОТОКОЛА (30% = 150 SATS)
-Three quick questions with circuit assembly animation:
-1. **СВОБОДА**: ПРАВО vs СЕРВИС (+10 score for correct)
-2. **СОБСТВЕННОСТЬ**: БАНК vs Я (+10 score for correct)
-3. **СУВЕРЕНИТЕТ**: ИНСТРУМЕНТ vs РИСК (+10 score for correct)
+### Phase 1: СБОРКА ПРОТОКОЛА (20% independence)
+Three quick questions with NFC circuit assembly animation:
+1. **СВОБОДА**: ПРАВО (correct) vs СЕРВИС
+2. **СОБСТВЕННОСТЬ**: БАНК vs Я (correct)
+3. **СУВЕРЕНИТЕТ**: ИНСТРУМЕНТ (correct) vs РИСК
 
-After each answer, circuit board elements appear on background:
-- Question 1: Horizontal traces on left
-- Question 2: Vertical connections in center + chip
-- Question 3: Complete connections on right + pulse effect
+After correct answers, NFC antenna loops and chip elements appear:
+- Question 1: Outer antenna loops
+- Question 2: Connection traces + central chip frame
+- Question 3: Chip pins + internal circuitry + pulse effect
 
-Completion screen shows "ПРОТОКОЛ СОБРАН" + "АКТИВИРОВАТЬ СУВЕРЕНИТЕТ" button
+The chip becomes a clickable CTA button when all answers are correct.
+Reward: 150 SATS
 
-### Transition: Horizontal Split
-- Light aluminum panels slide left/right like mechanical doors
-- Reveals dark terminal interface underneath
-- Duration: 1.2 seconds
+### Transition: Vertical Split
+- Top and bottom aluminum panels slide apart (up/down)
+- Center flash effect with "ПОДКЛЮЧЕНИЕ К САТОШИ..."
+- Reveals dark terminal interface
+- Duration: 1.5 seconds
 
-### Phase 2: ДИАЛОГ С САТОШИ (70% = 350 SATS)
+### Phase 2: ДИАЛОГ С САТОШИ (80% independence)
 Terminal-style chat interface:
 - Dark background (#2A2A2A)
-- Typewriter effect for Satoshi messages (25ms/char)
-- Copper text for Satoshi, light text for user
-- Branching dialogue with user choices
-- 7 main dialogue blocks with 50 SATS each
+- "TERMINAL://SATOSHI_PROTOCOL" header with ENCRYPTED label
+- Typewriter effect for Satoshi messages (copper text)
+- User messages in green (#4ADE80)
+- Text input field with send button
+- Branching dialogue with user choices (equal-size buttons 160px x 56px)
+- 7 dialogue blocks with 50 SATS each (350 SATS total)
 
 ### Completion Screen
 - "ПРОТОКОЛ ЗАВЕРШЁН. ТЫ АКТИВИРОВАН."
-- Total SATS display with pulse animation
-- Final independence score
+- Total SATS display with pulse/glow animation
+- Final independence score (100%)
+- Dark grid background
 
 ## Components
 
+### GridBackground.tsx
+Animated grid pattern for Phase 1:
+- SVG grid lines with copper color
+- Horizontal and vertical scan line animations
+- Corner accent decorations
+- Data stream dots
+
 ### CircuitBoard.tsx
-SVG component with 3 animated layers:
+NFC-style antenna circuit:
+- 3 concentric rounded rectangles (antenna loops)
+- Connection traces from loops to central chip
+- Central chip with pins and internal circuitry
+- Chip becomes clickable CTA when complete
 - `completedLayers` prop controls visibility (0-3)
-- Uses Framer Motion for path animations
-- Copper color (#B87333) at 60-80% opacity
+- `onChipClick` callback when chip is ready
 
 ### IndependenceBar.tsx
 Bottom-fixed progress indicator:
 - Horizontal bar with copper gradient fill
-- "НЕЗАВИСИМОСТЬ" label above
-- Percentage display (0-100%)
+- Animated shimmer effect
+- `progress` prop (0-100 percentage)
+- `phase` prop for styling adaptation
 
 ### TerminalChat.tsx
 Phase 2 chat interface:
-- Typewriter effect for messages
-- Handles branching dialogue logic
-- User choice buttons appear after relevant messages
+- Typewriter effect for Satoshi messages
+- Text input field with send button
+- Branching dialogue logic
+- User choice buttons (equal size)
+
+### BackButton.tsx
+Navigation button:
+- "НАЗАД" label with chevron icon
+- `isDark` prop for light/dark mode
+- Appears on all screens except first question
 
 ## API Endpoints
 - `POST /api/sessions` - Create new session
@@ -86,15 +109,18 @@ Phase 2 chat interface:
 - `POST /api/sessions/:id/action` - Update session with action
 
 ## Reward Distribution
-- Phase 1: 150 SATS (30%)
-- Phase 2: 350 SATS (70%)
+- Phase 1: 150 SATS (20% independence)
+- Phase 2: 350 SATS (80% independence)
 - Total: 500 SATS
 
 ## Recent Changes (Feb 2026)
-- Complete app rebuild with two-phase structure
-- Phase 1: 3 questions with circuit assembly animation
-- Horizontal split transition (mechanical doors effect)
-- Phase 2: Terminal chat with typewriter effect
-- Bottom independence bar (horizontal, copper)
-- Branching dialogue with user choices
-- Equal-size choice buttons (160px x 56px)
+- Grid background with animated scan lines (digital resistance vibe)
+- NFC-style circuit animation matching physical card design
+- Central chip becomes clickable CTA after all correct answers
+- Vertical transition (top-down panels sliding apart)
+- Text input field added to chat interface
+- Back button on all screens (except first question)
+- Independence bar fills 20% after Phase 1 (not 30%)
+- User messages displayed in green
+- System initialization message in chat
+- "DIGITAL RESISTANCE" branding throughout
