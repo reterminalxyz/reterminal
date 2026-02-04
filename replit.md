@@ -79,13 +79,21 @@ Mesmerizing animated background:
 - Corner brackets pulse
 
 ### BiometricCircuit.tsx
-Circuit lines converging from screen corners to central chip:
-- Lines start from CORNERS (0,0), (400,0), (0,400), (400,400) and EDGES
-- Lines do NOT overlap center content area (questions/answers)
-- NO dots on lines (removed)
-- Progressive reveal: 25% → 50% → 75% → 100%
-- Central chip (90x80) with pins, scan line animation, corner brackets
-- All lines converge to chip - no hanging lines
+PCB-style circuit assembly with geometric components:
+- **Straight traces with 90° angles only** (L-shapes, T-junctions) - no curves
+- **SMD components**: Small rectangles with terminal pads
+- **Resistors**: Rectangles with color bands
+- **Capacitors**: Two parallel lines with lead wires
+- **Vias**: Concentric circles (outer ring + inner dot)
+
+Progressive reveal after EACH correct answer:
+- Q1 (25%): 4 traces + 4 components in TOP margin (y < 100)
+- Q2 (50%): 4 traces + 4 components in RIGHT margin (x > 330)
+- Q3 (75%): 4 traces + 4 components in BOTTOM margin (y > 340)
+- Q4 (100%): 4 traces + 4 components in LEFT margin (x < 70) + central chip
+
+**SAFE ZONE**: x=70-330, y=100-340 - NO elements overlap content
+Central chip has pins on all 4 sides, connecting traces from margins
 
 ### Microchip.tsx
 Microchip assembly animation:
