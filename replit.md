@@ -30,15 +30,17 @@ A state-machine driven onboarding flow for a Bitcoin Lightning Network card prod
 ## App Flow (Two-Phase Structure)
 
 ### Phase 1: СБОРКА ПРОТОКОЛА (20% independence)
-Three quick questions with NFC circuit assembly animation:
-1. **СВОБОДА**: ПРАВО (correct) vs СЕРВИС
-2. **СОБСТВЕННОСТЬ**: БАНК vs Я (correct)
-3. **СУВЕРЕНИТЕТ**: ИНСТРУМЕНТ (correct) vs РИСК
+Four quick questions with biometric circuit reveal:
+1. **СВОБОДА**: ПРАВО (correct) vs СЕРВИС → 7%
+2. **СОБСТВЕННОСТЬ**: БАНК vs Я (correct) → 14%
+3. **СУВЕРЕНИТЕТ**: ИНСТРУМЕНТ (correct) vs РИСК → 21%
+4. **КОНТРОЛЬ**: СИСТЕМА vs ТЫ (correct) → 28%
 
-After correct answers, NFC antenna loops and chip elements appear:
-- Question 1: Outer antenna loops
-- Question 2: Connection traces + central chip frame
-- Question 3: Chip pins + internal circuitry + pulse effect
+Progressive biometric-style circuit reveal:
+- Question 1 (7%): Circuit lines from TOP (25% revealed)
+- Question 2 (14%): Circuit lines from RIGHT (50% revealed)
+- Question 3 (21%): Circuit lines from BOTTOM (75% revealed)
+- Question 4 (28%): Circuit lines from LEFT + central chip (100% revealed)
 
 The chip becomes a clickable CTA button when all answers are correct.
 Reward: 150 SATS
@@ -68,11 +70,18 @@ Terminal-style chat interface:
 ## Components
 
 ### GridBackground.tsx
-Animated grid pattern for Phase 1:
-- SVG grid lines with copper color
-- Horizontal and vertical scan line animations
-- Corner accent decorations
-- Data stream dots
+Teenage Engineering-inspired background:
+- Aluminum gradient with brushed metal texture
+- Animated floating copper accent lines
+- Subtle pulsing dots (digital resistance vibe)
+- Corner marks (TE style)
+
+### BiometricCircuit.tsx
+Large-scale biometric fingerprint scanning style:
+- Lines converge from all 4 directions to center
+- Progressive reveal: 25% → 50% → 75% → 100%
+- Connection nodes at line endpoints
+- Central chip appears at 100% with pulsing effect
 
 ### Microchip.tsx
 Microchip assembly animation:
@@ -87,8 +96,9 @@ Microchip assembly animation:
 
 ### IndependenceBar.tsx
 Bottom-fixed progress indicator:
-- Horizontal bar with copper gradient fill
-- Animated shimmer effect
+- Metallic gradient bar with shimmer effect
+- Only shows current percentage (no 0%/100% labels)
+- Pulsing effect during Phase 2
 - `progress` prop (0-100 percentage)
 - `phase` prop for styling adaptation
 
@@ -111,21 +121,24 @@ Navigation button:
 - `POST /api/sessions/:id/action` - Update session with action
 
 ## Reward Distribution
-- Phase 1: 150 SATS (20% independence)
-- Phase 2: 350 SATS (80% independence)
-- Total: 500 SATS
+- Phase 1: 150 SATS (28% independence after 4 questions, each gives 7%)
+- Phase 2: 350 SATS (72% independence through dialogue)
+- Total: 500 SATS (100% independence)
 
 ## Recent Changes (Feb 2026)
-- Clean minimal grid background (no scan lines or dots)
-- Microchip assembly animation (4 elements per question from different directions)
+- Teenage Engineering-inspired background (aluminum + copper, animated accents)
+- Biometric-style circuit reveal (lines from 4 directions converging to chip)
+- 4 questions now (each gives 7% independence: 7→14→21→28%)
+- Circuit reveal: Q1=25%, Q2=50%, Q3=75%, Q4=100% + central chip
 - Central chip becomes clickable CTA (like a lock opening Satoshi dialogue)
 - Vertical transition (top-down panels sliding apart)
 - Text input field added to chat interface
 - Close button in chat header for navigation back
 - Back button fixed positioning (no mobile overlaps)
 - Progress dots REMOVED from questions
-- Phase 1 complete screen: ONLY microchip button + label
+- Independence bar: ONLY shows current % (no 0% or 100% labels)
 - Independence bar: metallic styling with pulsing effect
-- Independence bar stays at 20% during Phase 2 (doesn't increase per dialogue)
+- Independence bar stays at 28% during Phase 2 (doesn't increase per dialogue)
+- Toast notification "+150 SATS" REMOVED (was blocking screen)
 - Mobile-first design (400px viewport optimized)
 - "DIGITAL RESISTANCE" branding throughout

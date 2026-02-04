@@ -1,21 +1,22 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Microchip } from "@/components/Microchip";
+import { BiometricCircuit } from "@/components/BiometricCircuit";
 import { GridBackground } from "@/components/GridBackground";
 import { IndependenceBar } from "@/components/IndependenceBar";
 import { TerminalChat } from "@/components/TerminalChat";
 import { BackButton } from "@/components/BackButton";
 import { useCreateSession, useUpdateSession, useSession } from "@/hooks/use-sessions";
 import { Loader2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 
 type Phase = "loading" | "phase_1" | "phase_1_complete" | "transition" | "phase_2" | "complete";
-type QuestionId = 1 | 2 | 3;
+type QuestionId = 1 | 2 | 3 | 4;
 
+// 4 questions - each gives 7% independence
 const QUESTIONS = [
   { id: 1, title: "СВОБОДА", options: [{ label: "ПРАВО", correct: true }, { label: "СЕРВИС", correct: false }] },
   { id: 2, title: "СОБСТВЕННОСТЬ", options: [{ label: "БАНК", correct: false }, { label: "Я", correct: true }] },
   { id: 3, title: "СУВЕРЕНИТЕТ", options: [{ label: "ИНСТРУМЕНТ", correct: true }, { label: "РИСК", correct: false }] },
+  { id: 4, title: "КОНТРОЛЬ", options: [{ label: "СИСТЕМА", correct: false }, { label: "ТЫ", correct: true }] },
 ];
 
 const DIALOGUES = [
@@ -38,15 +39,13 @@ export default function Home() {
   const [sessionId, setSessionId] = useState<number | null>(null);
   const [phase, setPhase] = useState<Phase>("loading");
   const [currentQuestion, setCurrentQuestion] = useState<QuestionId>(1);
-  const [completedLayers, setCompletedLayers] = useState(0);
-  const [correctAnswers, setCorrectAnswers] = useState(0);
+  const [circuitReveal, setCircuitReveal] = useState(0); // 0, 25, 50, 75, 100
   const [totalSats, setTotalSats] = useState(0);
-  const [progress, setProgress] = useState(0);
+  const [progress, setProgress] = useState(0); // Independence %
   
   const { data: session, isLoading: isSessionLoading } = useSession(sessionId);
   const createSession = useCreateSession();
   const updateSession = useUpdateSession();
-  const { toast } = useToast();
 
   useEffect(() => {
     if (!sessionId) {
@@ -61,8 +60,9 @@ export default function Home() {
 
   const handleQuestionAnswer = (questionId: QuestionId, isCorrect: boolean) => {
     if (isCorrect) {
-      setCorrectAnswers(prev => prev + 1);
-      setCompletedLayers(questionId);
+      // Each correct answer: +7% independence, +25% circuit reveal
+      setProgress(prev => prev + 7);
+      setCircuitReveal(questionId * 25);
     }
     
     if (sessionId) {
@@ -75,17 +75,12 @@ export default function Home() {
     }
 
     setTimeout(() => {
-      if (questionId < 3) {
+      if (questionId < 4) {
         setCurrentQuestion((questionId + 1) as QuestionId);
       } else {
+        // All 4 questions done - circuit complete
         setTotalSats(prev => prev + 150);
-        setProgress(20);
         setPhase("phase_1_complete");
-        toast({
-          title: "+150 SATS",
-          description: "Протокол собран",
-          className: "bg-[#2A2A2A] border-[#B87333] text-[#B87333] font-mono"
-        });
       }
     }, 800);
   };
@@ -93,12 +88,11 @@ export default function Home() {
   const handleBack = () => {
     if (phase === "phase_1" && currentQuestion > 1) {
       setCurrentQuestion((currentQuestion - 1) as QuestionId);
-      if (completedLayers >= currentQuestion - 1) {
-        setCompletedLayers(currentQuestion - 2);
-      }
+      setCircuitReveal((currentQuestion - 2) * 25);
+      setProgress(prev => Math.max(0, prev - 7));
     } else if (phase === "phase_1_complete") {
       setPhase("phase_1");
-      setCurrentQuestion(3);
+      setCurrentQuestion(4);
     }
   };
 
@@ -110,14 +104,14 @@ export default function Home() {
   };
 
   const handleChipClick = () => {
-    if (completedLayers >= 3) {
+    if (circuitReveal >= 100) {
       handleActivate();
     }
   };
 
   const handleDialogueReward = (reward: number) => {
     setTotalSats(prev => prev + reward);
-    // Progress stays at 20% during Phase 2 - only pulses, doesn't increase
+    // Progress stays at 28% during Phase 2
   };
 
   const handlePhase2Complete = () => {
@@ -131,11 +125,6 @@ export default function Home() {
         nextStepId: "complete"
       });
     }
-    toast({
-      title: "ПРОТОКОЛ ЗАВЕРШЁН",
-      description: `Всего заработано: ${totalSats} SATS`,
-      className: "bg-[#2A2A2A] border-[#B87333] text-[#B87333] font-mono"
-    });
   };
 
   const handleCloseChat = () => {
@@ -173,7 +162,7 @@ export default function Home() {
     return (
       <div className="min-h-screen bg-[#F5F5F5] relative overflow-hidden">
         <GridBackground />
-        <Microchip completedLayers={completedLayers} />
+        <BiometricCircuit revealProgress={circuitReveal} />
         
         {currentQuestion > 1 && (
           <BackButton onClick={handleBack} isDark={false} />
@@ -195,7 +184,7 @@ export default function Home() {
           </motion.div>
         </div>
 
-        {/* Question - no progress dots */}
+        {/* Question */}
         <div className="min-h-screen flex flex-col items-center justify-center relative z-10 px-4">
           <AnimatePresence mode="wait">
             <motion.div
@@ -241,40 +230,35 @@ export default function Home() {
     );
   }
 
-  // Phase 1 Complete - ONLY microchip button + label
+  // Phase 1 Complete - circuit complete, chip clickable
   if (phase === "phase_1_complete") {
     return (
       <div className="min-h-screen bg-[#F5F5F5] relative overflow-hidden flex flex-col items-center justify-center">
         <GridBackground />
+        <BiometricCircuit 
+          revealProgress={100} 
+          onChipClick={handleChipClick}
+          isComplete={true}
+        />
         
-        {/* Main content: microchip + label only */}
-        <div className="flex flex-col items-center z-10">
-          {/* Clickable microchip */}
-          <Microchip 
-            completedLayers={3} 
-            onChipClick={handleChipClick}
-            showOnly={true}
-          />
-          
-          {/* Label under chip */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-            className="mt-8 text-center"
+        {/* Label under chip */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.8 }}
+          className="absolute bottom-32 left-1/2 -translate-x-1/2 text-center z-10"
+        >
+          <motion.p
+            className="text-[11px] text-[#B87333] tracking-[2px] font-mono"
+            animate={{ opacity: [0.6, 1, 0.6] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
           >
-            <motion.p
-              className="text-[11px] text-[#B87333] tracking-[2px] font-mono"
-              animate={{ opacity: [0.6, 1, 0.6] }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-            >
-              НАЖМИТЕ НА ЧИП
-            </motion.p>
-            <p className="text-[9px] text-[#3E3129]/50 tracking-wider font-mono mt-2">
-              для активации суверенитета
-            </p>
-          </motion.div>
-        </div>
+            НАЖМИТЕ НА ЧИП
+          </motion.p>
+          <p className="text-[9px] text-[#3E3129]/50 tracking-wider font-mono mt-1">
+            для активации суверенитета
+          </p>
+        </motion.div>
 
         <IndependenceBar progress={progress} phase="phase_1" />
       </div>

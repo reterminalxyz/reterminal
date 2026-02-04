@@ -70,20 +70,19 @@ export function IndependenceBar({ progress, phase }: IndependenceBarProps) {
           </motion.div>
         </div>
         
-        {/* Percentage display */}
-        <div className="flex justify-between w-full text-[9px] tracking-wider">
-          <span className={isDark ? "text-[#E8E8E8]/40" : "text-[#3E3129]/40"}>0%</span>
-          <motion.span 
-            className="text-[#B87333] font-semibold"
-            animate={phase === "phase_2" ? { 
-              textShadow: ["0 0 4px rgba(184,115,51,0.3)", "0 0 8px rgba(184,115,51,0.6)", "0 0 4px rgba(184,115,51,0.3)"]
-            } : {}}
-            transition={{ duration: 1.5, repeat: Infinity }}
-          >
-            {Math.round(progress)}%
-          </motion.span>
-          <span className={isDark ? "text-[#E8E8E8]/40" : "text-[#3E3129]/40"}>100%</span>
-        </div>
+        {/* Only show current percentage - no 0% or 100% labels */}
+        <motion.span 
+          key={progress}
+          className="text-[#B87333] font-semibold text-[11px] tracking-wider"
+          initial={{ scale: 1.2, opacity: 0.5 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.3 }}
+          style={phase === "phase_2" ? {
+            textShadow: "0 0 6px rgba(184,115,51,0.4)"
+          } : {}}
+        >
+          {Math.round(progress)}%
+        </motion.span>
       </motion.div>
     </div>
   );
