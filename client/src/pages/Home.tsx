@@ -169,12 +169,12 @@ export default function Home() {
           <BackButton onClick={handleBack} isDark={false} />
         )}
         
-        {/* Header */}
+        {/* Header with background */}
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col items-center gap-0.5"
+            className="flex flex-col items-center gap-0.5 bg-[#F5F5F5]/90 px-4 py-2 border border-[#B87333]/20"
           >
             <span className="text-[8px] text-[#B87333]/60 tracking-[2px] font-mono font-bold">
               DIGITAL RESISTANCE
@@ -195,9 +195,9 @@ export default function Home() {
               exit={{ opacity: 0, y: -20 }}
               className="flex flex-col items-center"
             >
-              {/* Title moved higher with negative margin to avoid line overlap */}
+              {/* Title with background to avoid line overlap */}
               <motion.h1 
-                className="text-[16px] text-[#B87333] tracking-[4px] font-bold mb-16 -mt-24"
+                className="text-[16px] text-[#B87333] tracking-[4px] font-bold mb-16 -mt-24 bg-[#F5F5F5]/90 px-6 py-2 border border-[#B87333]/20"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
@@ -205,7 +205,7 @@ export default function Home() {
                 {question.title}
               </motion.h1>
               
-              <div className="flex gap-3">
+              <div className="flex gap-3 bg-[#F5F5F5]/90 p-3 border border-[#B87333]/20">
                 {question.options.map((option, idx) => (
                   <motion.button
                     key={option.label}
@@ -213,7 +213,7 @@ export default function Home() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 + idx * 0.1 }}
                     onClick={() => handleQuestionAnswer(question.id as QuestionId, option.correct)}
-                    className="w-36 h-12 bg-transparent border-2 border-[#B87333] text-[#3E3129] 
+                    className="w-36 h-12 bg-[#F5F5F5] border-2 border-[#B87333] text-[#3E3129] 
                              text-[13px] font-bold tracking-wider font-mono
                              hover:bg-[#B87333] hover:text-[#F5F5F5] 
                              active:scale-95 transition-all duration-200"
@@ -252,12 +252,12 @@ export default function Home() {
         {/* Back button */}
         <BackButton onClick={handleBack} isDark={false} />
         
-        {/* Label under chip - STATIC, positioned higher to avoid overlap */}
+        {/* Label under chip - with background */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
-          className="absolute bottom-36 left-1/2 -translate-x-1/2 text-center z-10"
+          className="absolute bottom-36 left-1/2 -translate-x-1/2 text-center z-10 bg-[#F5F5F5]/90 px-6 py-3 border border-[#B87333]/20"
         >
           <p className="text-[22px] text-[#B87333] tracking-[3px] font-mono font-bold">
             НАЖМИТЕ НА ЧИП
