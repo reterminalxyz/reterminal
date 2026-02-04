@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BiometricCircuit } from "@/components/BiometricCircuit";
 import { GridBackground } from "@/components/GridBackground";
@@ -42,6 +42,8 @@ export default function Home() {
   const [circuitReveal, setCircuitReveal] = useState(0); // 0, 25, 50, 75, 100
   const [totalSats, setTotalSats] = useState(0);
   const [progress, setProgress] = useState(0); // Independence % (5 per answer)
+  const [shakeScreen, setShakeScreen] = useState(false);
+  const [showError, setShowError] = useState(false);
   
   const { data: session, isLoading: isSessionLoading } = useSession(sessionId);
   const createSession = useCreateSession();
@@ -63,26 +65,32 @@ export default function Home() {
       // Each correct answer: +5% independence, +25% circuit reveal
       setProgress(prev => prev + 5);
       setCircuitReveal(questionId * 25);
-    }
-    
-    if (sessionId) {
-      updateSession.mutate({
-        id: sessionId,
-        actionId: `q${questionId}_answer`,
-        scoreDelta: isCorrect ? 10 : 0,
-        nextStepId: `phase_1_q${questionId}`
-      });
-    }
-
-    setTimeout(() => {
-      if (questionId < 4) {
-        setCurrentQuestion((questionId + 1) as QuestionId);
-      } else {
-        // All 4 questions done
-        setTotalSats(prev => prev + 150);
-        setPhase("phase_1_complete");
+      
+      if (sessionId) {
+        updateSession.mutate({
+          id: sessionId,
+          actionId: `q${questionId}_answer`,
+          scoreDelta: 10,
+          nextStepId: `phase_1_q${questionId}`
+        });
       }
-    }, 800);
+
+      setTimeout(() => {
+        if (questionId < 4) {
+          setCurrentQuestion((questionId + 1) as QuestionId);
+        } else {
+          // All 4 questions done - progress should be 20%
+          setTotalSats(prev => prev + 150);
+          setPhase("phase_1_complete");
+        }
+      }, 800);
+    } else {
+      // Wrong answer - shake screen and show error notification
+      setShakeScreen(true);
+      setShowError(true);
+      setTimeout(() => setShakeScreen(false), 500);
+      setTimeout(() => setShowError(false), 2000);
+    }
   };
 
   const handleBack = () => {
@@ -163,9 +171,30 @@ export default function Home() {
     const bgIntensity = currentQuestion === 1 ? "high" : "low";
     
     return (
-      <div className="min-h-screen bg-[#F5F5F5] relative overflow-hidden">
+      <motion.div 
+        className="min-h-screen bg-[#F5F5F5] relative overflow-hidden"
+        animate={shakeScreen ? { x: [-10, 10, -10, 10, 0] } : {}}
+        transition={{ duration: 0.4 }}
+      >
         <GridBackground intensity={bgIntensity} />
         <BiometricCircuit revealProgress={circuitReveal} />
+        
+        {/* Error notification */}
+        <AnimatePresence>
+          {showError && (
+            <motion.div
+              initial={{ opacity: 0, y: -50 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -50 }}
+              className="fixed top-4 left-1/2 -translate-x-1/2 z-50 
+                       bg-red-500/90 text-white px-6 py-3 
+                       text-[12px] tracking-[2px] font-mono font-bold
+                       border border-red-400"
+            >
+              ПОПРОБУЙ ЕЩЁ
+            </motion.div>
+          )}
+        </AnimatePresence>
         
         {/* Back button on all questions except first */}
         {currentQuestion > 1 && (
@@ -188,8 +217,8 @@ export default function Home() {
           </motion.div>
         </div>
 
-        {/* Question */}
-        <div className="min-h-screen flex flex-col items-center justify-center relative z-10 px-4">
+        {/* Question - moved HIGHER (top-1/3 instead of center) */}
+        <div className="min-h-screen flex flex-col items-center justify-start pt-32 relative z-10 px-4">
           <AnimatePresence mode="wait">
             <motion.div
               key={question.id}
@@ -230,7 +259,7 @@ export default function Home() {
         </div>
 
         <IndependenceBar progress={progress} phase="phase_1" />
-      </div>
+      </motion.div>
     );
   }
 
