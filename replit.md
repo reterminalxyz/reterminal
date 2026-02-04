@@ -70,18 +70,22 @@ Terminal-style chat interface:
 ## Components
 
 ### GridBackground.tsx
-Teenage Engineering-inspired background:
-- Aluminum gradient with brushed metal texture
-- Animated floating copper accent lines
-- Subtle pulsing dots (digital resistance vibe)
-- Corner marks (TE style)
+Mesmerizing animated background:
+- Aluminum gradient base
+- intensity="high": Large animated copper orbs, flowing light beams, pulsing corner accents
+- intensity="low": Subtle orbs only
+- Orbs move slowly with scale/opacity animation
+- Light beams flow horizontally and vertically
+- Corner brackets pulse
 
 ### BiometricCircuit.tsx
-Large-scale biometric fingerprint scanning style:
-- Lines converge from all 4 directions to center
+Circuit lines converging from screen corners to central chip:
+- Lines start from CORNERS (0,0), (400,0), (0,400), (400,400) and EDGES
+- Lines do NOT overlap center content area (questions/answers)
+- NO dots on lines (removed)
 - Progressive reveal: 25% → 50% → 75% → 100%
-- Connection nodes at line endpoints
-- Central chip appears at 100% with pulsing effect
+- Central chip (90x80) with pins, scan line animation, corner brackets
+- All lines converge to chip - no hanging lines
 
 ### Microchip.tsx
 Microchip assembly animation:
@@ -110,8 +114,10 @@ Phase 2 chat interface:
 - User choice buttons (equal size)
 
 ### BackButton.tsx
-Navigation button:
-- "НАЗАД" label with chevron icon
+Large prominent navigation button:
+- "НАЗАД" label with ArrowLeft icon
+- Large size: px-5 py-3, border-2, font-bold
+- Fixed position: top-20 left-4, z-50
 - `isDark` prop for light/dark mode
 - Appears on all screens except first question
 
