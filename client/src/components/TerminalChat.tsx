@@ -7,7 +7,7 @@ interface TerminalChatProps {
 }
 
 export function TerminalChat({ onComplete }: TerminalChatProps) {
-  const [displayedMessages, setDisplayedMessages] = useState<{ speaker: string; text: string }[]>([]);
+  const [messages, setMessages] = useState<{ speaker: string; text: string }[]>([]);
   const [typingText, setTypingText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [inputValue, setInputValue] = useState("");
@@ -18,33 +18,32 @@ export function TerminalChat({ onComplete }: TerminalChatProps) {
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: "smooth" });
-  }, [displayedMessages, typingText]);
+  }, [messages, typingText]);
 
-  // Start the conversation when component mounts
+  // Start with "привет" message
   useEffect(() => {
     if (hasStarted.current) return;
     hasStarted.current = true;
     
     const startChat = async () => {
-      // Wait a moment before starting
-      await new Promise(resolve => setTimeout(resolve, 800));
+      await new Promise(resolve => setTimeout(resolve, 300));
       
-      // Type out Satoshi's message
+      // Type out greeting quickly
       setIsTyping(true);
-      const message = "Привет, я Сатоши";
+      const greeting = "привет";
       
-      for (let i = 0; i <= message.length; i++) {
-        await new Promise(resolve => setTimeout(resolve, 50));
-        setTypingText(message.slice(0, i));
+      for (let i = 0; i <= greeting.length; i++) {
+        await new Promise(resolve => setTimeout(resolve, 40));
+        setTypingText(greeting.slice(0, i));
       }
       
+      // Immediately enable input after message completes
       setIsTyping(false);
-      setDisplayedMessages([{ speaker: "SATOSHI", text: message }]);
+      setMessages([{ speaker: "SATOSHI", text: greeting }]);
       setTypingText("");
-      
-      // Enable input after message completes
-      await new Promise(resolve => setTimeout(resolve, 500));
       setInputEnabled(true);
+      
+      await new Promise(resolve => setTimeout(resolve, 100));
       inputRef.current?.focus();
     };
     
@@ -55,16 +54,14 @@ export function TerminalChat({ onComplete }: TerminalChatProps) {
     e.preventDefault();
     if (!inputValue.trim() || !inputEnabled) return;
     
-    // Add user message to chat
-    setDisplayedMessages(prev => [...prev, { speaker: "ТЫ", text: inputValue }]);
+    // Add user message
+    setMessages(prev => [...prev, { speaker: "ТЫ", text: inputValue }]);
     setInputValue("");
-    setInputEnabled(false);
     
-    // Could continue conversation here or call onComplete
+    // Keep input enabled for continuous chat
     setTimeout(() => {
-      setInputEnabled(true);
       inputRef.current?.focus();
-    }, 500);
+    }, 100);
   };
 
   return (
@@ -87,23 +84,14 @@ export function TerminalChat({ onComplete }: TerminalChatProps) {
       </div>
       
       {/* Chat area */}
-      <div className="flex-1 overflow-y-auto p-4 pb-28 space-y-4 bg-[#1E1E1E]">
-        {/* System message */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-[9px] text-[#B87333]/50 font-mono mb-4"
-        >
-          [SYSTEM] Connection established. Digital resistance protocol active.
-        </motion.div>
-        
-        {/* Displayed messages */}
-        {displayedMessages.map((msg, i) => (
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#1E1E1E]">
+        {/* Messages */}
+        {messages.map((msg, i) => (
           <motion.div
             key={i}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="font-mono text-[13px] leading-relaxed"
+            className="font-mono text-[14px] leading-relaxed"
           >
             <span className={msg.speaker === "SATOSHI" ? "text-[#B87333]" : "text-[#4ADE80]"}>
               [{msg.speaker}]
@@ -114,7 +102,7 @@ export function TerminalChat({ onComplete }: TerminalChatProps) {
         
         {/* Currently typing */}
         {isTyping && typingText && (
-          <div className="font-mono text-[13px] leading-relaxed">
+          <div className="font-mono text-[14px] leading-relaxed">
             <span className="text-[#B87333]">[SATOSHI]</span>
             <span className="text-[#E8E8E8]/80 ml-2">{typingText}</span>
             <motion.span
@@ -128,31 +116,31 @@ export function TerminalChat({ onComplete }: TerminalChatProps) {
         <div ref={chatEndRef} />
       </div>
       
-      {/* Input area */}
+      {/* Input area - above independence bar */}
       <form 
         onSubmit={handleSubmit}
-        className="p-3 pb-24 border-t border-[#B87333]/40 bg-[#2A2A2A]"
+        className="p-4 pb-24 border-t border-[#B87333]/40 bg-[#2A2A2A]"
       >
-        <div className="flex items-center gap-2 border border-[#B87333]/50 bg-[#1E1E1E] px-3 py-2">
-          <span className="text-[#4ADE80] text-xs font-mono">&gt;</span>
+        <div className="flex items-center gap-2 border border-[#B87333]/50 bg-[#1E1E1E] px-3 py-3 rounded">
+          <span className="text-[#4ADE80] text-sm font-mono">&gt;</span>
           <input
             ref={inputRef}
             type="text"
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            placeholder={inputEnabled ? "Введите ответ..." : "Ожидание..."}
+            placeholder={inputEnabled ? "Введите сообщение..." : "..."}
             disabled={!inputEnabled}
-            className="flex-1 bg-transparent text-[#E8E8E8] text-[13px] font-mono 
+            className="flex-1 bg-transparent text-[#E8E8E8] text-[14px] font-mono 
                      placeholder:text-[#E8E8E8]/30 focus:outline-none disabled:opacity-50"
             data-testid="input-chat"
           />
           <button
             type="submit"
             disabled={!inputEnabled || !inputValue.trim()}
-            className="p-1 text-[#B87333] hover:text-[#D4956A] disabled:opacity-30 transition-colors"
+            className="p-2 text-[#B87333] hover:text-[#D4956A] disabled:opacity-30 transition-colors"
             data-testid="button-send"
           >
-            <Send className="w-4 h-4" />
+            <Send className="w-5 h-5" />
           </button>
         </div>
       </form>
