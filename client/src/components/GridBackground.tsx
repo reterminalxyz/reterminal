@@ -27,122 +27,157 @@ export function GridBackground({ intensity = "high" }: GridBackgroundProps) {
         <rect width="100%" height="100%" fill="url(#subtleGrid)" />
       </svg>
       
-      {/* Mesmerizing animated copper orbs - only on high intensity */}
+      {/* Mesmerizing animated copper orbs - BRIGHTER and LARGER on high intensity */}
       {isHigh && (
         <>
-          {/* Large slow-moving orb */}
+          {/* Large slow-moving orb - MUCH BRIGHTER */}
+          <motion.div
+            className="absolute w-80 h-80 rounded-full"
+            style={{
+              background: "radial-gradient(circle, rgba(184,115,51,0.5) 0%, rgba(184,115,51,0.2) 40%, transparent 70%)",
+              top: "5%",
+              left: "0%",
+              filter: "blur(20px)"
+            }}
+            animate={{
+              x: [0, 100, 0],
+              y: [0, 60, 0],
+              scale: [1, 1.3, 1],
+              opacity: [0.6, 0.9, 0.6]
+            }}
+            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+          />
+          
+          {/* Medium orb - BRIGHTER */}
           <motion.div
             className="absolute w-64 h-64 rounded-full"
             style={{
-              background: "radial-gradient(circle, rgba(184,115,51,0.15) 0%, transparent 70%)",
-              top: "10%",
-              left: "5%"
+              background: "radial-gradient(circle, rgba(184,115,51,0.45) 0%, rgba(184,115,51,0.15) 40%, transparent 70%)",
+              top: "45%",
+              right: "5%",
+              filter: "blur(15px)"
             }}
             animate={{
-              x: [0, 80, 0],
-              y: [0, 40, 0],
-              scale: [1, 1.2, 1],
-              opacity: [0.4, 0.7, 0.4]
+              x: [0, -80, 0],
+              y: [0, -50, 0],
+              scale: [1, 1.4, 1],
+              opacity: [0.5, 0.85, 0.5]
             }}
-            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
           />
           
-          {/* Medium orb - different timing */}
+          {/* Small bright orb - VERY BRIGHT */}
           <motion.div
             className="absolute w-48 h-48 rounded-full"
             style={{
-              background: "radial-gradient(circle, rgba(184,115,51,0.12) 0%, transparent 70%)",
-              top: "50%",
-              right: "10%"
+              background: "radial-gradient(circle, rgba(184,115,51,0.55) 0%, rgba(184,115,51,0.25) 35%, transparent 60%)",
+              bottom: "20%",
+              left: "15%",
+              filter: "blur(12px)"
             }}
             animate={{
-              x: [0, -60, 0],
+              x: [0, 70, 0],
               y: [0, -30, 0],
-              scale: [1, 1.3, 1],
-              opacity: [0.3, 0.6, 0.3]
+              opacity: [0.55, 0.9, 0.55]
             }}
-            transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+            transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 3 }}
           />
           
-          {/* Small bright orb */}
+          {/* Extra floating orb for more dynamism */}
           <motion.div
-            className="absolute w-32 h-32 rounded-full"
+            className="absolute w-40 h-40 rounded-full"
             style={{
-              background: "radial-gradient(circle, rgba(184,115,51,0.2) 0%, transparent 60%)",
-              bottom: "25%",
-              left: "20%"
+              background: "radial-gradient(circle, rgba(184,115,51,0.6) 0%, rgba(184,115,51,0.2) 50%, transparent 70%)",
+              top: "60%",
+              left: "50%",
+              filter: "blur(10px)"
             }}
             animate={{
-              x: [0, 50, 0],
-              y: [0, -20, 0],
-              opacity: [0.35, 0.65, 0.35]
+              x: [-50, 50, -50],
+              y: [0, -40, 0],
+              scale: [0.8, 1.2, 0.8],
+              opacity: [0.4, 0.8, 0.4]
             }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 4 }}
+            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 2 }}
           />
           
-          {/* Flowing horizontal light beam */}
+          {/* Flowing horizontal light beam - FASTER */}
           <motion.div
             className="absolute h-1 w-full"
             style={{
-              background: "linear-gradient(90deg, transparent 0%, rgba(184,115,51,0.3) 50%, transparent 100%)",
-              top: "35%"
+              background: "linear-gradient(90deg, transparent 0%, rgba(184,115,51,0.5) 50%, transparent 100%)",
+              top: "30%"
             }}
             animate={{
               x: ["-100%", "100%"],
-              opacity: [0, 0.8, 0]
+              opacity: [0, 0.9, 0]
             }}
-            transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
           />
           
-          {/* Vertical light beam */}
+          {/* Second horizontal beam - offset timing */}
+          <motion.div
+            className="absolute h-0.5 w-full"
+            style={{
+              background: "linear-gradient(90deg, transparent 0%, rgba(184,115,51,0.4) 50%, transparent 100%)",
+              top: "70%"
+            }}
+            animate={{
+              x: ["100%", "-100%"],
+              opacity: [0, 0.8, 0]
+            }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
+          />
+          
+          {/* Vertical light beam - FASTER */}
           <motion.div
             className="absolute w-1 h-full"
             style={{
-              background: "linear-gradient(180deg, transparent 0%, rgba(184,115,51,0.25) 50%, transparent 100%)",
-              left: "70%"
+              background: "linear-gradient(180deg, transparent 0%, rgba(184,115,51,0.45) 50%, transparent 100%)",
+              left: "75%"
             }}
             animate={{
               y: ["-100%", "100%"],
-              opacity: [0, 0.7, 0]
+              opacity: [0, 0.85, 0]
             }}
-            transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 3 }}
+            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut", delay: 1 }}
           />
           
-          {/* Pulsing corner accents */}
+          {/* Pulsing corner accents - BRIGHTER */}
           <motion.div
             className="absolute top-4 left-4"
-            animate={{ opacity: [0.3, 0.7, 0.3] }}
-            transition={{ duration: 3, repeat: Infinity }}
+            animate={{ opacity: [0.5, 0.9, 0.5] }}
+            transition={{ duration: 2.5, repeat: Infinity }}
           >
-            <div className="w-8 h-[2px] bg-[#B87333]" />
-            <div className="w-[2px] h-8 bg-[#B87333]" />
+            <div className="w-10 h-[3px] bg-[#B87333]" />
+            <div className="w-[3px] h-10 bg-[#B87333]" />
           </motion.div>
           
           <motion.div
             className="absolute top-4 right-4 flex flex-col items-end"
-            animate={{ opacity: [0.3, 0.7, 0.3] }}
-            transition={{ duration: 3, repeat: Infinity, delay: 0.5 }}
+            animate={{ opacity: [0.5, 0.9, 0.5] }}
+            transition={{ duration: 2.5, repeat: Infinity, delay: 0.4 }}
           >
-            <div className="w-8 h-[2px] bg-[#B87333]" />
-            <div className="w-[2px] h-8 bg-[#B87333] self-end" />
+            <div className="w-10 h-[3px] bg-[#B87333]" />
+            <div className="w-[3px] h-10 bg-[#B87333] self-end" />
           </motion.div>
           
           <motion.div
             className="absolute bottom-24 left-4"
-            animate={{ opacity: [0.3, 0.7, 0.3] }}
-            transition={{ duration: 3, repeat: Infinity, delay: 1 }}
+            animate={{ opacity: [0.5, 0.9, 0.5] }}
+            transition={{ duration: 2.5, repeat: Infinity, delay: 0.8 }}
           >
-            <div className="w-[2px] h-8 bg-[#B87333]" />
-            <div className="w-8 h-[2px] bg-[#B87333]" />
+            <div className="w-[3px] h-10 bg-[#B87333]" />
+            <div className="w-10 h-[3px] bg-[#B87333]" />
           </motion.div>
           
           <motion.div
             className="absolute bottom-24 right-4 flex flex-col items-end"
-            animate={{ opacity: [0.3, 0.7, 0.3] }}
-            transition={{ duration: 3, repeat: Infinity, delay: 1.5 }}
+            animate={{ opacity: [0.5, 0.9, 0.5] }}
+            transition={{ duration: 2.5, repeat: Infinity, delay: 1.2 }}
           >
-            <div className="w-[2px] h-8 bg-[#B87333] self-end" />
-            <div className="w-8 h-[2px] bg-[#B87333]" />
+            <div className="w-[3px] h-10 bg-[#B87333] self-end" />
+            <div className="w-10 h-[3px] bg-[#B87333]" />
           </motion.div>
         </>
       )}
@@ -153,26 +188,28 @@ export function GridBackground({ intensity = "high" }: GridBackgroundProps) {
           <motion.div
             className="absolute w-48 h-48 rounded-full"
             style={{
-              background: "radial-gradient(circle, rgba(184,115,51,0.06) 0%, transparent 70%)",
+              background: "radial-gradient(circle, rgba(184,115,51,0.1) 0%, transparent 70%)",
               top: "20%",
-              left: "10%"
+              left: "10%",
+              filter: "blur(10px)"
             }}
             animate={{
               x: [0, 30, 0],
-              opacity: [0.2, 0.35, 0.2]
+              opacity: [0.25, 0.4, 0.25]
             }}
             transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
           />
           <motion.div
             className="absolute w-32 h-32 rounded-full"
             style={{
-              background: "radial-gradient(circle, rgba(184,115,51,0.05) 0%, transparent 70%)",
+              background: "radial-gradient(circle, rgba(184,115,51,0.08) 0%, transparent 70%)",
               bottom: "30%",
-              right: "15%"
+              right: "15%",
+              filter: "blur(8px)"
             }}
             animate={{
               x: [0, -20, 0],
-              opacity: [0.15, 0.3, 0.15]
+              opacity: [0.2, 0.35, 0.2]
             }}
             transition={{ duration: 12, repeat: Infinity, ease: "easeInOut", delay: 3 }}
           />
