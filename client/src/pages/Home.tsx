@@ -95,12 +95,16 @@ export default function Home() {
 
   const handleBack = () => {
     if (phase === "phase_1" && currentQuestion > 1) {
-      setCurrentQuestion((currentQuestion - 1) as QuestionId);
-      setCircuitReveal((currentQuestion - 2) * 25);
-      setProgress(prev => Math.max(0, prev - 5));
+      // Going back resets ALL progress - percentages burn
+      setCurrentQuestion(1 as QuestionId);
+      setCircuitReveal(0);
+      setProgress(0);
     } else if (phase === "phase_1_complete") {
+      // Going back from chip screen resets everything
       setPhase("phase_1");
-      setCurrentQuestion(4);
+      setCurrentQuestion(1);
+      setCircuitReveal(0);
+      setProgress(0);
     } else if (phase === "phase_2") {
       setPhase("phase_1_complete");
     }
@@ -179,19 +183,20 @@ export default function Home() {
         <GridBackground intensity={bgIntensity} />
         <BiometricCircuit revealProgress={circuitReveal} />
         
-        {/* Error notification */}
+        {/* Error notification - dark terminal style, centered */}
         <AnimatePresence>
           {showError && (
             <motion.div
-              initial={{ opacity: 0, y: -50 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -50 }}
-              className="fixed top-4 left-1/2 -translate-x-1/2 z-50 
-                       bg-red-500/90 text-white px-6 py-3 
-                       text-[12px] tracking-[2px] font-mono font-bold
-                       border border-red-400"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none"
             >
-              ПОПРОБУЙ ЕЩЁ
+              <div className="bg-[#1E1E1E] text-[#B87333] px-8 py-4 
+                            text-[14px] tracking-[3px] font-mono font-bold
+                            border border-[#B87333]/60 shadow-lg">
+                ПОПРОБУЙ ЕЩЁ
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -217,8 +222,8 @@ export default function Home() {
           </motion.div>
         </div>
 
-        {/* Question - moved HIGHER (top-1/3 instead of center) */}
-        <div className="min-h-screen flex flex-col items-center justify-start pt-32 relative z-10 px-4">
+        {/* Question - centered, only TITLE moved slightly higher */}
+        <div className="min-h-screen flex flex-col items-center justify-center relative z-10 px-4">
           <AnimatePresence mode="wait">
             <motion.div
               key={question.id}
@@ -227,8 +232,9 @@ export default function Home() {
               exit={{ opacity: 0, y: -20 }}
               className="flex flex-col items-center"
             >
+              {/* Title moved higher with negative margin to avoid line overlap */}
               <motion.h1 
-                className="text-[16px] text-[#B87333] tracking-[4px] font-bold mb-10"
+                className="text-[16px] text-[#B87333] tracking-[4px] font-bold mb-16 -mt-24"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
@@ -263,11 +269,17 @@ export default function Home() {
     );
   }
 
-  // Phase 1 Complete
+  // Phase 1 Complete - NO animated background on chip screen
   if (phase === "phase_1_complete") {
     return (
       <div className="min-h-screen bg-[#F5F5F5] relative overflow-hidden flex flex-col items-center justify-center">
-        <GridBackground intensity="low" />
+        {/* Simple static aluminum background - no animated orbs */}
+        <div 
+          className="fixed inset-0"
+          style={{
+            background: "linear-gradient(135deg, #F9F9F9 0%, #E6E6E6 50%, #F4F4F4 100%)"
+          }}
+        />
         <BiometricCircuit 
           revealProgress={100} 
           onChipClick={handleChipClick}
@@ -277,21 +289,21 @@ export default function Home() {
         {/* Back button */}
         <BackButton onClick={handleBack} isDark={false} />
         
-        {/* Label under chip */}
+        {/* Label under chip - MUCH BIGGER */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
-          className="absolute bottom-32 left-1/2 -translate-x-1/2 text-center z-10"
+          className="absolute bottom-24 left-1/2 -translate-x-1/2 text-center z-10"
         >
           <motion.p
-            className="text-[12px] text-[#B87333] tracking-[3px] font-mono font-bold"
-            animate={{ opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
+            className="text-[24px] text-[#B87333] tracking-[4px] font-mono font-bold"
+            animate={{ opacity: [0.6, 1, 0.6], scale: [0.98, 1.02, 0.98] }}
+            transition={{ duration: 1.2, repeat: Infinity }}
           >
             НАЖМИТЕ НА ЧИП
           </motion.p>
-          <p className="text-[9px] text-[#3E3129]/60 tracking-wider font-mono mt-1 font-medium">
+          <p className="text-[12px] text-[#3E3129]/70 tracking-wider font-mono mt-2 font-medium">
             для активации суверенитета
           </p>
         </motion.div>
@@ -375,6 +387,9 @@ export default function Home() {
   if (phase === "phase_2") {
     return (
       <div className="min-h-screen bg-[#2A2A2A] relative">
+        {/* Animated dark background with orbs */}
+        <GridBackground intensity="low" variant="dark" />
+        
         {/* Back button in phase 2 */}
         <BackButton onClick={handleBack} isDark={true} />
         
@@ -382,7 +397,7 @@ export default function Home() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="h-screen pb-20 pt-14"
+          className="h-screen pb-20 pt-14 relative z-10"
         >
           <TerminalChat 
             dialogues={DIALOGUES}
@@ -401,17 +416,8 @@ export default function Home() {
   if (phase === "complete") {
     return (
       <div className="min-h-screen bg-[#2A2A2A] flex items-center justify-center relative overflow-hidden">
-        {/* Subtle grid */}
-        <div className="absolute inset-0 opacity-[0.06]">
-          <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <pattern id="gridDark" width="50" height="50" patternUnits="userSpaceOnUse">
-                <path d="M 50 0 L 0 0 0 50" fill="none" stroke="#B87333" strokeWidth="0.5" />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#gridDark)" />
-          </svg>
-        </div>
+        {/* Animated dark background with orbs */}
+        <GridBackground intensity="low" variant="dark" />
         
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
