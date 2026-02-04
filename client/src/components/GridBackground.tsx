@@ -9,6 +9,10 @@ export function GridBackground({ intensity = "high", variant = "light" }: GridBa
   const isHigh = intensity === "high";
   const isDark = variant === "dark";
   
+  // Brighter opacity values for better visibility
+  const orbOpacityBase = isDark ? 0.5 : 0.55;
+  const orbOpacityHigh = isDark ? 0.7 : 0.75;
+  
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
       {/* Base gradient - light or dark */}
@@ -31,74 +35,74 @@ export function GridBackground({ intensity = "high", variant = "light" }: GridBa
         <rect width="100%" height="100%" fill="url(#subtleGrid)" />
       </svg>
       
-      {/* Copper orbs - on ALL screens (both high and low) */}
+      {/* Copper orbs - BRIGHTER and more visible */}
       {/* Large slow-moving orb */}
       <motion.div
-        className="absolute w-80 h-80 rounded-full"
+        className="absolute w-96 h-96 rounded-full"
         style={{
-          background: `radial-gradient(circle, rgba(184,115,51,${isHigh ? 0.5 : 0.35}) 0%, rgba(184,115,51,${isHigh ? 0.2 : 0.12}) 40%, transparent 70%)`,
-          top: "5%",
-          left: "0%",
-          filter: "blur(20px)"
+          background: `radial-gradient(circle, rgba(184,115,51,${isHigh ? 0.65 : 0.55}) 0%, rgba(184,115,51,${isHigh ? 0.3 : 0.2}) 40%, transparent 70%)`,
+          top: "2%",
+          left: "-5%",
+          filter: "blur(25px)"
         }}
         animate={{
-          x: [0, 100, 0],
-          y: [0, 60, 0],
-          scale: [1, 1.3, 1],
-          opacity: [0.5, 0.8, 0.5]
+          x: [0, 120, 0],
+          y: [0, 80, 0],
+          scale: [1, 1.4, 1],
+          opacity: [orbOpacityBase, orbOpacityHigh, orbOpacityBase]
         }}
         transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
       />
       
-      {/* Medium orb */}
+      {/* Medium orb - right side */}
       <motion.div
-        className="absolute w-64 h-64 rounded-full"
+        className="absolute w-80 h-80 rounded-full"
         style={{
-          background: `radial-gradient(circle, rgba(184,115,51,${isHigh ? 0.45 : 0.3}) 0%, rgba(184,115,51,${isHigh ? 0.15 : 0.1}) 40%, transparent 70%)`,
-          top: "45%",
-          right: "5%",
-          filter: "blur(15px)"
+          background: `radial-gradient(circle, rgba(184,115,51,${isHigh ? 0.6 : 0.5}) 0%, rgba(184,115,51,${isHigh ? 0.25 : 0.18}) 40%, transparent 70%)`,
+          top: "40%",
+          right: "-5%",
+          filter: "blur(20px)"
         }}
         animate={{
-          x: [0, -80, 0],
-          y: [0, -50, 0],
-          scale: [1, 1.4, 1],
-          opacity: [0.45, 0.75, 0.45]
+          x: [0, -100, 0],
+          y: [0, -60, 0],
+          scale: [1, 1.5, 1],
+          opacity: [orbOpacityBase, orbOpacityHigh, orbOpacityBase]
         }}
         transition={{ duration: 8, repeat: Infinity, ease: "easeInOut", delay: 1.5 }}
       />
       
-      {/* Small bright orb */}
+      {/* Small bright orb - bottom left */}
       <motion.div
-        className="absolute w-48 h-48 rounded-full"
+        className="absolute w-64 h-64 rounded-full"
         style={{
-          background: `radial-gradient(circle, rgba(184,115,51,${isHigh ? 0.55 : 0.35}) 0%, rgba(184,115,51,${isHigh ? 0.25 : 0.15}) 35%, transparent 60%)`,
-          bottom: "20%",
-          left: "15%",
-          filter: "blur(12px)"
+          background: `radial-gradient(circle, rgba(184,115,51,${isHigh ? 0.7 : 0.55}) 0%, rgba(184,115,51,${isHigh ? 0.35 : 0.22}) 35%, transparent 60%)`,
+          bottom: "15%",
+          left: "10%",
+          filter: "blur(15px)"
         }}
         animate={{
-          x: [0, 70, 0],
-          y: [0, -30, 0],
-          opacity: [0.5, 0.85, 0.5]
+          x: [0, 90, 0],
+          y: [0, -40, 0],
+          opacity: [orbOpacityBase, orbOpacityHigh, orbOpacityBase]
         }}
         transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 3 }}
       />
       
-      {/* Extra floating orb */}
+      {/* Extra floating orb - center */}
       <motion.div
-        className="absolute w-40 h-40 rounded-full"
+        className="absolute w-56 h-56 rounded-full"
         style={{
-          background: `radial-gradient(circle, rgba(184,115,51,${isHigh ? 0.6 : 0.4}) 0%, rgba(184,115,51,0.2) 50%, transparent 70%)`,
-          top: "60%",
-          left: "50%",
-          filter: "blur(10px)"
+          background: `radial-gradient(circle, rgba(184,115,51,${isHigh ? 0.75 : 0.6}) 0%, rgba(184,115,51,0.28) 50%, transparent 70%)`,
+          top: "55%",
+          left: "45%",
+          filter: "blur(12px)"
         }}
         animate={{
-          x: [-50, 50, -50],
-          y: [0, -40, 0],
-          scale: [0.8, 1.2, 0.8],
-          opacity: [0.35, 0.7, 0.35]
+          x: [-60, 60, -60],
+          y: [0, -50, 0],
+          scale: [0.9, 1.3, 0.9],
+          opacity: [0.45, orbOpacityHigh, 0.45]
         }}
         transition={{ duration: 6, repeat: Infinity, ease: "easeInOut", delay: 2 }}
       />
@@ -110,12 +114,12 @@ export function GridBackground({ intensity = "high", variant = "light" }: GridBa
           <motion.div
             className="absolute h-1 w-full"
             style={{
-              background: "linear-gradient(90deg, transparent 0%, rgba(184,115,51,0.5) 50%, transparent 100%)",
+              background: "linear-gradient(90deg, transparent 0%, rgba(184,115,51,0.55) 50%, transparent 100%)",
               top: "30%"
             }}
             animate={{
               x: ["-100%", "100%"],
-              opacity: [0, 0.9, 0]
+              opacity: [0, 0.95, 0]
             }}
             transition={{ duration: 1.8, repeat: Infinity, ease: "easeInOut" }}
           />
@@ -124,12 +128,12 @@ export function GridBackground({ intensity = "high", variant = "light" }: GridBa
           <motion.div
             className="absolute h-0.5 w-full"
             style={{
-              background: "linear-gradient(90deg, transparent 0%, rgba(184,115,51,0.4) 50%, transparent 100%)",
+              background: "linear-gradient(90deg, transparent 0%, rgba(184,115,51,0.45) 50%, transparent 100%)",
               top: "70%"
             }}
             animate={{
               x: ["100%", "-100%"],
-              opacity: [0, 0.8, 0]
+              opacity: [0, 0.85, 0]
             }}
             transition={{ duration: 2.2, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
           />
@@ -138,12 +142,12 @@ export function GridBackground({ intensity = "high", variant = "light" }: GridBa
           <motion.div
             className="absolute w-1 h-full"
             style={{
-              background: "linear-gradient(180deg, transparent 0%, rgba(184,115,51,0.45) 50%, transparent 100%)",
+              background: "linear-gradient(180deg, transparent 0%, rgba(184,115,51,0.5) 50%, transparent 100%)",
               left: "75%"
             }}
             animate={{
               y: ["-100%", "100%"],
-              opacity: [0, 0.85, 0]
+              opacity: [0, 0.9, 0]
             }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
           />
@@ -168,7 +172,7 @@ export function GridBackground({ intensity = "high", variant = "light" }: GridBa
           </motion.div>
           
           <motion.div
-            className="absolute bottom-24 left-4"
+            className="absolute bottom-28 left-4"
             animate={{ opacity: [0.5, 0.9, 0.5] }}
             transition={{ duration: 2.5, repeat: Infinity, delay: 0.8 }}
           >
@@ -177,7 +181,7 @@ export function GridBackground({ intensity = "high", variant = "light" }: GridBa
           </motion.div>
           
           <motion.div
-            className="absolute bottom-24 right-4 flex flex-col items-end"
+            className="absolute bottom-28 right-4 flex flex-col items-end"
             animate={{ opacity: [0.5, 0.9, 0.5] }}
             transition={{ duration: 2.5, repeat: Infinity, delay: 1.2 }}
           >

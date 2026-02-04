@@ -95,16 +95,18 @@ export default function Home() {
 
   const handleBack = () => {
     if (phase === "phase_1" && currentQuestion > 1) {
-      // Going back resets ALL progress - percentages burn
-      setCurrentQuestion(1 as QuestionId);
-      setCircuitReveal(0);
-      setProgress(0);
+      // Go to previous question, keep progress earned so far
+      const prevQ = (currentQuestion - 1) as QuestionId;
+      setCurrentQuestion(prevQ);
+      // Progress and circuit stay at what was earned for previous questions
+      setProgress((prevQ - 1) * 5);
+      setCircuitReveal((prevQ - 1) * 25);
     } else if (phase === "phase_1_complete") {
-      // Going back from chip screen resets everything
+      // Go back to Q4
       setPhase("phase_1");
-      setCurrentQuestion(1);
-      setCircuitReveal(0);
-      setProgress(0);
+      setCurrentQuestion(4 as QuestionId);
+      setProgress(15); // Q1-Q3 answered = 15%
+      setCircuitReveal(75);
     } else if (phase === "phase_2") {
       setPhase("phase_1_complete");
     }
@@ -183,17 +185,17 @@ export default function Home() {
         <GridBackground intensity={bgIntensity} />
         <BiometricCircuit revealProgress={circuitReveal} />
         
-        {/* Error notification - dark terminal style, centered */}
+        {/* Error notification - dark terminal style, TOP toast */}
         <AnimatePresence>
           {showError && (
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.9 }}
-              className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none"
+              initial={{ opacity: 0, y: -50 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -50 }}
+              className="fixed top-4 left-1/2 -translate-x-1/2 z-50 pointer-events-none"
             >
-              <div className="bg-[#1E1E1E] text-[#B87333] px-8 py-4 
-                            text-[14px] tracking-[3px] font-mono font-bold
+              <div className="bg-[#1E1E1E] text-[#B87333] px-6 py-3 
+                            text-[13px] tracking-[3px] font-mono font-bold
                             border border-[#B87333]/60 shadow-lg">
                 ПОПРОБУЙ ЕЩЁ
               </div>
@@ -289,20 +291,16 @@ export default function Home() {
         {/* Back button */}
         <BackButton onClick={handleBack} isDark={false} />
         
-        {/* Label under chip - MUCH BIGGER */}
+        {/* Label under chip - STATIC, no pulsation */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1 }}
-          className="absolute bottom-24 left-1/2 -translate-x-1/2 text-center z-10"
+          className="absolute bottom-28 left-1/2 -translate-x-1/2 text-center z-10"
         >
-          <motion.p
-            className="text-[24px] text-[#B87333] tracking-[4px] font-mono font-bold"
-            animate={{ opacity: [0.6, 1, 0.6], scale: [0.98, 1.02, 0.98] }}
-            transition={{ duration: 1.2, repeat: Infinity }}
-          >
+          <p className="text-[24px] text-[#B87333] tracking-[4px] font-mono font-bold">
             НАЖМИТЕ НА ЧИП
-          </motion.p>
+          </p>
           <p className="text-[12px] text-[#3E3129]/70 tracking-wider font-mono mt-2 font-medium">
             для активации суверенитета
           </p>
