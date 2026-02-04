@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send } from "lucide-react";
+import { Send, X } from "lucide-react";
 
 interface DialogueBlock {
   id: string;
@@ -14,9 +14,10 @@ interface TerminalChatProps {
   dialogues: DialogueBlock[];
   onDialogueComplete: (reward: number) => void;
   onComplete: () => void;
+  onClose?: () => void;
 }
 
-export function TerminalChat({ dialogues, onDialogueComplete, onComplete }: TerminalChatProps) {
+export function TerminalChat({ dialogues, onDialogueComplete, onComplete, onClose }: TerminalChatProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [displayedMessages, setDisplayedMessages] = useState<{ speaker: string; text: string }[]>([]);
   const [typingText, setTypingText] = useState("");
@@ -139,22 +140,33 @@ export function TerminalChat({ dialogues, onDialogueComplete, onComplete }: Term
             animate={{ opacity: [0.4, 1, 0.4] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           />
-          <span className="text-[11px] text-[#B87333] tracking-[2px] font-mono">
-            TERMINAL://SATOSHI_PROTOCOL
+          <span className="text-[10px] text-[#B87333] tracking-[1px] font-mono">
+            SATOSHI_PROTOCOL
           </span>
         </div>
-        <span className="text-[9px] text-[#E8E8E8]/40 tracking-wider font-mono">
-          ENCRYPTED
-        </span>
+        <div className="flex items-center gap-3">
+          <span className="text-[8px] text-[#E8E8E8]/40 tracking-wider font-mono">
+            ENCRYPTED
+          </span>
+          {onClose && (
+            <button
+              onClick={onClose}
+              className="p-1 text-[#E8E8E8]/50 hover:text-[#E8E8E8] transition-colors"
+              data-testid="button-close-chat"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
       </div>
       
       {/* Chat area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#1E1E1E] border-x border-[#B87333]/20 mx-2">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-[#1E1E1E]">
         {/* System initialization message */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          className="text-[10px] text-[#B87333]/50 font-mono mb-4"
+          className="text-[9px] text-[#B87333]/50 font-mono mb-4"
         >
           [SYSTEM] Connection established. Digital resistance protocol active.
         </motion.div>
@@ -165,7 +177,7 @@ export function TerminalChat({ dialogues, onDialogueComplete, onComplete }: Term
               key={i}
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="font-mono text-sm leading-relaxed"
+              className="font-mono text-[13px] leading-relaxed"
             >
               <span className={msg.speaker === "SATOSHI" ? "text-[#B87333]" : "text-[#4ADE80]"}>
                 [{msg.speaker}]
@@ -177,7 +189,7 @@ export function TerminalChat({ dialogues, onDialogueComplete, onComplete }: Term
         
         {/* Currently typing */}
         {isTyping && typingText && (
-          <div className="font-mono text-sm leading-relaxed">
+          <div className="font-mono text-[13px] leading-relaxed">
             <span className="text-[#B87333]">[SATOSHI]</span>
             <span className="text-[#E8E8E8]/80 ml-2">{typingText}</span>
             <motion.span
@@ -195,13 +207,14 @@ export function TerminalChat({ dialogues, onDialogueComplete, onComplete }: Term
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="flex flex-wrap gap-3 pt-4"
+              className="flex flex-col sm:flex-row flex-wrap gap-3 pt-4"
             >
               {currentDialogue.options.map((option) => (
                 <button
                   key={option.id}
                   onClick={() => handleOptionClick(option)}
-                  className="w-40 h-14 border-2 border-[#B87333] text-[#E8E8E8] text-[13px] tracking-wider font-mono
+                  className="flex-1 min-w-[140px] h-12 border-2 border-[#B87333] text-[#E8E8E8] 
+                           text-[12px] tracking-wider font-mono
                            hover:bg-[#B87333] hover:text-[#1E1E1E] transition-all duration-200"
                   data-testid={`chat-option-${option.id}`}
                 >
@@ -218,7 +231,7 @@ export function TerminalChat({ dialogues, onDialogueComplete, onComplete }: Term
       {/* Input area */}
       <form 
         onSubmit={handleSubmit}
-        className="px-2 py-3 border-t border-[#B87333]/40 bg-[#2A2A2A]"
+        className="p-3 border-t border-[#B87333]/40 bg-[#2A2A2A]"
       >
         <div className="flex items-center gap-2 border border-[#B87333]/50 bg-[#1E1E1E] px-3 py-2">
           <span className="text-[#4ADE80] text-xs font-mono">&gt;</span>
@@ -229,7 +242,7 @@ export function TerminalChat({ dialogues, onDialogueComplete, onComplete }: Term
             onChange={(e) => setInputValue(e.target.value)}
             placeholder={inputEnabled ? "Введите ответ..." : "Ожидание..."}
             disabled={!inputEnabled}
-            className="flex-1 bg-transparent text-[#E8E8E8] text-sm font-mono 
+            className="flex-1 bg-transparent text-[#E8E8E8] text-[13px] font-mono 
                      placeholder:text-[#E8E8E8]/30 focus:outline-none disabled:opacity-50"
             data-testid="input-chat"
           />

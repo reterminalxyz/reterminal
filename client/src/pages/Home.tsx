@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { CircuitBoard } from "@/components/CircuitBoard";
+import { Microchip } from "@/components/Microchip";
 import { GridBackground } from "@/components/GridBackground";
 import { IndependenceBar } from "@/components/IndependenceBar";
 import { TerminalChat } from "@/components/TerminalChat";
@@ -41,7 +41,7 @@ export default function Home() {
   const [completedLayers, setCompletedLayers] = useState(0);
   const [correctAnswers, setCorrectAnswers] = useState(0);
   const [totalSats, setTotalSats] = useState(0);
-  const [progress, setProgress] = useState(0); // 0-100
+  const [progress, setProgress] = useState(0);
   
   const { data: session, isLoading: isSessionLoading } = useSession(sessionId);
   const createSession = useCreateSession();
@@ -79,7 +79,7 @@ export default function Home() {
         setCurrentQuestion((questionId + 1) as QuestionId);
       } else {
         setTotalSats(prev => prev + 150);
-        setProgress(20); // Phase 1 = 20%
+        setProgress(20);
         setPhase("phase_1_complete");
         toast({
           title: "+150 SATS",
@@ -117,8 +117,7 @@ export default function Home() {
 
   const handleDialogueReward = (reward: number) => {
     setTotalSats(prev => prev + reward);
-    // Each dialogue adds ~10% (7 dialogues = 70%, but we start at 20%)
-    setProgress(prev => Math.min(prev + 10, 90));
+    // Progress stays at 20% during Phase 2 - only pulses, doesn't increase
   };
 
   const handlePhase2Complete = () => {
@@ -139,6 +138,10 @@ export default function Home() {
     });
   };
 
+  const handleCloseChat = () => {
+    setPhase("phase_1_complete");
+  };
+
   // Loading state
   if (phase === "loading" || !sessionId || isSessionLoading) {
     return (
@@ -156,7 +159,7 @@ export default function Home() {
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           >
-            ИНИЦИАЛИЗАЦИЯ ПРОТОКОЛА...
+            ИНИЦИАЛИЗАЦИЯ...
           </motion.div>
         </div>
       </div>
@@ -170,30 +173,29 @@ export default function Home() {
     return (
       <div className="min-h-screen bg-[#F5F5F5] relative overflow-hidden">
         <GridBackground />
-        <CircuitBoard completedLayers={completedLayers} />
+        <Microchip completedLayers={completedLayers} />
         
-        {/* Back button */}
         {currentQuestion > 1 && (
           <BackButton onClick={handleBack} isDark={false} />
         )}
         
         {/* Header */}
-        <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col items-center gap-1"
+            className="flex flex-col items-center gap-0.5"
           >
-            <span className="text-[9px] text-[#B87333]/50 tracking-[3px] font-mono">
+            <span className="text-[8px] text-[#B87333]/50 tracking-[2px] font-mono">
               DIGITAL RESISTANCE
             </span>
-            <span className="text-[11px] text-[#B87333] tracking-[3px] font-mono">
+            <span className="text-[10px] text-[#B87333] tracking-[2px] font-mono">
               СБОРКА ПРОТОКОЛА
             </span>
           </motion.div>
         </div>
 
-        {/* Question */}
+        {/* Question - no progress dots */}
         <div className="min-h-screen flex flex-col items-center justify-center relative z-10 px-4">
           <AnimatePresence mode="wait">
             <motion.div
@@ -204,7 +206,7 @@ export default function Home() {
               className="flex flex-col items-center"
             >
               <motion.h1 
-                className="text-[16px] text-[#B87333] tracking-[4px] font-semibold mb-12"
+                className="text-[15px] text-[#B87333] tracking-[3px] font-semibold mb-10"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
@@ -212,7 +214,7 @@ export default function Home() {
                 {question.title}
               </motion.h1>
               
-              <div className="flex gap-4">
+              <div className="flex gap-3">
                 {question.options.map((option, idx) => (
                   <motion.button
                     key={option.label}
@@ -220,30 +222,14 @@ export default function Home() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 + idx * 0.1 }}
                     onClick={() => handleQuestionAnswer(question.id as QuestionId, option.correct)}
-                    className="w-40 h-14 bg-transparent border-2 border-[#B87333] text-[#3E3129] 
-                             text-[14px] font-medium tracking-wider font-mono
+                    className="w-36 h-12 bg-transparent border-2 border-[#B87333] text-[#3E3129] 
+                             text-[13px] font-medium tracking-wider font-mono
                              hover:bg-[#B87333] hover:text-[#F5F5F5] 
-                             transition-all duration-200"
+                             active:scale-95 transition-all duration-200"
                     data-testid={`button-q${question.id}-${idx === 0 ? 'a' : 'b'}`}
                   >
                     {option.label}
                   </motion.button>
-                ))}
-              </div>
-              
-              {/* Progress dots */}
-              <div className="flex gap-3 mt-12">
-                {[1, 2, 3].map((q) => (
-                  <motion.div
-                    key={q}
-                    className={`w-2 h-2 rounded-full transition-colors duration-300 ${
-                      q < currentQuestion ? 'bg-[#B87333]' : 
-                      q === currentQuestion ? 'bg-[#B87333]/50' : 
-                      'bg-[#D4956A]/30'
-                    }`}
-                    animate={q === currentQuestion ? { scale: [1, 1.2, 1] } : {}}
-                    transition={{ duration: 1, repeat: Infinity }}
-                  />
                 ))}
               </div>
             </motion.div>
@@ -255,70 +241,38 @@ export default function Home() {
     );
   }
 
-  // Phase 1 Complete - chip becomes the CTA
+  // Phase 1 Complete - ONLY microchip button + label
   if (phase === "phase_1_complete") {
     return (
-      <div className="min-h-screen bg-[#F5F5F5] relative overflow-hidden">
+      <div className="min-h-screen bg-[#F5F5F5] relative overflow-hidden flex flex-col items-center justify-center">
         <GridBackground />
-        <CircuitBoard completedLayers={3} onChipClick={handleChipClick} />
         
-        <BackButton onClick={handleBack} isDark={false} />
-        
-        <div className="min-h-screen flex flex-col items-center justify-center relative z-10 px-4">
+        {/* Main content: microchip + label only */}
+        <div className="flex flex-col items-center z-10">
+          {/* Clickable microchip */}
+          <Microchip 
+            completedLayers={3} 
+            onChipClick={handleChipClick}
+            showOnly={true}
+          />
+          
+          {/* Label under chip */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="flex flex-col items-center text-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5 }}
+            className="mt-8 text-center"
           >
-            <motion.div
-              className="text-[9px] text-[#B87333]/50 tracking-[3px] font-mono mb-2"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-            >
-              DIGITAL RESISTANCE
-            </motion.div>
-            
-            <motion.h1 
-              className="text-[18px] text-[#B87333] tracking-[3px] font-semibold mb-6"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.3 }}
-            >
-              ПРОТОКОЛ СОБРАН
-            </motion.h1>
-            
-            <motion.div
-              className="text-[28px] text-[#B87333] font-bold mb-8 font-mono"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.6 }}
-            >
-              +150 SATS
-            </motion.div>
-            
             <motion.p
-              className="text-[12px] text-[#3E3129]/60 tracking-wider mb-8 max-w-xs font-mono"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.9 }}
+              className="text-[11px] text-[#B87333] tracking-[2px] font-mono"
+              animate={{ opacity: [0.6, 1, 0.6] }}
+              transition={{ duration: 1.5, repeat: Infinity }}
             >
-              Нажмите на чип в центре схемы для активации суверенитета
+              НАЖМИТЕ НА ЧИП
             </motion.p>
-            
-            {/* Alternative button for mobile / accessibility */}
-            <motion.button
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.2 }}
-              onClick={handleActivate}
-              className="w-72 h-14 bg-[#B87333] text-[#F5F5F5] 
-                       text-[13px] font-semibold tracking-[2px]
-                       hover:bg-[#A66829] 
-                       transition-all duration-300 font-mono"
-              data-testid="button-activate"
-            >
-              АКТИВИРОВАТЬ СУВЕРЕНИТЕТ
-            </motion.button>
+            <p className="text-[9px] text-[#3E3129]/50 tracking-wider font-mono mt-2">
+              для активации суверенитета
+            </p>
           </motion.div>
         </div>
 
@@ -327,11 +281,10 @@ export default function Home() {
     );
   }
 
-  // Vertical transition animation (center to down)
+  // Vertical transition animation
   if (phase === "transition") {
     return (
       <div className="min-h-screen bg-[#2A2A2A] relative overflow-hidden">
-        {/* Dark terminal is revealed behind */}
         <motion.div 
           className="absolute inset-0 bg-[#2A2A2A] z-10"
           initial={{ opacity: 0 }}
@@ -347,7 +300,6 @@ export default function Home() {
           transition={{ duration: 1.2, ease: [0.76, 0, 0.24, 1], delay: 0.2 }}
         >
           <div className="w-full h-full border-b-2 border-[#B87333]/40" />
-          {/* Glitch lines */}
           <motion.div 
             className="absolute bottom-0 left-0 right-0 h-1 bg-[#B87333]/60"
             animate={{ opacity: [0, 1, 0, 1, 0] }}
@@ -363,7 +315,6 @@ export default function Home() {
           transition={{ duration: 1.2, ease: [0.76, 0, 0.24, 1], delay: 0.2 }}
         >
           <div className="w-full h-full border-t-2 border-[#B87333]/40" />
-          {/* Glitch lines */}
           <motion.div 
             className="absolute top-0 left-0 right-0 h-1 bg-[#B87333]/60"
             animate={{ opacity: [0, 1, 0, 1, 0] }}
@@ -371,7 +322,7 @@ export default function Home() {
           />
         </motion.div>
         
-        {/* Center flash effect */}
+        {/* Center flash */}
         <motion.div
           className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none"
           initial={{ opacity: 0 }}
@@ -389,7 +340,7 @@ export default function Home() {
           transition={{ delay: 0.8 }}
         >
           <motion.span 
-            className="text-[11px] text-[#B87333] tracking-[4px] font-mono"
+            className="text-[10px] text-[#B87333] tracking-[3px] font-mono"
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 0.5, repeat: Infinity }}
           >
@@ -408,12 +359,13 @@ export default function Home() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="h-screen pb-16"
+          className="h-screen pb-20"
         >
           <TerminalChat 
             dialogues={DIALOGUES}
             onDialogueComplete={handleDialogueReward}
             onComplete={handlePhase2Complete}
+            onClose={handleCloseChat}
           />
         </motion.div>
         
@@ -426,12 +378,12 @@ export default function Home() {
   if (phase === "complete") {
     return (
       <div className="min-h-screen bg-[#2A2A2A] flex items-center justify-center relative overflow-hidden">
-        {/* Subtle grid for dark mode */}
-        <div className="absolute inset-0 opacity-10">
+        {/* Subtle grid */}
+        <div className="absolute inset-0 opacity-[0.05]">
           <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              <pattern id="gridDark" width="40" height="40" patternUnits="userSpaceOnUse">
-                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#B87333" strokeWidth="0.3" />
+              <pattern id="gridDark" width="50" height="50" patternUnits="userSpaceOnUse">
+                <path d="M 50 0 L 0 0 0 50" fill="none" stroke="#B87333" strokeWidth="0.5" />
               </pattern>
             </defs>
             <rect width="100%" height="100%" fill="url(#gridDark)" />
@@ -444,7 +396,7 @@ export default function Home() {
           className="flex flex-col items-center text-center px-4 z-10"
         >
           <motion.div
-            className="text-[9px] text-[#B87333]/50 tracking-[3px] font-mono mb-4"
+            className="text-[8px] text-[#B87333]/50 tracking-[2px] font-mono mb-3"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
@@ -452,24 +404,24 @@ export default function Home() {
           </motion.div>
           
           <motion.h1 
-            className="text-[18px] text-[#B87333] tracking-[3px] font-semibold mb-3"
+            className="text-[16px] text-[#B87333] tracking-[2px] font-semibold mb-2"
             animate={{ opacity: [0.7, 1, 0.7] }}
             transition={{ duration: 2, repeat: Infinity }}
           >
             ПРОТОКОЛ ЗАВЕРШЁН
           </motion.h1>
           
-          <motion.p className="text-[#E8E8E8]/70 text-sm mb-8 font-mono tracking-wider">
+          <motion.p className="text-[#E8E8E8]/70 text-[12px] mb-6 font-mono tracking-wider">
             ТЫ АКТИВИРОВАН
           </motion.p>
           
           <motion.div
-            className="text-[36px] text-[#B87333] font-bold font-mono"
+            className="text-[32px] text-[#B87333] font-bold font-mono"
             animate={{ 
               textShadow: [
-                "0 0 10px rgba(184,115,51,0.3)",
-                "0 0 30px rgba(184,115,51,0.6)",
-                "0 0 10px rgba(184,115,51,0.3)"
+                "0 0 8px rgba(184,115,51,0.3)",
+                "0 0 20px rgba(184,115,51,0.6)",
+                "0 0 8px rgba(184,115,51,0.3)"
               ]
             }}
             transition={{ duration: 1.5, repeat: Infinity }}
@@ -478,7 +430,7 @@ export default function Home() {
           </motion.div>
           
           <motion.div
-            className="mt-8 px-6 py-3 border border-[#B87333]/50 text-[#B87333] text-xs tracking-wider font-mono"
+            className="mt-6 px-4 py-2 border border-[#B87333]/50 text-[#B87333] text-[10px] tracking-wider font-mono"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
@@ -487,7 +439,7 @@ export default function Home() {
           </motion.div>
           
           <motion.p
-            className="mt-6 text-[10px] text-[#E8E8E8]/40 tracking-wider font-mono max-w-xs"
+            className="mt-4 text-[9px] text-[#E8E8E8]/40 tracking-wider font-mono max-w-[280px]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8 }}

@@ -74,14 +74,16 @@ Animated grid pattern for Phase 1:
 - Corner accent decorations
 - Data stream dots
 
-### CircuitBoard.tsx
-NFC-style antenna circuit:
-- 3 concentric rounded rectangles (antenna loops)
-- Connection traces from loops to central chip
-- Central chip with pins and internal circuitry
-- Chip becomes clickable CTA when complete
-- `completedLayers` prop controls visibility (0-3)
-- `onChipClick` callback when chip is ready
+### Microchip.tsx
+Microchip assembly animation:
+- 12 circuit elements total (4 per question)
+- Q1: elements appear from TOP
+- Q2: elements appear from SIDES
+- Q3: elements appear from BOTTOM
+- Central chip appears after Q2, becomes clickable after Q3
+- `completedLayers` prop (0-3)
+- `onChipClick` callback when ready
+- `showOnly` prop for minimal display on completion screen
 
 ### IndependenceBar.tsx
 Bottom-fixed progress indicator:
@@ -114,13 +116,16 @@ Navigation button:
 - Total: 500 SATS
 
 ## Recent Changes (Feb 2026)
-- Grid background with animated scan lines (digital resistance vibe)
-- NFC-style circuit animation matching physical card design
-- Central chip becomes clickable CTA after all correct answers
+- Clean minimal grid background (no scan lines or dots)
+- Microchip assembly animation (4 elements per question from different directions)
+- Central chip becomes clickable CTA (like a lock opening Satoshi dialogue)
 - Vertical transition (top-down panels sliding apart)
 - Text input field added to chat interface
-- Back button on all screens (except first question)
-- Independence bar fills 20% after Phase 1 (not 30%)
-- User messages displayed in green
-- System initialization message in chat
+- Close button in chat header for navigation back
+- Back button fixed positioning (no mobile overlaps)
+- Progress dots REMOVED from questions
+- Phase 1 complete screen: ONLY microchip button + label
+- Independence bar: metallic styling with pulsing effect
+- Independence bar stays at 20% during Phase 2 (doesn't increase per dialogue)
+- Mobile-first design (400px viewport optimized)
 - "DIGITAL RESISTANCE" branding throughout
