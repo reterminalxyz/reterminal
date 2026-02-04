@@ -31,16 +31,16 @@ A state-machine driven onboarding flow for a Bitcoin Lightning Network card prod
 
 ### Phase 1: СБОРКА ПРОТОКОЛА (20% independence)
 Four quick questions with biometric circuit reveal:
-1. **СВОБОДА**: ПРАВО (correct) vs СЕРВИС → 7%
-2. **СОБСТВЕННОСТЬ**: БАНК vs Я (correct) → 14%
-3. **СУВЕРЕНИТЕТ**: ИНСТРУМЕНТ (correct) vs РИСК → 21%
-4. **КОНТРОЛЬ**: СИСТЕМА vs ТЫ (correct) → 28%
+1. **СВОБОДА**: ПРАВО (correct) vs СЕРВИС → 5%
+2. **СОБСТВЕННОСТЬ**: БАНК vs Я (correct) → 10%
+3. **СУВЕРЕНИТЕТ**: ИНСТРУМЕНТ (correct) vs РИСК → 15%
+4. **КОНТРОЛЬ**: СИСТЕМА vs ТЫ (correct) → 20%
 
 Progressive biometric-style circuit reveal:
-- Question 1 (7%): Circuit lines from TOP (25% revealed)
-- Question 2 (14%): Circuit lines from RIGHT (50% revealed)
-- Question 3 (21%): Circuit lines from BOTTOM (75% revealed)
-- Question 4 (28%): Circuit lines from LEFT + central chip (100% revealed)
+- Question 1 (5%): Circuit lines from TOP (25% revealed)
+- Question 2 (10%): Circuit lines from RIGHT (50% revealed)
+- Question 3 (15%): Circuit lines from BOTTOM (75% revealed)
+- Question 4 (20%): Circuit lines from LEFT + central chip (100% revealed)
 
 The chip becomes a clickable CTA button when all answers are correct.
 Reward: 150 SATS
@@ -121,14 +121,14 @@ Navigation button:
 - `POST /api/sessions/:id/action` - Update session with action
 
 ## Reward Distribution
-- Phase 1: 150 SATS (28% independence after 4 questions, each gives 7%)
-- Phase 2: 350 SATS (72% independence through dialogue)
+- Phase 1: 150 SATS (20% independence after 4 questions, each gives 5%)
+- Phase 2: 350 SATS (80% independence through dialogue)
 - Total: 500 SATS (100% independence)
 
 ## Recent Changes (Feb 2026)
 - Teenage Engineering-inspired background (aluminum + copper, animated accents)
 - Biometric-style circuit reveal (lines from 4 directions converging to chip)
-- 4 questions now (each gives 7% independence: 7→14→21→28%)
+- 4 questions now (each gives 5% independence: 5→10→15→20%)
 - Circuit reveal: Q1=25%, Q2=50%, Q3=75%, Q4=100% + central chip
 - Central chip becomes clickable CTA (like a lock opening Satoshi dialogue)
 - Vertical transition (top-down panels sliding apart)
@@ -138,7 +138,7 @@ Navigation button:
 - Progress dots REMOVED from questions
 - Independence bar: ONLY shows current % (no 0% or 100% labels)
 - Independence bar: metallic styling with pulsing effect
-- Independence bar stays at 28% during Phase 2 (doesn't increase per dialogue)
+- Independence bar stays at 20% during Phase 2 (doesn't increase per dialogue)
 - Toast notification "+150 SATS" REMOVED (was blocking screen)
 - Mobile-first design (400px viewport optimized)
 - "DIGITAL RESISTANCE" branding throughout

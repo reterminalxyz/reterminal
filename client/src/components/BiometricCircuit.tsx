@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 
 interface BiometricCircuitProps {
-  revealProgress: number; // 0-100%
+  revealProgress: number; // 0, 25, 50, 75, 100
   onChipClick?: () => void;
   isComplete?: boolean;
 }
@@ -10,215 +10,300 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
   const showChip = revealProgress >= 100;
   const isClickable = showChip && onChipClick;
   
-  // SVG paths for biometric-style circuit lines
-  // Lines converge from all edges toward center chip
-  const circuitPaths = [
-    // TOP section (25%) - vertical descending lines
-    { d: "M 200 0 L 200 120 L 180 140", reveal: 25, delay: 0 },
-    { d: "M 200 0 L 200 80", reveal: 25, delay: 0.05 },
-    { d: "M 150 0 L 150 100 L 170 120", reveal: 25, delay: 0.1 },
-    { d: "M 250 0 L 250 100 L 230 120", reveal: 25, delay: 0.15 },
-    { d: "M 180 0 L 180 60 L 200 80", reveal: 25, delay: 0.08 },
-    { d: "M 220 0 L 220 60 L 200 80", reveal: 25, delay: 0.12 },
-    
-    // RIGHT section (50%) - horizontal lines from right
-    { d: "M 400 200 L 280 200 L 260 220", reveal: 50, delay: 0 },
-    { d: "M 400 180 L 300 180 L 280 200", reveal: 50, delay: 0.05 },
-    { d: "M 400 220 L 300 220 L 280 200", reveal: 50, delay: 0.1 },
-    { d: "M 400 160 L 320 160 L 300 180", reveal: 50, delay: 0.08 },
-    { d: "M 400 240 L 320 240 L 300 220", reveal: 50, delay: 0.12 },
-    { d: "M 400 200 L 260 200", reveal: 50, delay: 0.15 },
-    
-    // BOTTOM section (75%) - vertical ascending lines
-    { d: "M 200 400 L 200 280 L 220 260", reveal: 75, delay: 0 },
-    { d: "M 200 400 L 200 320", reveal: 75, delay: 0.05 },
-    { d: "M 150 400 L 150 300 L 170 280", reveal: 75, delay: 0.1 },
-    { d: "M 250 400 L 250 300 L 230 280", reveal: 75, delay: 0.15 },
-    { d: "M 180 400 L 180 340 L 200 320", reveal: 75, delay: 0.08 },
-    { d: "M 220 400 L 220 340 L 200 320", reveal: 75, delay: 0.12 },
-    
-    // LEFT section (100%) - horizontal lines from left
-    { d: "M 0 200 L 120 200 L 140 220", reveal: 100, delay: 0 },
-    { d: "M 0 180 L 100 180 L 120 200", reveal: 100, delay: 0.05 },
-    { d: "M 0 220 L 100 220 L 120 200", reveal: 100, delay: 0.1 },
-    { d: "M 0 160 L 80 160 L 100 180", reveal: 100, delay: 0.08 },
-    { d: "M 0 240 L 80 240 L 100 220", reveal: 100, delay: 0.12 },
-    { d: "M 0 200 L 140 200", reveal: 100, delay: 0.15 },
-    
-    // Center convergence traces (100%)
-    { d: "M 180 140 L 180 180 L 160 200", reveal: 100, delay: 0.2 },
-    { d: "M 220 140 L 220 180 L 240 200", reveal: 100, delay: 0.22 },
-    { d: "M 260 200 L 240 200", reveal: 100, delay: 0.25 },
-    { d: "M 140 200 L 160 200", reveal: 100, delay: 0.25 },
-    { d: "M 180 260 L 180 220 L 160 200", reveal: 100, delay: 0.28 },
-    { d: "M 220 260 L 220 220 L 240 200", reveal: 100, delay: 0.3 },
+  // All unique paths - no mirroring
+  // TOP section (25%) - descending from top edge
+  const topPaths = [
+    { d: "M 200 0 L 200 80 L 200 140", delay: 0 },
+    { d: "M 200 0 L 200 60 L 170 90 L 170 130", delay: 0.1 },
+    { d: "M 200 0 L 200 50 L 230 80 L 230 130", delay: 0.15 },
+    { d: "M 140 0 L 140 70 L 160 90 L 160 120", delay: 0.2 },
+    { d: "M 260 0 L 260 60 L 240 80 L 240 120", delay: 0.25 },
+    { d: "M 120 0 L 120 50 L 150 80", delay: 0.3 },
+    { d: "M 280 0 L 280 50 L 250 80", delay: 0.35 },
   ];
+  
+  // RIGHT section (50%) - from right edge, unique asymmetric pattern
+  const rightPaths = [
+    { d: "M 400 200 L 320 200 L 270 200", delay: 0 },
+    { d: "M 400 160 L 340 160 L 300 180 L 280 180", delay: 0.1 },
+    { d: "M 400 240 L 350 240 L 310 220 L 280 220", delay: 0.15 },
+    { d: "M 400 130 L 360 130 L 330 150 L 290 150", delay: 0.2 },
+    { d: "M 400 270 L 370 270 L 340 250 L 290 250", delay: 0.25 },
+    { d: "M 400 180 L 310 180 L 270 190", delay: 0.3 },
+  ];
+  
+  // BOTTOM section (75%) - ascending from bottom edge, unique pattern
+  const bottomPaths = [
+    { d: "M 200 400 L 200 320 L 200 260", delay: 0 },
+    { d: "M 180 400 L 180 340 L 175 280 L 180 260", delay: 0.1 },
+    { d: "M 220 400 L 220 350 L 225 290 L 220 260", delay: 0.15 },
+    { d: "M 150 400 L 150 360 L 165 300 L 165 270", delay: 0.2 },
+    { d: "M 250 400 L 250 350 L 235 300 L 235 270", delay: 0.25 },
+    { d: "M 130 400 L 130 370 L 155 320", delay: 0.3 },
+    { d: "M 270 400 L 270 370 L 245 320", delay: 0.35 },
+  ];
+  
+  // LEFT section (100%) - from left edge, unique asymmetric
+  const leftPaths = [
+    { d: "M 0 200 L 80 200 L 130 200", delay: 0 },
+    { d: "M 0 170 L 60 170 L 100 185 L 120 185", delay: 0.1 },
+    { d: "M 0 230 L 50 230 L 90 215 L 120 215", delay: 0.15 },
+    { d: "M 0 140 L 40 140 L 70 160 L 110 160", delay: 0.2 },
+    { d: "M 0 260 L 30 260 L 60 240 L 110 240", delay: 0.25 },
+    { d: "M 0 200 L 70 200 L 110 210", delay: 0.3 },
+  ];
+  
+  // Central convergence paths (100%)
+  const centerPaths = [
+    { d: "M 170 130 L 170 170 L 155 200", delay: 0.4 },
+    { d: "M 230 130 L 230 170 L 245 200", delay: 0.45 },
+    { d: "M 270 200 L 245 200", delay: 0.5 },
+    { d: "M 130 200 L 155 200", delay: 0.5 },
+    { d: "M 180 260 L 180 230 L 165 200", delay: 0.55 },
+    { d: "M 220 260 L 220 230 L 235 200", delay: 0.6 },
+  ];
+
+  const renderPaths = (paths: {d: string, delay: number}[], minProgress: number) => (
+    paths.map((path, i) => (
+      <motion.path
+        key={`${minProgress}-${i}`}
+        d={path.d}
+        stroke="#B87333"
+        strokeWidth={2.5}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+        initial={{ pathLength: 0, opacity: 0 }}
+        animate={{ 
+          pathLength: revealProgress >= minProgress ? 1 : 0,
+          opacity: revealProgress >= minProgress ? 0.8 : 0
+        }}
+        transition={{ 
+          duration: 1.2,
+          delay: revealProgress >= minProgress ? path.delay : 0,
+          ease: "easeOut"
+        }}
+      />
+    ))
+  );
+
+  // Animated dots at endpoints
+  const renderDots = (positions: {x: number, y: number}[], minProgress: number) => (
+    <motion.g
+      initial={{ opacity: 0 }}
+      animate={{ opacity: revealProgress >= minProgress ? 1 : 0 }}
+      transition={{ delay: 0.5, duration: 0.5 }}
+    >
+      {positions.map((pos, i) => (
+        <motion.circle
+          key={i}
+          cx={pos.x}
+          cy={pos.y}
+          r={4}
+          fill="#B87333"
+          animate={{ 
+            scale: [1, 1.3, 1],
+            opacity: [0.6, 1, 0.6]
+          }}
+          transition={{ 
+            duration: 2,
+            repeat: Infinity,
+            delay: i * 0.2
+          }}
+        />
+      ))}
+    </motion.g>
+  );
 
   return (
     <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-0 overflow-hidden">
       <svg 
-        className="w-full h-full max-w-[400px] max-h-[400px]" 
+        className="w-full h-full" 
         viewBox="0 0 400 400"
         preserveAspectRatio="xMidYMid meet"
       >
-        {/* Circuit paths with progressive reveal */}
-        {circuitPaths.map((path, i) => (
-          <motion.path
-            key={i}
-            d={path.d}
-            stroke="#B87333"
-            strokeWidth={revealProgress >= path.reveal ? 2 : 1.5}
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            fill="none"
-            initial={{ pathLength: 0, opacity: 0 }}
-            animate={{ 
-              pathLength: revealProgress >= path.reveal ? 1 : 0,
-              opacity: revealProgress >= path.reveal ? 0.7 : 0.15
-            }}
-            transition={{ 
-              duration: 0.8, 
-              delay: revealProgress >= path.reveal ? path.delay : 0,
-              ease: "easeOut"
-            }}
-          />
-        ))}
+        {/* TOP paths - 25% */}
+        {renderPaths(topPaths, 25)}
+        {renderDots([{x:200, y:140}, {x:170, y:130}, {x:230, y:130}], 25)}
         
-        {/* Connection nodes at line ends */}
-        {revealProgress >= 25 && (
-          <motion.g initial={{ opacity: 0 }} animate={{ opacity: 0.6 }} transition={{ delay: 0.3 }}>
-            <circle cx="200" cy="120" r="3" fill="#B87333" />
-            <circle cx="150" cy="100" r="2" fill="#B87333" />
-            <circle cx="250" cy="100" r="2" fill="#B87333" />
-          </motion.g>
-        )}
+        {/* RIGHT paths - 50% */}
+        {renderPaths(rightPaths, 50)}
+        {renderDots([{x:270, y:200}, {x:280, y:180}, {x:280, y:220}], 50)}
         
-        {revealProgress >= 50 && (
-          <motion.g initial={{ opacity: 0 }} animate={{ opacity: 0.6 }} transition={{ delay: 0.3 }}>
-            <circle cx="280" cy="200" r="3" fill="#B87333" />
-            <circle cx="300" cy="180" r="2" fill="#B87333" />
-            <circle cx="300" cy="220" r="2" fill="#B87333" />
-          </motion.g>
-        )}
+        {/* BOTTOM paths - 75% */}
+        {renderPaths(bottomPaths, 75)}
+        {renderDots([{x:200, y:260}, {x:180, y:260}, {x:220, y:260}], 75)}
         
-        {revealProgress >= 75 && (
-          <motion.g initial={{ opacity: 0 }} animate={{ opacity: 0.6 }} transition={{ delay: 0.3 }}>
-            <circle cx="200" cy="280" r="3" fill="#B87333" />
-            <circle cx="150" cy="300" r="2" fill="#B87333" />
-            <circle cx="250" cy="300" r="2" fill="#B87333" />
-          </motion.g>
-        )}
+        {/* LEFT paths - 100% */}
+        {renderPaths(leftPaths, 100)}
+        {renderPaths(centerPaths, 100)}
+        {renderDots([{x:130, y:200}, {x:120, y:185}, {x:120, y:215}], 100)}
         
-        {revealProgress >= 100 && (
-          <motion.g initial={{ opacity: 0 }} animate={{ opacity: 0.6 }} transition={{ delay: 0.3 }}>
-            <circle cx="120" cy="200" r="3" fill="#B87333" />
-            <circle cx="100" cy="180" r="2" fill="#B87333" />
-            <circle cx="100" cy="220" r="2" fill="#B87333" />
-          </motion.g>
-        )}
-        
-        {/* Central chip - appears when 100% complete */}
+        {/* Central chip - cyberpunk style */}
         {showChip && (
           <motion.g
             initial={{ scale: 0, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.5, delay: 0.4 }}
+            transition={{ duration: 0.6, delay: 0.7 }}
           >
-            {/* Chip frame */}
+            {/* Outer glow */}
             <motion.rect
-              x="160"
+              x="145"
+              y="175"
+              width="110"
+              height="50"
+              rx="3"
+              fill="none"
+              stroke="#B87333"
+              strokeWidth="1"
+              animate={{
+                opacity: [0.2, 0.5, 0.2],
+                scale: [1, 1.05, 1]
+              }}
+              transition={{ duration: 2, repeat: Infinity }}
+              style={{ transformOrigin: "200px 200px" }}
+            />
+            
+            {/* Main chip frame */}
+            <motion.rect
+              x="150"
               y="180"
-              width="80"
+              width="100"
               height="40"
               rx="2"
               stroke="#B87333"
-              strokeWidth={isClickable ? 2.5 : 2}
-              fill="rgba(184,115,51,0.1)"
+              strokeWidth={isClickable ? 3 : 2}
+              fill="rgba(184,115,51,0.12)"
               className={isClickable ? "pointer-events-auto cursor-pointer" : ""}
               onClick={isClickable ? onChipClick : undefined}
               animate={isClickable ? {
-                strokeOpacity: [0.8, 1, 0.8],
-                fillOpacity: [0.05, 0.15, 0.05]
+                strokeOpacity: [0.7, 1, 0.7],
+                fillOpacity: [0.08, 0.18, 0.08]
               } : {}}
-              transition={{ duration: 1.2, repeat: Infinity }}
+              transition={{ duration: 1.5, repeat: Infinity }}
             />
             
             {/* Chip pins - top */}
-            {[170, 185, 200, 215, 230].map((x, i) => (
+            {[160, 175, 190, 205, 220, 235].map((x, i) => (
               <motion.line
-                key={`top-${i}`}
-                x1={x} y1="175" x2={x} y2="180"
+                key={`top-pin-${i}`}
+                x1={x} y1="172" x2={x} y2="180"
                 stroke="#B87333"
-                strokeWidth="2"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 0.8 }}
-                transition={{ delay: 0.5 + i * 0.03 }}
+                strokeWidth="2.5"
+                initial={{ opacity: 0, y: 5 }}
+                animate={{ opacity: 0.9, y: 0 }}
+                transition={{ delay: 0.8 + i * 0.05 }}
               />
             ))}
             
             {/* Chip pins - bottom */}
-            {[170, 185, 200, 215, 230].map((x, i) => (
+            {[160, 175, 190, 205, 220, 235].map((x, i) => (
               <motion.line
-                key={`bottom-${i}`}
-                x1={x} y1="220" x2={x} y2="225"
+                key={`bottom-pin-${i}`}
+                x1={x} y1="220" x2={x} y2="228"
                 stroke="#B87333"
-                strokeWidth="2"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 0.8 }}
-                transition={{ delay: 0.55 + i * 0.03 }}
+                strokeWidth="2.5"
+                initial={{ opacity: 0, y: -5 }}
+                animate={{ opacity: 0.9, y: 0 }}
+                transition={{ delay: 0.85 + i * 0.05 }}
               />
             ))}
             
-            {/* Internal chip detail */}
+            {/* Internal chip details - cyberpunk style */}
             <motion.rect
-              x="168" y="188" width="24" height="24" rx="1"
-              fill="rgba(184,115,51,0.2)"
+              x="156" y="186" width="28" height="28" rx="1"
+              fill="rgba(184,115,51,0.25)"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.6 }}
+              transition={{ delay: 0.9 }}
             />
-            <motion.rect
-              x="196" y="188" width="36" height="10" rx="1"
-              fill="rgba(184,115,51,0.15)"
+            <motion.g
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ delay: 0.65 }}
+              transition={{ delay: 1 }}
+            >
+              <rect x="188" y="186" width="56" height="8" rx="1" fill="rgba(184,115,51,0.18)" />
+              <rect x="188" y="198" width="56" height="8" rx="1" fill="rgba(184,115,51,0.18)" />
+              <rect x="188" y="210" width="56" height="8" rx="1" fill="rgba(184,115,51,0.18)" />
+            </motion.g>
+            
+            {/* Animated scan line inside chip */}
+            <motion.rect
+              x="156"
+              y="186"
+              width="88"
+              height="2"
+              fill="#B87333"
+              opacity={0.6}
+              animate={{ y: [186, 216, 186] }}
+              transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
             />
-            <motion.rect
-              x="196" y="202" width="36" height="10" rx="1"
-              fill="rgba(184,115,51,0.15)"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.7 }}
+            
+            {/* Corner accents for cyberpunk feel */}
+            <motion.path
+              d="M 150 185 L 150 180 L 155 180"
+              stroke="#B87333"
+              strokeWidth="2"
+              fill="none"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ delay: 1.1 }}
+            />
+            <motion.path
+              d="M 250 185 L 250 180 L 245 180"
+              stroke="#B87333"
+              strokeWidth="2"
+              fill="none"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ delay: 1.15 }}
+            />
+            <motion.path
+              d="M 150 215 L 150 220 L 155 220"
+              stroke="#B87333"
+              strokeWidth="2"
+              fill="none"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ delay: 1.2 }}
+            />
+            <motion.path
+              d="M 250 215 L 250 220 L 245 220"
+              stroke="#B87333"
+              strokeWidth="2"
+              fill="none"
+              initial={{ pathLength: 0 }}
+              animate={{ pathLength: 1 }}
+              transition={{ delay: 1.25 }}
             />
           </motion.g>
         )}
         
-        {/* Pulse effect when chip is clickable */}
+        {/* Pulse rings when clickable */}
         {isClickable && (
           <>
             <motion.rect
-              x="160" y="180" width="80" height="40" rx="2"
+              x="150" y="180" width="100" height="40" rx="2"
+              stroke="#B87333"
+              strokeWidth="1.5"
+              fill="none"
+              animate={{ 
+                scale: [1, 1.2, 1.4],
+                opacity: [0.6, 0.2, 0]
+              }}
+              transition={{ duration: 1.8, repeat: Infinity }}
+              style={{ transformOrigin: "200px 200px" }}
+            />
+            <motion.rect
+              x="150" y="180" width="100" height="40" rx="2"
               stroke="#B87333"
               strokeWidth="1"
               fill="none"
               animate={{ 
-                scale: [1, 1.15, 1.3],
-                opacity: [0.5, 0.2, 0]
+                scale: [1, 1.3, 1.6],
+                opacity: [0.4, 0.15, 0]
               }}
-              transition={{ duration: 1.5, repeat: Infinity }}
-              style={{ transformOrigin: "200px 200px" }}
-            />
-            <motion.rect
-              x="160" y="180" width="80" height="40" rx="2"
-              stroke="#B87333"
-              strokeWidth="0.5"
-              fill="none"
-              animate={{ 
-                scale: [1, 1.25, 1.5],
-                opacity: [0.3, 0.1, 0]
-              }}
-              transition={{ duration: 2, repeat: Infinity, delay: 0.3 }}
+              transition={{ duration: 2.2, repeat: Infinity, delay: 0.4 }}
               style={{ transformOrigin: "200px 200px" }}
             />
           </>

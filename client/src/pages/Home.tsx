@@ -11,7 +11,7 @@ import { Loader2 } from "lucide-react";
 type Phase = "loading" | "phase_1" | "phase_1_complete" | "transition" | "phase_2" | "complete";
 type QuestionId = 1 | 2 | 3 | 4;
 
-// 4 questions - each gives 7% independence
+// 4 questions - each gives 5% independence (5→10→15→20%)
 const QUESTIONS = [
   { id: 1, title: "СВОБОДА", options: [{ label: "ПРАВО", correct: true }, { label: "СЕРВИС", correct: false }] },
   { id: 2, title: "СОБСТВЕННОСТЬ", options: [{ label: "БАНК", correct: false }, { label: "Я", correct: true }] },
@@ -41,7 +41,7 @@ export default function Home() {
   const [currentQuestion, setCurrentQuestion] = useState<QuestionId>(1);
   const [circuitReveal, setCircuitReveal] = useState(0); // 0, 25, 50, 75, 100
   const [totalSats, setTotalSats] = useState(0);
-  const [progress, setProgress] = useState(0); // Independence %
+  const [progress, setProgress] = useState(0); // Independence % (5 per answer)
   
   const { data: session, isLoading: isSessionLoading } = useSession(sessionId);
   const createSession = useCreateSession();
@@ -60,8 +60,8 @@ export default function Home() {
 
   const handleQuestionAnswer = (questionId: QuestionId, isCorrect: boolean) => {
     if (isCorrect) {
-      // Each correct answer: +7% independence, +25% circuit reveal
-      setProgress(prev => prev + 7);
+      // Each correct answer: +5% independence, +25% circuit reveal
+      setProgress(prev => prev + 5);
       setCircuitReveal(questionId * 25);
     }
     
@@ -78,7 +78,7 @@ export default function Home() {
       if (questionId < 4) {
         setCurrentQuestion((questionId + 1) as QuestionId);
       } else {
-        // All 4 questions done - circuit complete
+        // All 4 questions done
         setTotalSats(prev => prev + 150);
         setPhase("phase_1_complete");
       }
@@ -89,10 +89,12 @@ export default function Home() {
     if (phase === "phase_1" && currentQuestion > 1) {
       setCurrentQuestion((currentQuestion - 1) as QuestionId);
       setCircuitReveal((currentQuestion - 2) * 25);
-      setProgress(prev => Math.max(0, prev - 7));
+      setProgress(prev => Math.max(0, prev - 5));
     } else if (phase === "phase_1_complete") {
       setPhase("phase_1");
       setCurrentQuestion(4);
+    } else if (phase === "phase_2") {
+      setPhase("phase_1_complete");
     }
   };
 
@@ -111,7 +113,6 @@ export default function Home() {
 
   const handleDialogueReward = (reward: number) => {
     setTotalSats(prev => prev + reward);
-    // Progress stays at 28% during Phase 2
   };
 
   const handlePhase2Complete = () => {
@@ -135,7 +136,7 @@ export default function Home() {
   if (phase === "loading" || !sessionId || isSessionLoading) {
     return (
       <div className="min-h-screen bg-[#F5F5F5] flex items-center justify-center">
-        <GridBackground />
+        <GridBackground intensity="high" />
         <div className="flex flex-col items-center gap-4 z-10">
           <motion.div
             animate={{ rotate: 360 }}
@@ -158,12 +159,15 @@ export default function Home() {
   // Phase 1: Questions
   if (phase === "phase_1") {
     const question = QUESTIONS[currentQuestion - 1];
+    // First question gets high intensity background, rest get low
+    const bgIntensity = currentQuestion === 1 ? "high" : "low";
     
     return (
       <div className="min-h-screen bg-[#F5F5F5] relative overflow-hidden">
-        <GridBackground />
+        <GridBackground intensity={bgIntensity} />
         <BiometricCircuit revealProgress={circuitReveal} />
         
+        {/* Back button on all questions except first */}
         {currentQuestion > 1 && (
           <BackButton onClick={handleBack} isDark={false} />
         )}
@@ -175,10 +179,10 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col items-center gap-0.5"
           >
-            <span className="text-[8px] text-[#B87333]/50 tracking-[2px] font-mono">
+            <span className="text-[8px] text-[#B87333]/60 tracking-[2px] font-mono font-bold">
               DIGITAL RESISTANCE
             </span>
-            <span className="text-[10px] text-[#B87333] tracking-[2px] font-mono">
+            <span className="text-[11px] text-[#B87333] tracking-[3px] font-mono font-bold">
               СБОРКА ПРОТОКОЛА
             </span>
           </motion.div>
@@ -195,7 +199,7 @@ export default function Home() {
               className="flex flex-col items-center"
             >
               <motion.h1 
-                className="text-[15px] text-[#B87333] tracking-[3px] font-semibold mb-10"
+                className="text-[16px] text-[#B87333] tracking-[4px] font-bold mb-10"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
@@ -212,7 +216,7 @@ export default function Home() {
                     transition={{ delay: 0.3 + idx * 0.1 }}
                     onClick={() => handleQuestionAnswer(question.id as QuestionId, option.correct)}
                     className="w-36 h-12 bg-transparent border-2 border-[#B87333] text-[#3E3129] 
-                             text-[13px] font-medium tracking-wider font-mono
+                             text-[13px] font-bold tracking-wider font-mono
                              hover:bg-[#B87333] hover:text-[#F5F5F5] 
                              active:scale-95 transition-all duration-200"
                     data-testid={`button-q${question.id}-${idx === 0 ? 'a' : 'b'}`}
@@ -230,32 +234,35 @@ export default function Home() {
     );
   }
 
-  // Phase 1 Complete - circuit complete, chip clickable
+  // Phase 1 Complete
   if (phase === "phase_1_complete") {
     return (
       <div className="min-h-screen bg-[#F5F5F5] relative overflow-hidden flex flex-col items-center justify-center">
-        <GridBackground />
+        <GridBackground intensity="low" />
         <BiometricCircuit 
           revealProgress={100} 
           onChipClick={handleChipClick}
           isComplete={true}
         />
         
+        {/* Back button */}
+        <BackButton onClick={handleBack} isDark={false} />
+        
         {/* Label under chip */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
+          transition={{ delay: 1 }}
           className="absolute bottom-32 left-1/2 -translate-x-1/2 text-center z-10"
         >
           <motion.p
-            className="text-[11px] text-[#B87333] tracking-[2px] font-mono"
-            animate={{ opacity: [0.6, 1, 0.6] }}
+            className="text-[12px] text-[#B87333] tracking-[3px] font-mono font-bold"
+            animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           >
             НАЖМИТЕ НА ЧИП
           </motion.p>
-          <p className="text-[9px] text-[#3E3129]/50 tracking-wider font-mono mt-1">
+          <p className="text-[9px] text-[#3E3129]/60 tracking-wider font-mono mt-1 font-medium">
             для активации суверенитета
           </p>
         </motion.div>
@@ -265,7 +272,7 @@ export default function Home() {
     );
   }
 
-  // Vertical transition animation
+  // Transition
   if (phase === "transition") {
     return (
       <div className="min-h-screen bg-[#2A2A2A] relative overflow-hidden">
@@ -276,7 +283,7 @@ export default function Home() {
           transition={{ duration: 0.3 }}
         />
         
-        {/* Top panel sliding up */}
+        {/* Top panel */}
         <motion.div
           className="absolute inset-x-0 top-0 h-1/2 bg-[#F5F5F5] z-20"
           initial={{ y: 0 }}
@@ -291,7 +298,7 @@ export default function Home() {
           />
         </motion.div>
         
-        {/* Bottom panel sliding down */}
+        {/* Bottom panel */}
         <motion.div
           className="absolute inset-x-0 bottom-0 h-1/2 bg-[#F5F5F5] z-20"
           initial={{ y: 0 }}
@@ -324,7 +331,7 @@ export default function Home() {
           transition={{ delay: 0.8 }}
         >
           <motion.span 
-            className="text-[10px] text-[#B87333] tracking-[3px] font-mono"
+            className="text-[11px] text-[#B87333] tracking-[4px] font-mono font-bold"
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 0.5, repeat: Infinity }}
           >
@@ -339,11 +346,14 @@ export default function Home() {
   if (phase === "phase_2") {
     return (
       <div className="min-h-screen bg-[#2A2A2A] relative">
+        {/* Back button in phase 2 */}
+        <BackButton onClick={handleBack} isDark={true} />
+        
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="h-screen pb-20"
+          className="h-screen pb-20 pt-14"
         >
           <TerminalChat 
             dialogues={DIALOGUES}
@@ -363,7 +373,7 @@ export default function Home() {
     return (
       <div className="min-h-screen bg-[#2A2A2A] flex items-center justify-center relative overflow-hidden">
         {/* Subtle grid */}
-        <div className="absolute inset-0 opacity-[0.05]">
+        <div className="absolute inset-0 opacity-[0.06]">
           <svg className="w-full h-full" xmlns="http://www.w3.org/2000/svg">
             <defs>
               <pattern id="gridDark" width="50" height="50" patternUnits="userSpaceOnUse">
@@ -380,7 +390,7 @@ export default function Home() {
           className="flex flex-col items-center text-center px-4 z-10"
         >
           <motion.div
-            className="text-[8px] text-[#B87333]/50 tracking-[2px] font-mono mb-3"
+            className="text-[9px] text-[#B87333]/60 tracking-[3px] font-mono font-bold mb-3"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
@@ -388,24 +398,24 @@ export default function Home() {
           </motion.div>
           
           <motion.h1 
-            className="text-[16px] text-[#B87333] tracking-[2px] font-semibold mb-2"
+            className="text-[18px] text-[#B87333] tracking-[3px] font-bold mb-2"
             animate={{ opacity: [0.7, 1, 0.7] }}
             transition={{ duration: 2, repeat: Infinity }}
           >
             ПРОТОКОЛ ЗАВЕРШЁН
           </motion.h1>
           
-          <motion.p className="text-[#E8E8E8]/70 text-[12px] mb-6 font-mono tracking-wider">
+          <motion.p className="text-[#E8E8E8]/70 text-[13px] mb-6 font-mono tracking-wider font-bold">
             ТЫ АКТИВИРОВАН
           </motion.p>
           
           <motion.div
-            className="text-[32px] text-[#B87333] font-bold font-mono"
+            className="text-[36px] text-[#B87333] font-bold font-mono"
             animate={{ 
               textShadow: [
-                "0 0 8px rgba(184,115,51,0.3)",
-                "0 0 20px rgba(184,115,51,0.6)",
-                "0 0 8px rgba(184,115,51,0.3)"
+                "0 0 10px rgba(184,115,51,0.3)",
+                "0 0 25px rgba(184,115,51,0.6)",
+                "0 0 10px rgba(184,115,51,0.3)"
               ]
             }}
             transition={{ duration: 1.5, repeat: Infinity }}
@@ -414,7 +424,7 @@ export default function Home() {
           </motion.div>
           
           <motion.div
-            className="mt-6 px-4 py-2 border border-[#B87333]/50 text-[#B87333] text-[10px] tracking-wider font-mono"
+            className="mt-6 px-5 py-2.5 border-2 border-[#B87333]/60 text-[#B87333] text-[11px] tracking-wider font-mono font-bold"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5 }}
@@ -423,7 +433,7 @@ export default function Home() {
           </motion.div>
           
           <motion.p
-            className="mt-4 text-[9px] text-[#E8E8E8]/40 tracking-wider font-mono max-w-[280px]"
+            className="mt-5 text-[10px] text-[#E8E8E8]/50 tracking-wider font-mono max-w-[280px]"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8 }}
