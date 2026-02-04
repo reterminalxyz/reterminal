@@ -10,15 +10,15 @@ export function IndependenceBar({ progress, phase, showBackground = false }: Ind
   const isDark = phase === "phase_2" || phase === "complete";
   
   return (
-    <div className={`fixed bottom-0 left-0 right-0 z-50 px-4 pb-6 pt-3 ${showBackground ? 'bg-[#F5F5F5]/90' : ''}`}>
+    <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-6 pt-3">
       <motion.div 
         className="flex flex-col items-center gap-2.5 max-w-md mx-auto"
         animate={phase === "phase_2" ? { opacity: [0.85, 1, 0.85] } : {}}
         transition={{ duration: 2, repeat: Infinity }}
       >
-        {/* Title - BIGGER and bolder */}
+        {/* Title - with optional background */}
         <motion.span 
-          className="text-[13px] tracking-[5px] font-bold text-[#B87333]"
+          className={`text-[13px] tracking-[5px] font-bold text-[#B87333] ${showBackground ? 'bg-[#F5F5F5]/90 px-4 py-1 border border-[#B87333]/20' : ''}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >

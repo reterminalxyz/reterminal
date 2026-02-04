@@ -264,7 +264,7 @@ export default function Home() {
           </p>
         </motion.div>
 
-        <IndependenceBar progress={progress} phase="phase_1" />
+        <IndependenceBar progress={progress} phase="phase_1" showBackground={true} />
       </div>
     );
   }
@@ -334,7 +334,7 @@ export default function Home() {
           </motion.p>
         </motion.div>
         
-        <IndependenceBar progress={progress} phase="complete" />
+        <IndependenceBar progress={progress} phase="complete" showBackground={true} />
       </div>
     );
   }
