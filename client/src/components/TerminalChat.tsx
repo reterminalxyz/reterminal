@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { X } from "lucide-react";
 
 interface Message {
   id: number;
@@ -8,7 +9,7 @@ interface Message {
 }
 
 interface TerminalChatProps {
-  onProgressUpdate: (newProgress: number) => void;
+  onBack: () => void;
 }
 
 const PixelSendIcon = () => (
@@ -27,25 +28,24 @@ const PixelSendIcon = () => (
   </svg>
 );
 
-const dialogueBlocks = [
-  { satoshi: "Привет, я Сатоши.", progressTarget: 20 },
-  { satoshi: "Ты прошёл первый этап. Теперь поговорим о свободе.", progressTarget: 31 },
-  { satoshi: "Деньги — это энергия. Кто контролирует деньги, контролирует время людей.", progressTarget: 43 },
-  { satoshi: "Биткоин — это выход. Никто не может заблокировать твой кошелёк.", progressTarget: 54 },
-  { satoshi: "Суверенитет начинается с контроля над своими ключами.", progressTarget: 66 },
-  { satoshi: "Not your keys, not your coins. Запомни это.", progressTarget: 77 },
-  { satoshi: "Ты уже не такой как раньше. Добро пожаловать в сеть.", progressTarget: 89 },
-  { satoshi: "ПРОТОКОЛ ЗАВЕРШЁН. ТЫ АКТИВИРОВАН.", progressTarget: 100 }
+const dialogueResponses = [
+  "Ты прошёл первый этап. Теперь поговорим о свободе.",
+  "Деньги — это энергия. Кто контролирует деньги, контролирует время людей.",
+  "Биткоин — это выход. Никто не может заблокировать твой кошелёк.",
+  "Суверенитет начинается с контроля над своими ключами.",
+  "Not your keys, not your coins. Запомни это.",
+  "Ты уже не такой как раньше. Добро пожаловать в сеть.",
+  "ПРОТОКОЛ ПРОДОЛЖАЕТСЯ..."
 ];
 
-export function TerminalChat({ onProgressUpdate }: TerminalChatProps) {
+export function TerminalChat({ onBack }: TerminalChatProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [displayedText, setDisplayedText] = useState("");
   const [dialogueStep, setDialogueStep] = useState(0);
-  const [isProcessing, setIsProcessing] = useState(false); // UI state for disabling input
-  const isLockedRef = useRef(false); // Synchronous lock to prevent any race conditions
+  const [isProcessing, setIsProcessing] = useState(false);
+  const isLockedRef = useRef(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -58,9 +58,7 @@ export function TerminalChat({ onProgressUpdate }: TerminalChatProps) {
   }, [messages, displayedText]);
 
   useEffect(() => {
-    if (dialogueStep === 0 && messages.length === 0) {
-      typeMessage(dialogueBlocks[0].satoshi, "satoshi");
-    }
+    typeMessage("Привет, я Сатоши.", "satoshi");
   }, []);
 
   const typeMessage = (text: string, sender: "satoshi" | "user", onComplete?: () => void) => {
@@ -87,33 +85,25 @@ export function TerminalChat({ onProgressUpdate }: TerminalChatProps) {
   };
 
   const handleSend = () => {
-    // Synchronous ref check prevents any race conditions
     if (isLockedRef.current) return;
-    if (!inputValue.trim() || isTyping || isProcessing || dialogueStep >= dialogueBlocks.length - 1) return;
+    if (!inputValue.trim() || isTyping || isProcessing) return;
     
-    isLockedRef.current = true; // Immediate synchronous lock
-    setIsProcessing(true); // Disable UI immediately
+    isLockedRef.current = true;
+    setIsProcessing(true);
     
     const userMessage = inputValue.trim();
     typeMessage(userMessage, "user");
     setInputValue("");
     
-    const nextStep = dialogueStep + 1;
-    setDialogueStep(nextStep);
+    const nextStep = dialogueStep;
+    setDialogueStep(prev => prev + 1);
     
     setTimeout(() => {
-      if (nextStep < dialogueBlocks.length) {
-        const block = dialogueBlocks[nextStep];
-        // Unlock only after Satoshi finishes typing
-        typeMessage(block.satoshi, "satoshi", () => {
-          isLockedRef.current = false;
-          setIsProcessing(false);
-        });
-        onProgressUpdate(block.progressTarget);
-      } else {
+      const response = dialogueResponses[nextStep % dialogueResponses.length];
+      typeMessage(response, "satoshi", () => {
         isLockedRef.current = false;
         setIsProcessing(false);
-      }
+      });
     }, 500);
   };
 
@@ -124,40 +114,47 @@ export function TerminalChat({ onProgressUpdate }: TerminalChatProps) {
     }
   };
 
-  const isComplete = dialogueStep >= dialogueBlocks.length - 1;
-
   return (
-    <div className="flex flex-col h-full bg-[#0D0D0D] text-[#E8E8E8] font-mono">
-      {/* Pixel-style header */}
-      <div className="flex items-center justify-between px-4 py-3 border-b-2 border-[#B87333]/50 bg-[#151515]">
+    <div className="flex flex-col h-full bg-[#0A0A0A] text-[#E8E8E8] font-mono">
+      {/* Pixel-style header with X button */}
+      <div className="flex items-center justify-between px-4 py-3 border-b-2 border-[#B87333]/60 bg-[#111111]">
         <div className="flex items-center gap-3">
-          <div className="w-2 h-2 bg-[#B87333]" style={{ imageRendering: 'pixelated' }} />
-          <span className="text-[10px] tracking-[3px] font-bold text-[#B87333] uppercase">
+          <div className="w-3 h-3 bg-[#B87333]" />
+          <span className="text-[11px] tracking-[4px] font-bold text-[#B87333] uppercase">
             TERMINAL://SATOSHI
           </span>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="px-2 py-1 border border-[#B87333]/40 bg-[#B87333]/10">
-            <span className="text-[8px] tracking-[2px] text-[#B87333]/80">
-              {isComplete ? "100%" : "ENCRYPTED"}
+        <div className="flex items-center gap-3">
+          <div className="px-2 py-1 border-2 border-[#B87333]/50 bg-[#B87333]/10">
+            <span className="text-[9px] tracking-[2px] text-[#B87333] font-bold">
+              ENCRYPTED
             </span>
           </div>
+          <motion.button
+            onClick={onBack}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            className="w-8 h-8 flex items-center justify-center border-2 border-[#B87333]/50 bg-[#B87333]/10 text-[#B87333] hover:bg-[#B87333]/20 transition-colors"
+            data-testid="button-close-terminal"
+          >
+            <X size={16} strokeWidth={3} />
+          </motion.button>
         </div>
       </div>
 
-      {/* Messages area with scanlines */}
+      {/* Messages area with heavy scanlines */}
       <div 
-        className="flex-1 overflow-y-auto px-4 py-4 space-y-4 relative pb-36"
+        className="flex-1 overflow-y-auto px-4 py-6 space-y-5"
         style={{
           background: `
             repeating-linear-gradient(
               0deg,
               transparent,
-              transparent 2px,
-              rgba(0,0,0,0.1) 2px,
-              rgba(0,0,0,0.1) 4px
+              transparent 3px,
+              rgba(0,0,0,0.15) 3px,
+              rgba(0,0,0,0.15) 6px
             ),
-            #0D0D0D
+            linear-gradient(180deg, #0A0A0A 0%, #0F0F0F 100%)
           `
         }}
       >
@@ -171,14 +168,14 @@ export function TerminalChat({ onProgressUpdate }: TerminalChatProps) {
               className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={`max-w-[85%] px-3 py-2 text-[12px] leading-relaxed ${
+                className={`max-w-[90%] px-4 py-3 text-[13px] leading-relaxed ${
                   message.sender === "user"
-                    ? "bg-[#4ADE80]/15 text-[#4ADE80] border-l-2 border-[#4ADE80]"
-                    : "bg-[#B87333]/10 text-[#B87333] border-l-2 border-[#B87333]"
+                    ? "bg-[#4ADE80]/10 text-[#4ADE80] border-l-4 border-[#4ADE80]"
+                    : "bg-[#B87333]/10 text-[#B87333] border-l-4 border-[#B87333]"
                 }`}
               >
-                <span className="text-[9px] opacity-50 block mb-1">
-                  {message.sender === "user" ? "> USER" : "> SATOSHI"}
+                <span className="text-[10px] opacity-60 block mb-1 tracking-wider">
+                  {message.sender === "user" ? "[ USER ]" : "[ SATOSHI ]"}
                 </span>
                 {message.text}
               </div>
@@ -193,32 +190,32 @@ export function TerminalChat({ onProgressUpdate }: TerminalChatProps) {
             animate={{ opacity: 1 }}
             className="flex justify-start"
           >
-            <div className="max-w-[85%] px-3 py-2 text-[12px] leading-relaxed bg-[#B87333]/10 text-[#B87333] border-l-2 border-[#B87333]">
-              <span className="text-[9px] opacity-50 block mb-1">&gt; SATOSHI</span>
+            <div className="max-w-[90%] px-4 py-3 text-[13px] leading-relaxed bg-[#B87333]/10 text-[#B87333] border-l-4 border-[#B87333]">
+              <span className="text-[10px] opacity-60 block mb-1 tracking-wider">[ SATOSHI ]</span>
               {displayedText}
-              <span className="inline-block w-2 h-3 ml-1 bg-[#B87333] animate-pulse" />
+              <span className="inline-block w-3 h-4 ml-1 bg-[#B87333] animate-pulse" />
             </div>
           </motion.div>
         )}
 
-        <div ref={messagesEndRef} />
+        <div ref={messagesEndRef} className="h-40" />
       </div>
 
-      {/* Fixed input at bottom - height: 68px total (py-3=24px + input h-11=44px) */}
-      <div className="fixed bottom-0 left-0 right-0 px-4 py-3 border-t-2 border-[#B87333]/50 bg-[#151515] z-50">
+      {/* Fixed input at bottom */}
+      <div className="fixed bottom-[90px] left-0 right-0 px-4 py-3 border-t-2 border-[#B87333]/60 bg-[#111111] z-50">
         <div className="flex items-center gap-3 max-w-[400px] mx-auto">
           <div className="flex-1 relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#B87333]/50 text-[12px]">&gt;</span>
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#B87333]/60 text-[14px] font-bold">&gt;</span>
             <input
               ref={inputRef}
               type="text"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder={isComplete ? "Протокол завершён" : "Введите ответ..."}
-              disabled={isTyping || isProcessing || isComplete}
-              className="w-full h-11 bg-[#0D0D0D] border-2 border-[#B87333]/40 px-4 pl-7
-                       text-[#E8E8E8] text-[12px] placeholder-[#555]
+              placeholder="Введите ответ..."
+              disabled={isTyping || isProcessing}
+              className="w-full h-12 bg-[#0A0A0A] border-2 border-[#B87333]/50 px-4 pl-8
+                       text-[#E8E8E8] text-[13px] placeholder-[#555]
                        focus:outline-none focus:border-[#B87333] transition-colors
                        disabled:opacity-40"
               data-testid="input-terminal-message"
@@ -226,11 +223,11 @@ export function TerminalChat({ onProgressUpdate }: TerminalChatProps) {
           </div>
           <motion.button
             onClick={handleSend}
-            disabled={!inputValue.trim() || isTyping || isProcessing || isComplete}
+            disabled={!inputValue.trim() || isTyping || isProcessing}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className="w-11 h-11 flex items-center justify-center 
-                     bg-[#B87333] text-[#0D0D0D] border-2 border-[#B87333]
+            className="w-12 h-12 flex items-center justify-center 
+                     bg-[#B87333] text-[#0A0A0A] border-2 border-[#B87333]
                      disabled:opacity-30 disabled:cursor-not-allowed
                      transition-opacity"
             data-testid="button-send-message"

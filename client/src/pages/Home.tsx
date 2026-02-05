@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { BiometricCircuit } from "@/components/BiometricCircuit";
 import { GridBackground } from "@/components/GridBackground";
@@ -26,9 +26,12 @@ export default function Home() {
   const [currentQuestion, setCurrentQuestion] = useState<QuestionId>(1);
   const [circuitReveal, setCircuitReveal] = useState(0); // 0, 25, 50, 75, 100
   const [totalSats, setTotalSats] = useState(0);
-  const [progress, setProgress] = useState(0); // Independence % (5 per answer)
+  const [progress, setProgress] = useState(0); // Independence % (5 per answer, max 20%)
   const [shakeScreen, setShakeScreen] = useState(false);
   const [showError, setShowError] = useState(false);
+  const [terminalKey, setTerminalKey] = useState(0); // Key for resetting terminal state
+  const [answeredQuestions, setAnsweredQuestions] = useState<Set<QuestionId>>(new Set()); // Track which questions answered
+  const isAnsweringRef = useRef(false); // Synchronous lock to prevent any race conditions
   
   const { data: session, isLoading: isSessionLoading } = useSession(sessionId);
   const createSession = useCreateSession();
@@ -46,9 +49,21 @@ export default function Home() {
   }, []);
 
   const handleQuestionAnswer = (questionId: QuestionId, isCorrect: boolean) => {
+    // Synchronous ref check prevents any race conditions
+    if (isAnsweringRef.current) return;
+    // Check if this question was already answered
+    if (answeredQuestions.has(questionId)) return;
+    
+    isAnsweringRef.current = true; // Lock immediately (synchronous)
+    
     if (isCorrect) {
-      // Each correct answer: +5% independence
-      setProgress(prev => prev + 5);
+      // Mark question as answered
+      setAnsweredQuestions(prev => new Set(prev).add(questionId));
+      
+      // Progress is strictly based on answered questions count (each = 5%)
+      const newProgress = answeredQuestions.size * 5 + 5; // +5 for current
+      setProgress(Math.min(20, newProgress));
+      
       // For Q1-Q3: immediately reveal circuit traces (25%, 50%, 75%)
       // For Q4: delay circuit reveal to 100% until phase changes (to avoid chip animating twice)
       if (questionId < 4) {
@@ -70,31 +85,49 @@ export default function Home() {
         } else {
           // All 4 questions done - set circuit to 100% and change phase
           setCircuitReveal(100);
+          setProgress(20); // Ensure exactly 20%
           setTotalSats(prev => prev + 150);
           setPhase("phase_1_complete");
         }
+        isAnsweringRef.current = false; // Unlock after transition
       }, 800);
     } else {
       // Wrong answer - shake screen and show error notification
       setShakeScreen(true);
       setShowError(true);
-      setTimeout(() => setShakeScreen(false), 500);
+      setTimeout(() => {
+        setShakeScreen(false);
+        isAnsweringRef.current = false; // Unlock after error animation
+      }, 500);
       setTimeout(() => setShowError(false), 2000);
     }
   };
 
   const handleBack = () => {
     if (phase === "phase_1" && currentQuestion > 1) {
-      // Go to previous question, keep progress earned so far
+      // Go to previous question
       const prevQ = (currentQuestion - 1) as QuestionId;
       setCurrentQuestion(prevQ);
-      // Progress and circuit stay at what was earned for previous questions
-      setProgress((prevQ - 1) * 5);
-      setCircuitReveal((prevQ - 1) * 25);
+      // Remove the answer for current question so user can re-answer
+      setAnsweredQuestions(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(currentQuestion);
+        return newSet;
+      });
+      // Recalculate progress based on remaining answered questions
+      const newAnsweredCount = answeredQuestions.size - (answeredQuestions.has(currentQuestion) ? 1 : 0);
+      setProgress(Math.min(20, newAnsweredCount * 5));
+      setCircuitReveal(Math.max(0, (prevQ - 1) * 25));
     } else if (phase === "phase_1_complete") {
       // Go back to Q4
       setPhase("phase_1");
       setCurrentQuestion(4 as QuestionId);
+      // Remove Q4 answer so user can re-answer
+      setAnsweredQuestions(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(4 as QuestionId);
+        return newSet;
+      });
       setProgress(15); // Q1-Q3 answered = 15%
       setCircuitReveal(75);
     }
@@ -103,12 +136,14 @@ export default function Home() {
   const handleChipClick = () => {
     if (circuitReveal >= 100) {
       setTotalSats(prev => prev + 150);
+      setTerminalKey(prev => prev + 1); // Reset terminal state
       setPhase("phase_2");
     }
   };
 
-  const handleTerminalProgress = (newProgress: number) => {
-    setProgress(newProgress);
+  const handleTerminalBack = () => {
+    // Go back to chip screen from terminal
+    setPhase("phase_1_complete");
   };
 
 
@@ -282,7 +317,7 @@ export default function Home() {
       <div className="min-h-[100dvh] bg-[#0D0D0D] flex flex-col relative overflow-hidden">
         {/* Terminal fills entire screen */}
         <div className="flex-1">
-          <TerminalChat onProgressUpdate={handleTerminalProgress} />
+          <TerminalChat key={terminalKey} onBack={handleTerminalBack} />
         </div>
         
         <IndependenceBar progress={progress} phase="phase_2" showBackground={false} />
