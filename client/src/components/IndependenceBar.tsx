@@ -8,26 +8,29 @@ interface IndependenceBarProps {
 
 export function IndependenceBar({ progress, phase, showBackground = false }: IndependenceBarProps) {
   const isDark = phase === "phase_2" || phase === "complete";
+  const isCompact = phase === "phase_2";
   
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-6 pt-3">
+    <div className={`fixed bottom-0 left-0 right-0 z-50 px-4 ${isCompact ? 'pb-3 pt-2' : 'pb-6 pt-3'}`}>
       <motion.div 
-        className="flex flex-col items-center gap-2.5 max-w-md mx-auto"
+        className={`flex ${isCompact ? 'flex-row items-center justify-center gap-4' : 'flex-col items-center gap-2.5'} max-w-md mx-auto`}
         animate={phase === "phase_2" ? { opacity: [0.85, 1, 0.85] } : {}}
         transition={{ duration: 2, repeat: Infinity }}
       >
-        {/* Title - with optional background */}
-        <motion.span 
-          className={`text-[13px] tracking-[5px] font-bold text-[#B87333] ${showBackground ? 'bg-[#F5F5F5]/90 px-4 py-1 border border-[#B87333]/20' : ''}`}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
-          НЕЗАВИСИМОСТЬ
-        </motion.span>
+        {/* Title - with optional background, hidden in compact mode */}
+        {!isCompact && (
+          <motion.span 
+            className={`text-[13px] tracking-[5px] font-bold text-[#B87333] ${showBackground ? 'bg-[#F5F5F5]/90 px-4 py-1 border border-[#B87333]/20' : ''}`}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            НЕЗАВИСИМОСТЬ
+          </motion.span>
+        )}
         
-        {/* Metallic bar container - BIGGER and thicker */}
+        {/* Metallic bar container */}
         <div 
-          className="w-full h-6 rounded-sm overflow-hidden relative"
+          className={`${isCompact ? 'w-40 h-4' : 'w-full h-6'} rounded-sm overflow-hidden relative`}
           style={{
             background: isDark 
               ? "linear-gradient(180deg, #1A1A1A 0%, #2A2A2A 50%, #1A1A1A 100%)"
@@ -72,14 +75,14 @@ export function IndependenceBar({ progress, phase, showBackground = false }: Ind
           </motion.div>
         </div>
         
-        {/* Percentage - BIGGER and bolder */}
+        {/* Percentage */}
         <motion.span 
           key={progress}
-          className="text-[#B87333] font-bold text-[16px] tracking-[0.2em]"
+          className={`text-[#B87333] font-bold ${isCompact ? 'text-[12px]' : 'text-[16px]'} tracking-[0.2em]`}
           initial={{ scale: 1.3, opacity: 0.5 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.3 }}
-          style={phase === "phase_2" ? {
+          style={isDark ? {
             textShadow: "0 0 10px rgba(184,115,51,0.6)"
           } : {}}
         >

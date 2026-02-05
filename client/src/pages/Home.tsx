@@ -4,10 +4,11 @@ import { BiometricCircuit } from "@/components/BiometricCircuit";
 import { GridBackground } from "@/components/GridBackground";
 import { IndependenceBar } from "@/components/IndependenceBar";
 import { BackButton } from "@/components/BackButton";
+import { TerminalChat } from "@/components/TerminalChat";
 import { useCreateSession, useUpdateSession, useSession } from "@/hooks/use-sessions";
 import { Loader2 } from "lucide-react";
 
-type Phase = "loading" | "phase_1" | "phase_1_complete" | "complete";
+type Phase = "loading" | "phase_1" | "phase_1_complete" | "phase_2" | "complete";
 type QuestionId = 1 | 2 | 3 | 4;
 
 // 4 questions - each gives 5% independence (5→10→15→20%)
@@ -99,16 +100,20 @@ export default function Home() {
     }
   };
 
-  const handleActivate = () => {
-    setProgress(100);
-    setTotalSats(prev => prev + 150);
-    setPhase("complete");
-  };
-
   const handleChipClick = () => {
     if (circuitReveal >= 100) {
-      handleActivate();
+      setTotalSats(prev => prev + 150);
+      setPhase("phase_2");
     }
+  };
+
+  const handleTerminalProgress = (sats: number) => {
+    setTotalSats(prev => prev + sats);
+  };
+
+  const handleTerminalComplete = () => {
+    setProgress(100);
+    setPhase("complete");
   };
 
 
@@ -272,6 +277,23 @@ export default function Home() {
         </motion.div>
 
         <IndependenceBar progress={progress} phase="phase_1" showBackground={true} />
+      </div>
+    );
+  }
+
+  // Phase 2 - Terminal Chat with Satoshi
+  if (phase === "phase_2") {
+    return (
+      <div className="min-h-[100dvh] bg-[#1A1A1A] flex flex-col relative overflow-hidden">
+        {/* Terminal fills most of screen, leaving room for independence bar */}
+        <div className="flex-1 pb-28">
+          <TerminalChat 
+            onProgressUpdate={handleTerminalProgress} 
+            onComplete={handleTerminalComplete}
+          />
+        </div>
+        
+        <IndependenceBar progress={progress} phase="phase_2" showBackground={false} />
       </div>
     );
   }
