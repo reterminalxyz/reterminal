@@ -4,14 +4,18 @@ interface BiometricCircuitProps {
   revealProgress: number; // 0, 25, 50, 75, 100
   onChipClick?: () => void;
   isComplete?: boolean;
+  skipTraceAnimation?: boolean; // Skip trace animation if already revealed
 }
 
-export function BiometricCircuit({ revealProgress, onChipClick, isComplete = false }: BiometricCircuitProps) {
+export function BiometricCircuit({ revealProgress, onChipClick, isComplete = false, skipTraceAnimation = false }: BiometricCircuitProps) {
   const showChip = revealProgress >= 100;
   const isClickable = showChip && onChipClick;
   
-  // Traces flow FROM edges TO center chip
-  // Each question reveals traces from ALL 4 directions equally
+  // When skipTraceAnimation is true, traces appear instantly
+  const traceInitial = skipTraceAnimation ? { pathLength: 1 } : { pathLength: 0 };
+  const viaInitial = skipTraceAnimation ? { scale: 1 } : { scale: 0 };
+  const traceDuration = skipTraceAnimation ? 0 : 0.7;
+  const viaDuration = skipTraceAnimation ? 0 : 0.2;
   
   return (
     <div className="fixed inset-0 flex items-center justify-center pointer-events-none z-0 overflow-hidden">
@@ -20,363 +24,363 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
         viewBox="0 0 400 700"
         preserveAspectRatio="xMidYMid slice"
       >
-        {/* ============ Q1 (25%) - First wave from ALL sides ============ */}
+        {/* ============ Q1 (25%) - First wave - ASYMMETRIC ============ */}
         <motion.g
-          initial={{ opacity: 0 }}
+          initial={{ opacity: skipTraceAnimation ? 1 : 0 }}
           animate={{ opacity: revealProgress >= 25 ? 1 : 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: skipTraceAnimation ? 0 : 0.5 }}
         >
-          {/* TOP - first traces */}
+          {/* TOP - varied positions */}
           <motion.path
-            d="M 150 0 L 150 50 L 180 50 L 180 120 L 200 120 L 200 310"
+            d="M 130 0 L 130 65 L 175 65 L 175 140 L 195 140 L 195 310"
             stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 25 ? 1 : 0 }}
-            transition={{ duration: 0.7 }}
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 25 ? 1 : 0 }}
+            transition={{ duration: traceDuration }}
           />
           <motion.path
-            d="M 250 0 L 250 50 L 220 50 L 220 120 L 200 120"
+            d="M 270 0 L 270 45 L 235 45 L 235 115 L 210 115 L 210 310"
             stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 25 ? 1 : 0 }}
-            transition={{ duration: 0.7, delay: 0.1 }}
-          />
-          
-          {/* RIGHT - first traces */}
-          <motion.path
-            d="M 400 300 L 350 300 L 350 340 L 280 340 L 280 350 L 245 350"
-            stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 25 ? 1 : 0 }}
-            transition={{ duration: 0.7, delay: 0.05 }}
-          />
-          <motion.path
-            d="M 400 400 L 350 400 L 350 360 L 280 360 L 280 350"
-            stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 25 ? 1 : 0 }}
-            transition={{ duration: 0.7, delay: 0.15 }}
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 25 ? 1 : 0 }}
+            transition={{ duration: traceDuration, delay: skipTraceAnimation ? 0 : 0.1 }}
           />
           
-          {/* BOTTOM - first traces */}
+          {/* RIGHT - different Y positions */}
           <motion.path
-            d="M 150 700 L 150 650 L 180 650 L 180 580 L 200 580 L 200 390"
+            d="M 400 280 L 355 280 L 355 325 L 290 325 L 290 345 L 245 345"
             stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 25 ? 1 : 0 }}
-            transition={{ duration: 0.7, delay: 0.1 }}
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 25 ? 1 : 0 }}
+            transition={{ duration: traceDuration, delay: skipTraceAnimation ? 0 : 0.05 }}
           />
           <motion.path
-            d="M 250 700 L 250 650 L 220 650 L 220 580 L 200 580"
+            d="M 400 420 L 340 420 L 340 375 L 285 375 L 285 355 L 245 355"
             stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 25 ? 1 : 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
-          />
-          
-          {/* LEFT - first traces */}
-          <motion.path
-            d="M 0 300 L 50 300 L 50 340 L 120 340 L 120 350 L 155 350"
-            stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 25 ? 1 : 0 }}
-            transition={{ duration: 0.7, delay: 0.15 }}
-          />
-          <motion.path
-            d="M 0 400 L 50 400 L 50 360 L 120 360 L 120 350"
-            stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 25 ? 1 : 0 }}
-            transition={{ duration: 0.7, delay: 0.25 }}
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 25 ? 1 : 0 }}
+            transition={{ duration: traceDuration, delay: skipTraceAnimation ? 0 : 0.15 }}
           />
           
-          {/* Via nodes */}
-          <motion.circle cx={180} cy={120} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 25 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.5 }} />
-          <motion.circle cx={180} cy={120} r={1.5} fill="#B87333"
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 25 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.55 }} />
-          <motion.circle cx={350} cy={300} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 25 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.5 }} />
-          <motion.circle cx={350} cy={300} r={1.5} fill="#B87333"
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 25 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.55 }} />
-          <motion.circle cx={180} cy={580} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 25 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.5 }} />
-          <motion.circle cx={180} cy={580} r={1.5} fill="#B87333"
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 25 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.55 }} />
-          <motion.circle cx={50} cy={300} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 25 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.5 }} />
-          <motion.circle cx={50} cy={300} r={1.5} fill="#B87333"
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 25 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.55 }} />
+          {/* BOTTOM - asymmetric to top */}
+          <motion.path
+            d="M 165 700 L 165 640 L 190 640 L 190 560 L 205 560 L 205 390"
+            stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 25 ? 1 : 0 }}
+            transition={{ duration: traceDuration, delay: skipTraceAnimation ? 0 : 0.1 }}
+          />
+          <motion.path
+            d="M 240 700 L 240 665 L 215 665 L 215 575 L 195 575 L 195 390"
+            stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 25 ? 1 : 0 }}
+            transition={{ duration: traceDuration, delay: skipTraceAnimation ? 0 : 0.2 }}
+          />
+          
+          {/* LEFT - different from right */}
+          <motion.path
+            d="M 0 320 L 45 320 L 45 350 L 115 350 L 115 345 L 155 345"
+            stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 25 ? 1 : 0 }}
+            transition={{ duration: traceDuration, delay: skipTraceAnimation ? 0 : 0.15 }}
+          />
+          <motion.path
+            d="M 0 380 L 60 380 L 60 360 L 125 360 L 125 355 L 155 355"
+            stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 25 ? 1 : 0 }}
+            transition={{ duration: traceDuration, delay: skipTraceAnimation ? 0 : 0.25 }}
+          />
+          
+          {/* Via nodes - asymmetric positions */}
+          <motion.circle cx={175} cy={140} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
+            initial={viaInitial} animate={{ scale: revealProgress >= 25 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.5 }} />
+          <motion.circle cx={175} cy={140} r={1.5} fill="#B87333"
+            initial={viaInitial} animate={{ scale: revealProgress >= 25 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.55 }} />
+          <motion.circle cx={355} cy={280} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
+            initial={viaInitial} animate={{ scale: revealProgress >= 25 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.5 }} />
+          <motion.circle cx={355} cy={280} r={1.5} fill="#B87333"
+            initial={viaInitial} animate={{ scale: revealProgress >= 25 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.55 }} />
+          <motion.circle cx={190} cy={560} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
+            initial={viaInitial} animate={{ scale: revealProgress >= 25 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.5 }} />
+          <motion.circle cx={190} cy={560} r={1.5} fill="#B87333"
+            initial={viaInitial} animate={{ scale: revealProgress >= 25 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.55 }} />
+          <motion.circle cx={45} cy={320} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
+            initial={viaInitial} animate={{ scale: revealProgress >= 25 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.5 }} />
+          <motion.circle cx={45} cy={320} r={1.5} fill="#B87333"
+            initial={viaInitial} animate={{ scale: revealProgress >= 25 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.55 }} />
         </motion.g>
 
-        {/* ============ Q2 (50%) - Second wave from ALL sides ============ */}
+        {/* ============ Q2 (50%) - Second wave - ASYMMETRIC ============ */}
         <motion.g
-          initial={{ opacity: 0 }}
+          initial={{ opacity: skipTraceAnimation ? 1 : 0 }}
           animate={{ opacity: revealProgress >= 50 ? 1 : 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: skipTraceAnimation ? 0 : 0.5 }}
         >
-          {/* TOP - second traces */}
+          {/* TOP - varied */}
           <motion.path
-            d="M 50 0 L 50 80 L 100 80 L 100 200 L 170 200 L 170 310"
+            d="M 45 0 L 45 90 L 95 90 L 95 210 L 165 210 L 165 310"
             stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 50 ? 1 : 0 }}
-            transition={{ duration: 0.7 }}
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 50 ? 1 : 0 }}
+            transition={{ duration: traceDuration }}
           />
           <motion.path
-            d="M 350 0 L 350 80 L 300 80 L 300 200 L 230 200 L 230 310"
+            d="M 340 0 L 340 70 L 305 70 L 305 185 L 235 185 L 235 310"
             stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 50 ? 1 : 0 }}
-            transition={{ duration: 0.7, delay: 0.1 }}
-          />
-          
-          {/* RIGHT - second traces */}
-          <motion.path
-            d="M 400 200 L 320 200 L 320 320 L 260 320 L 260 340 L 245 340"
-            stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 50 ? 1 : 0 }}
-            transition={{ duration: 0.7, delay: 0.05 }}
-          />
-          <motion.path
-            d="M 400 500 L 320 500 L 320 380 L 260 380 L 260 360 L 245 360"
-            stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 50 ? 1 : 0 }}
-            transition={{ duration: 0.7, delay: 0.15 }}
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 50 ? 1 : 0 }}
+            transition={{ duration: traceDuration, delay: skipTraceAnimation ? 0 : 0.1 }}
           />
           
-          {/* BOTTOM - second traces */}
+          {/* RIGHT */}
           <motion.path
-            d="M 50 700 L 50 620 L 100 620 L 100 500 L 170 500 L 170 390"
+            d="M 400 185 L 325 185 L 325 305 L 265 305 L 265 335 L 245 335"
             stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 50 ? 1 : 0 }}
-            transition={{ duration: 0.7, delay: 0.1 }}
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 50 ? 1 : 0 }}
+            transition={{ duration: traceDuration, delay: skipTraceAnimation ? 0 : 0.05 }}
           />
           <motion.path
-            d="M 350 700 L 350 620 L 300 620 L 300 500 L 230 500 L 230 390"
+            d="M 400 515 L 315 515 L 315 395 L 270 395 L 270 365 L 245 365"
             stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 50 ? 1 : 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 50 ? 1 : 0 }}
+            transition={{ duration: traceDuration, delay: skipTraceAnimation ? 0 : 0.15 }}
           />
           
-          {/* LEFT - second traces */}
+          {/* BOTTOM - different from top */}
           <motion.path
-            d="M 0 200 L 80 200 L 80 320 L 140 320 L 140 340 L 155 340"
+            d="M 70 700 L 70 610 L 110 610 L 110 490 L 175 490 L 175 390"
             stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 50 ? 1 : 0 }}
-            transition={{ duration: 0.7, delay: 0.15 }}
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 50 ? 1 : 0 }}
+            transition={{ duration: traceDuration, delay: skipTraceAnimation ? 0 : 0.1 }}
           />
           <motion.path
-            d="M 0 500 L 80 500 L 80 380 L 140 380 L 140 360 L 155 360"
+            d="M 330 700 L 330 635 L 290 635 L 290 515 L 225 515 L 225 390"
             stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 50 ? 1 : 0 }}
-            transition={{ duration: 0.7, delay: 0.25 }}
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 50 ? 1 : 0 }}
+            transition={{ duration: traceDuration, delay: skipTraceAnimation ? 0 : 0.2 }}
+          />
+          
+          {/* LEFT - different from right */}
+          <motion.path
+            d="M 0 215 L 75 215 L 75 335 L 135 335 L 135 340 L 155 340"
+            stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 50 ? 1 : 0 }}
+            transition={{ duration: traceDuration, delay: skipTraceAnimation ? 0 : 0.15 }}
+          />
+          <motion.path
+            d="M 0 485 L 90 485 L 90 385 L 145 385 L 145 360 L 155 360"
+            stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 50 ? 1 : 0 }}
+            transition={{ duration: traceDuration, delay: skipTraceAnimation ? 0 : 0.25 }}
           />
           
           {/* Via nodes */}
-          <motion.circle cx={100} cy={80} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 50 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.5 }} />
-          <motion.circle cx={100} cy={80} r={1.5} fill="#B87333"
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 50 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.55 }} />
-          <motion.circle cx={300} cy={80} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 50 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.5 }} />
-          <motion.circle cx={300} cy={80} r={1.5} fill="#B87333"
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 50 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.55 }} />
-          <motion.circle cx={320} cy={200} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 50 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.5 }} />
-          <motion.circle cx={320} cy={200} r={1.5} fill="#B87333"
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 50 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.55 }} />
-          <motion.circle cx={80} cy={200} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 50 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.5 }} />
-          <motion.circle cx={80} cy={200} r={1.5} fill="#B87333"
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 50 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.55 }} />
+          <motion.circle cx={95} cy={90} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
+            initial={viaInitial} animate={{ scale: revealProgress >= 50 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.5 }} />
+          <motion.circle cx={95} cy={90} r={1.5} fill="#B87333"
+            initial={viaInitial} animate={{ scale: revealProgress >= 50 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.55 }} />
+          <motion.circle cx={305} cy={70} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
+            initial={viaInitial} animate={{ scale: revealProgress >= 50 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.5 }} />
+          <motion.circle cx={305} cy={70} r={1.5} fill="#B87333"
+            initial={viaInitial} animate={{ scale: revealProgress >= 50 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.55 }} />
+          <motion.circle cx={325} cy={185} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
+            initial={viaInitial} animate={{ scale: revealProgress >= 50 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.5 }} />
+          <motion.circle cx={325} cy={185} r={1.5} fill="#B87333"
+            initial={viaInitial} animate={{ scale: revealProgress >= 50 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.55 }} />
+          <motion.circle cx={75} cy={215} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
+            initial={viaInitial} animate={{ scale: revealProgress >= 50 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.5 }} />
+          <motion.circle cx={75} cy={215} r={1.5} fill="#B87333"
+            initial={viaInitial} animate={{ scale: revealProgress >= 50 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.55 }} />
         </motion.g>
 
-        {/* ============ Q3 (75%) - Third wave from ALL sides ============ */}
+        {/* ============ Q3 (75%) - Third wave - ASYMMETRIC ============ */}
         <motion.g
-          initial={{ opacity: 0 }}
+          initial={{ opacity: skipTraceAnimation ? 1 : 0 }}
           animate={{ opacity: revealProgress >= 75 ? 1 : 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: skipTraceAnimation ? 0 : 0.5 }}
         >
-          {/* TOP - third traces (corners) */}
+          {/* TOP - varied corners */}
           <motion.path
-            d="M 20 0 L 20 120 L 60 120 L 60 250 L 160 250 L 160 310"
+            d="M 15 0 L 15 135 L 55 135 L 55 265 L 155 265 L 155 310"
             stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 75 ? 1 : 0 }}
-            transition={{ duration: 0.7 }}
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 75 ? 1 : 0 }}
+            transition={{ duration: traceDuration }}
           />
           <motion.path
-            d="M 380 0 L 380 120 L 340 120 L 340 250 L 240 250 L 240 310"
+            d="M 375 0 L 375 105 L 345 105 L 345 235 L 245 235 L 245 310"
             stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 75 ? 1 : 0 }}
-            transition={{ duration: 0.7, delay: 0.1 }}
-          />
-          
-          {/* RIGHT - third traces */}
-          <motion.path
-            d="M 400 150 L 360 150 L 360 280 L 300 280 L 300 330 L 245 330"
-            stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 75 ? 1 : 0 }}
-            transition={{ duration: 0.7, delay: 0.05 }}
-          />
-          <motion.path
-            d="M 400 550 L 360 550 L 360 420 L 300 420 L 300 370 L 245 370"
-            stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 75 ? 1 : 0 }}
-            transition={{ duration: 0.7, delay: 0.15 }}
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 75 ? 1 : 0 }}
+            transition={{ duration: traceDuration, delay: skipTraceAnimation ? 0 : 0.1 }}
           />
           
-          {/* BOTTOM - third traces (corners) */}
+          {/* RIGHT */}
           <motion.path
-            d="M 20 700 L 20 580 L 60 580 L 60 450 L 160 450 L 160 390"
+            d="M 400 135 L 365 135 L 365 290 L 305 290 L 305 330 L 245 330"
             stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 75 ? 1 : 0 }}
-            transition={{ duration: 0.7, delay: 0.1 }}
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 75 ? 1 : 0 }}
+            transition={{ duration: traceDuration, delay: skipTraceAnimation ? 0 : 0.05 }}
           />
           <motion.path
-            d="M 380 700 L 380 580 L 340 580 L 340 450 L 240 450 L 240 390"
+            d="M 400 565 L 355 565 L 355 430 L 295 430 L 295 375 L 245 375"
             stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 75 ? 1 : 0 }}
-            transition={{ duration: 0.7, delay: 0.2 }}
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 75 ? 1 : 0 }}
+            transition={{ duration: traceDuration, delay: skipTraceAnimation ? 0 : 0.15 }}
           />
           
-          {/* LEFT - third traces */}
+          {/* BOTTOM - different */}
           <motion.path
-            d="M 0 150 L 40 150 L 40 280 L 100 280 L 100 330 L 155 330"
+            d="M 30 700 L 30 570 L 70 570 L 70 440 L 165 440 L 165 390"
             stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 75 ? 1 : 0 }}
-            transition={{ duration: 0.7, delay: 0.15 }}
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 75 ? 1 : 0 }}
+            transition={{ duration: traceDuration, delay: skipTraceAnimation ? 0 : 0.1 }}
           />
           <motion.path
-            d="M 0 550 L 40 550 L 40 420 L 100 420 L 100 370 L 155 370"
+            d="M 365 700 L 365 595 L 330 595 L 330 465 L 235 465 L 235 390"
             stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 75 ? 1 : 0 }}
-            transition={{ duration: 0.7, delay: 0.25 }}
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 75 ? 1 : 0 }}
+            transition={{ duration: traceDuration, delay: skipTraceAnimation ? 0 : 0.2 }}
+          />
+          
+          {/* LEFT */}
+          <motion.path
+            d="M 0 165 L 35 165 L 35 295 L 95 295 L 95 335 L 155 335"
+            stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 75 ? 1 : 0 }}
+            transition={{ duration: traceDuration, delay: skipTraceAnimation ? 0 : 0.15 }}
+          />
+          <motion.path
+            d="M 0 540 L 50 540 L 50 410 L 110 410 L 110 365 L 155 365"
+            stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 75 ? 1 : 0 }}
+            transition={{ duration: traceDuration, delay: skipTraceAnimation ? 0 : 0.25 }}
           />
           
           {/* Via nodes */}
-          <motion.circle cx={60} cy={120} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 75 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.5 }} />
-          <motion.circle cx={60} cy={120} r={1.5} fill="#B87333"
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 75 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.55 }} />
-          <motion.circle cx={340} cy={120} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 75 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.5 }} />
-          <motion.circle cx={340} cy={120} r={1.5} fill="#B87333"
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 75 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.55 }} />
-          <motion.circle cx={60} cy={580} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 75 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.5 }} />
-          <motion.circle cx={60} cy={580} r={1.5} fill="#B87333"
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 75 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.55 }} />
-          <motion.circle cx={340} cy={580} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 75 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.5 }} />
-          <motion.circle cx={340} cy={580} r={1.5} fill="#B87333"
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 75 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.55 }} />
+          <motion.circle cx={55} cy={135} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
+            initial={viaInitial} animate={{ scale: revealProgress >= 75 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.5 }} />
+          <motion.circle cx={55} cy={135} r={1.5} fill="#B87333"
+            initial={viaInitial} animate={{ scale: revealProgress >= 75 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.55 }} />
+          <motion.circle cx={345} cy={105} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
+            initial={viaInitial} animate={{ scale: revealProgress >= 75 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.5 }} />
+          <motion.circle cx={345} cy={105} r={1.5} fill="#B87333"
+            initial={viaInitial} animate={{ scale: revealProgress >= 75 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.55 }} />
+          <motion.circle cx={70} cy={570} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
+            initial={viaInitial} animate={{ scale: revealProgress >= 75 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.5 }} />
+          <motion.circle cx={70} cy={570} r={1.5} fill="#B87333"
+            initial={viaInitial} animate={{ scale: revealProgress >= 75 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.55 }} />
+          <motion.circle cx={330} cy={595} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
+            initial={viaInitial} animate={{ scale: revealProgress >= 75 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.5 }} />
+          <motion.circle cx={330} cy={595} r={1.5} fill="#B87333"
+            initial={viaInitial} animate={{ scale: revealProgress >= 75 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.55 }} />
         </motion.g>
 
-        {/* ============ Q4 (100%) - Fourth wave from ALL sides + CHIP ============ */}
+        {/* ============ Q4 (100%) - Fourth wave - ASYMMETRIC ============ */}
         <motion.g
-          initial={{ opacity: 0 }}
+          initial={{ opacity: skipTraceAnimation ? 1 : 0 }}
           animate={{ opacity: revealProgress >= 100 ? 1 : 0 }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: skipTraceAnimation ? 0 : 0.5 }}
         >
-          {/* TOP - fourth traces */}
+          {/* TOP */}
           <motion.path
-            d="M 100 0 L 100 40 L 140 40 L 140 160 L 185 160 L 185 310"
+            d="M 90 0 L 90 55 L 135 55 L 135 175 L 180 175 L 180 310"
             stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 100 ? 1 : 0 }}
-            transition={{ duration: 0.6 }}
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 100 ? 1 : 0 }}
+            transition={{ duration: skipTraceAnimation ? 0 : 0.6 }}
           />
           <motion.path
-            d="M 300 0 L 300 40 L 260 40 L 260 160 L 215 160 L 215 310"
+            d="M 310 0 L 310 35 L 265 35 L 265 150 L 220 150 L 220 310"
             stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 100 ? 1 : 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
-          />
-          
-          {/* RIGHT - fourth traces */}
-          <motion.path
-            d="M 400 250 L 340 250 L 340 310 L 280 310 L 280 345 L 245 345"
-            stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 100 ? 1 : 0 }}
-            transition={{ duration: 0.6, delay: 0.05 }}
-          />
-          <motion.path
-            d="M 400 450 L 340 450 L 340 390 L 280 390 L 280 355 L 245 355"
-            stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 100 ? 1 : 0 }}
-            transition={{ duration: 0.6, delay: 0.15 }}
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 100 ? 1 : 0 }}
+            transition={{ duration: skipTraceAnimation ? 0 : 0.6, delay: skipTraceAnimation ? 0 : 0.1 }}
           />
           
-          {/* BOTTOM - fourth traces */}
+          {/* RIGHT */}
           <motion.path
-            d="M 100 700 L 100 660 L 140 660 L 140 540 L 185 540 L 185 390"
+            d="M 400 235 L 345 235 L 345 300 L 285 300 L 285 340 L 245 340"
             stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 100 ? 1 : 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 100 ? 1 : 0 }}
+            transition={{ duration: skipTraceAnimation ? 0 : 0.6, delay: skipTraceAnimation ? 0 : 0.05 }}
           />
           <motion.path
-            d="M 300 700 L 300 660 L 260 660 L 260 540 L 215 540 L 215 390"
+            d="M 400 465 L 335 465 L 335 400 L 275 400 L 275 360 L 245 360"
             stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 100 ? 1 : 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 100 ? 1 : 0 }}
+            transition={{ duration: skipTraceAnimation ? 0 : 0.6, delay: skipTraceAnimation ? 0 : 0.15 }}
           />
           
-          {/* LEFT - fourth traces */}
+          {/* BOTTOM */}
           <motion.path
-            d="M 0 250 L 60 250 L 60 310 L 120 310 L 120 345 L 155 345"
+            d="M 115 700 L 115 650 L 150 650 L 150 530 L 190 530 L 190 390"
             stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 100 ? 1 : 0 }}
-            transition={{ duration: 0.6, delay: 0.15 }}
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 100 ? 1 : 0 }}
+            transition={{ duration: skipTraceAnimation ? 0 : 0.6, delay: skipTraceAnimation ? 0 : 0.1 }}
           />
           <motion.path
-            d="M 0 450 L 60 450 L 60 390 L 120 390 L 120 355 L 155 355"
+            d="M 285 700 L 285 670 L 250 670 L 250 550 L 210 550 L 210 390"
             stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
-            initial={{ pathLength: 0 }} animate={{ pathLength: revealProgress >= 100 ? 1 : 0 }}
-            transition={{ duration: 0.6, delay: 0.25 }}
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 100 ? 1 : 0 }}
+            transition={{ duration: skipTraceAnimation ? 0 : 0.6, delay: skipTraceAnimation ? 0 : 0.2 }}
+          />
+          
+          {/* LEFT */}
+          <motion.path
+            d="M 0 265 L 55 265 L 55 320 L 115 320 L 115 350 L 155 350"
+            stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 100 ? 1 : 0 }}
+            transition={{ duration: skipTraceAnimation ? 0 : 0.6, delay: skipTraceAnimation ? 0 : 0.15 }}
+          />
+          <motion.path
+            d="M 0 435 L 70 435 L 70 380 L 125 380 L 125 350 L 155 350"
+            stroke="#B87333" strokeWidth={1.5} strokeLinecap="square" fill="none"
+            initial={traceInitial} animate={{ pathLength: revealProgress >= 100 ? 1 : 0 }}
+            transition={{ duration: skipTraceAnimation ? 0 : 0.6, delay: skipTraceAnimation ? 0 : 0.25 }}
           />
           
           {/* Via nodes */}
-          <motion.circle cx={140} cy={40} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 100 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.4 }} />
-          <motion.circle cx={140} cy={40} r={1.5} fill="#B87333"
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 100 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.45 }} />
-          <motion.circle cx={260} cy={40} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 100 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.4 }} />
-          <motion.circle cx={260} cy={40} r={1.5} fill="#B87333"
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 100 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.45 }} />
-          <motion.circle cx={140} cy={660} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 100 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.4 }} />
-          <motion.circle cx={140} cy={660} r={1.5} fill="#B87333"
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 100 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.45 }} />
-          <motion.circle cx={260} cy={660} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 100 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.4 }} />
-          <motion.circle cx={260} cy={660} r={1.5} fill="#B87333"
-            initial={{ scale: 0 }} animate={{ scale: revealProgress >= 100 ? 1 : 0 }}
-            transition={{ duration: 0.2, delay: 0.45 }} />
+          <motion.circle cx={135} cy={55} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
+            initial={viaInitial} animate={{ scale: revealProgress >= 100 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.4 }} />
+          <motion.circle cx={135} cy={55} r={1.5} fill="#B87333"
+            initial={viaInitial} animate={{ scale: revealProgress >= 100 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.45 }} />
+          <motion.circle cx={265} cy={35} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
+            initial={viaInitial} animate={{ scale: revealProgress >= 100 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.4 }} />
+          <motion.circle cx={265} cy={35} r={1.5} fill="#B87333"
+            initial={viaInitial} animate={{ scale: revealProgress >= 100 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.45 }} />
+          <motion.circle cx={150} cy={650} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
+            initial={viaInitial} animate={{ scale: revealProgress >= 100 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.4 }} />
+          <motion.circle cx={150} cy={650} r={1.5} fill="#B87333"
+            initial={viaInitial} animate={{ scale: revealProgress >= 100 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.45 }} />
+          <motion.circle cx={250} cy={670} r={3} fill="none" stroke="#B87333" strokeWidth={1.5}
+            initial={viaInitial} animate={{ scale: revealProgress >= 100 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.4 }} />
+          <motion.circle cx={250} cy={670} r={1.5} fill="#B87333"
+            initial={viaInitial} animate={{ scale: revealProgress >= 100 ? 1 : 0 }}
+            transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.45 }} />
         </motion.g>
 
-        {/* ============ CHIP - ONLY AT 100% ============ */}
+        {/* ============ CHIP - appears at 100% without redrawing traces ============ */}
         {showChip && (
           <motion.g
             initial={{ opacity: 0, scale: 0.8 }}
@@ -471,99 +475,114 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
               />
             ))}
             
-            {/* Inner die frame */}
-            <motion.rect
-              x={165} y={320} width={70} height={60} rx={2}
-              fill="none" stroke="#B87333" strokeWidth={1} opacity={0.6}
-              initial={{ opacity: 0 }} animate={{ opacity: 0.6 }}
-              transition={{ delay: 0.8 }}
-            />
-            
-            {/* Inner grid lines (IC die pattern) */}
-            <motion.g initial={{ opacity: 0 }} animate={{ opacity: 0.3 }} transition={{ delay: 0.85 }}>
+            {/* Chip grid pattern */}
+            <motion.g
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.4 }}
+              transition={{ duration: 0.3, delay: 0.8 }}
+            >
+              <line x1={172} y1={320} x2={228} y2={320} stroke="#B87333" strokeWidth={0.5} />
               <line x1={172} y1={335} x2={228} y2={335} stroke="#B87333" strokeWidth={0.5} />
               <line x1={172} y1={350} x2={228} y2={350} stroke="#B87333" strokeWidth={0.5} />
               <line x1={172} y1={365} x2={228} y2={365} stroke="#B87333" strokeWidth={0.5} />
-              <line x1={185} y1={325} x2={185} y2={375} stroke="#B87333" strokeWidth={0.5} />
-              <line x1={200} y1={325} x2={200} y2={375} stroke="#B87333" strokeWidth={0.5} />
-              <line x1={215} y1={325} x2={215} y2={375} stroke="#B87333" strokeWidth={0.5} />
+              <line x1={172} y1={380} x2={228} y2={380} stroke="#B87333" strokeWidth={0.5} />
+              <line x1={172} y1={320} x2={172} y2={380} stroke="#B87333" strokeWidth={0.5} />
+              <line x1={186} y1={320} x2={186} y2={380} stroke="#B87333" strokeWidth={0.5} />
+              <line x1={200} y1={320} x2={200} y2={380} stroke="#B87333" strokeWidth={0.5} />
+              <line x1={214} y1={320} x2={214} y2={380} stroke="#B87333" strokeWidth={0.5} />
+              <line x1={228} y1={320} x2={228} y2={380} stroke="#B87333" strokeWidth={0.5} />
             </motion.g>
             
-            {/* FREEDOM text - centered, smaller, flickering */}
+            {/* "FREEDOM" text - flickering */}
             <motion.text
               x={200}
-              y={350}
+              y={355}
               textAnchor="middle"
               dominantBaseline="middle"
               fill="#B87333"
               fontSize={10}
-              fontFamily="monospace"
               fontWeight="bold"
+              fontFamily="monospace"
               letterSpacing={1}
               initial={{ opacity: 0 }}
-              animate={{ opacity: [0.3, 1, 0.3, 0.9, 1, 0.4, 1] }}
-              transition={{ 
-                duration: 1.5,
-                repeat: Infinity,
-                repeatType: "loop",
-                delay: 0.9
-              }}
+              animate={{ opacity: [0.3, 1, 0.3, 0.8, 0.5, 1] }}
+              transition={{ duration: 2, repeat: Infinity, delay: 0.9 }}
             >
               FREEDOM
             </motion.text>
+          </motion.g>
+        )}
+        
+        {/* ============ PULSING RINGS - ONLY AT 100% ============ */}
+        {showChip && (
+          <motion.g>
+            {/* Inner glow */}
+            <motion.circle
+              cx={200}
+              cy={350}
+              r={55}
+              fill="none"
+              stroke="#B87333"
+              strokeWidth={1}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: [0.2, 0.5, 0.2] }}
+              transition={{ duration: 1.5, repeat: Infinity, delay: 1 }}
+            />
             
-            {/* Pulse effect when clickable - MUCH MORE VISIBLE */}
-            {isClickable && (
-              <>
-                {/* Inner glow pulse */}
-                <motion.rect
-                  x={147} y={302} width={106} height={96} rx={5}
-                  fill="none" stroke="#B87333" strokeWidth={4}
-                  animate={{ opacity: [0.3, 1, 0.3], strokeWidth: [3, 6, 3] }}
-                  transition={{ duration: 0.8, repeat: Infinity }}
-                />
-                {/* Outer expanding ring 1 */}
-                <motion.rect
-                  x={150} y={305} width={100} height={90} rx={4}
-                  fill="none" stroke="#B87333" strokeWidth={3}
-                  animate={{ scale: [1, 1.15, 1.25], opacity: [0.8, 0.4, 0] }}
-                  transition={{ duration: 1, repeat: Infinity }}
-                  style={{ transformOrigin: "200px 350px" }}
-                />
-                {/* Outer expanding ring 2 - offset */}
-                <motion.rect
-                  x={150} y={305} width={100} height={90} rx={4}
-                  fill="none" stroke="#B87333" strokeWidth={2}
-                  animate={{ scale: [1, 1.2, 1.35], opacity: [0.6, 0.2, 0] }}
-                  transition={{ duration: 1, repeat: Infinity, delay: 0.5 }}
-                  style={{ transformOrigin: "200px 350px" }}
-                />
-              </>
-            )}
+            {/* Expanding ring 1 */}
+            <motion.circle
+              cx={200}
+              cy={350}
+              r={55}
+              fill="none"
+              stroke="#B87333"
+              strokeWidth={2}
+              initial={{ opacity: 0, scale: 1 }}
+              animate={{ 
+                opacity: [0.6, 0],
+                scale: [1, 1.8]
+              }}
+              transition={{ duration: 2, repeat: Infinity, delay: 1.2 }}
+            />
+            
+            {/* Expanding ring 2 */}
+            <motion.circle
+              cx={200}
+              cy={350}
+              r={55}
+              fill="none"
+              stroke="#B87333"
+              strokeWidth={1.5}
+              initial={{ opacity: 0, scale: 1 }}
+              animate={{ 
+                opacity: [0.4, 0],
+                scale: [1, 2.2]
+              }}
+              transition={{ duration: 2.5, repeat: Infinity, delay: 1.6 }}
+            />
           </motion.g>
         )}
       </svg>
       
-      {/* Clickable overlay */}
+      {/* Clickable overlay for chip */}
       {isClickable && (
         <motion.button
           onClick={onChipClick}
+          className="absolute pointer-events-auto cursor-pointer z-50"
+          style={{
+            width: 120,
+            height: 100,
+            left: "calc(50% - 60px)",
+            top: "calc(50% - 50px)",
+            background: "transparent",
+            border: "none"
+          }}
+          data-testid="button-chip"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
-          className="absolute cursor-pointer z-50"
-          style={{
-            width: '130px',
-            height: '120px',
-            background: 'transparent',
-            border: 'none',
-            top: '50%',
-            left: '50%',
-            transform: 'translate(-50%, -50%)',
-            pointerEvents: 'auto',
-          }}
-          aria-label="Activate chip"
-          data-testid="button-chip"
+          transition={{ delay: 0.8 }}
         />
       )}
     </div>

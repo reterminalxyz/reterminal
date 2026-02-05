@@ -110,7 +110,7 @@ export default function Home() {
   // Loading state
   if (phase === "loading" || !sessionId || isSessionLoading) {
     return (
-      <div className="min-h-screen bg-[#F5F5F5] flex items-center justify-center">
+      <div className="min-h-[100dvh] bg-[#F5F5F5] flex items-center justify-center">
         <GridBackground intensity="high" />
         <div className="flex flex-col items-center gap-4 z-10">
           <motion.div
@@ -139,7 +139,7 @@ export default function Home() {
     
     return (
       <motion.div 
-        className="min-h-screen bg-[#F5F5F5] relative overflow-hidden"
+        className="min-h-[100dvh] bg-[#F5F5F5] relative overflow-hidden"
         animate={shakeScreen ? { x: [-10, 10, -10, 10, 0] } : {}}
         transition={{ duration: 0.4 }}
       >
@@ -186,7 +186,7 @@ export default function Home() {
         </div>
 
         {/* Question - centered, only TITLE moved slightly higher */}
-        <div className="min-h-screen flex flex-col items-center justify-center relative z-10 px-4">
+        <div className="min-h-[100dvh] flex flex-col items-center justify-center relative z-10 px-4">
           <AnimatePresence mode="wait">
             <motion.div
               key={question.id}
@@ -205,7 +205,7 @@ export default function Home() {
                 {question.title}
               </motion.h1>
               
-              <div className={`flex gap-3 p-3 ${currentQuestion > 1 ? 'bg-[#F5F5F5]/90 border border-[#B87333]/20' : ''}`}>
+              <div className="flex gap-3">
                 {question.options.map((option, idx) => (
                   <motion.button
                     key={option.label}
@@ -213,10 +213,11 @@ export default function Home() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 + idx * 0.1 }}
                     onClick={() => handleQuestionAnswer(question.id as QuestionId, option.correct)}
-                    className="w-36 h-12 bg-[#F5F5F5] border-2 border-[#B87333] text-[#3E3129] 
+                    className={`w-36 h-12 border-2 border-[#B87333] text-[#3E3129] 
                              text-[13px] font-bold tracking-wider font-mono
                              hover:bg-[#B87333] hover:text-[#F5F5F5] 
-                             active:scale-95 transition-all duration-200"
+                             active:scale-95 transition-all duration-200
+                             ${currentQuestion > 1 ? 'bg-[#F5F5F5]/90' : 'bg-[#F5F5F5]'}`}
                     data-testid={`button-q${question.id}-${idx === 0 ? 'a' : 'b'}`}
                   >
                     {option.label}
@@ -235,7 +236,7 @@ export default function Home() {
   // Phase 1 Complete - NO animated background on chip screen
   if (phase === "phase_1_complete") {
     return (
-      <div className="min-h-screen bg-[#F5F5F5] relative overflow-hidden flex flex-col items-center justify-center">
+      <div className="min-h-[100dvh] bg-[#F5F5F5] relative overflow-hidden flex flex-col items-center justify-center">
         {/* Simple static aluminum background - no animated orbs */}
         <div 
           className="fixed inset-0"
@@ -247,6 +248,7 @@ export default function Home() {
           revealProgress={100} 
           onChipClick={handleChipClick}
           isComplete={true}
+          skipTraceAnimation={true}
         />
         
         {/* Back button */}
@@ -272,7 +274,7 @@ export default function Home() {
   // Complete
   if (phase === "complete") {
     return (
-      <div className="min-h-screen bg-[#2A2A2A] flex items-center justify-center relative overflow-hidden">
+      <div className="min-h-[100dvh] bg-[#2A2A2A] flex items-center justify-center relative overflow-hidden">
         {/* Animated dark background with orbs */}
         <GridBackground intensity="low" variant="dark" />
         

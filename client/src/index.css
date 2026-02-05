@@ -4,6 +4,17 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Fix mobile browser white bar at bottom */
+html, body, #root {
+  min-height: 100dvh;
+  min-height: -webkit-fill-available;
+  background-color: #F5F5F5;
+}
+
+body {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
 :root {
   /* Light aluminum palette */
   --background: 0 0% 97%; /* #F5F5F7 - Apple aluminum */
