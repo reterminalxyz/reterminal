@@ -116,10 +116,13 @@ Bottom-fixed progress indicator:
 
 ### TerminalChat.tsx
 Phase 2 chat interface:
-- Typewriter effect for Satoshi messages
+- Dark theme (#1A1A1A background)
+- Header: "TERMINAL://SATOSHI_PROTOCOL" with ENCRYPTED label and X close button
+- Initial message: "Привет, я Сатоши." with typewriter effect (30ms per char)
+- User messages in green (#4ADE80), Satoshi messages in copper (#B87333)
 - Text input field with send button
-- Branching dialogue logic
-- User choice buttons (equal size)
+- Auto-scroll to latest messages
+- onComplete callback triggers completion (100% independence)
 
 ### BackButton.tsx
 Large prominent navigation button:
