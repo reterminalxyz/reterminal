@@ -46,9 +46,13 @@ export default function Home() {
 
   const handleQuestionAnswer = (questionId: QuestionId, isCorrect: boolean) => {
     if (isCorrect) {
-      // Each correct answer: +5% independence, +25% circuit reveal
+      // Each correct answer: +5% independence
       setProgress(prev => prev + 5);
-      setCircuitReveal(questionId * 25);
+      // For Q1-Q3: immediately reveal circuit traces (25%, 50%, 75%)
+      // For Q4: delay circuit reveal to 100% until phase changes (to avoid chip animating twice)
+      if (questionId < 4) {
+        setCircuitReveal(questionId * 25);
+      }
       
       if (sessionId) {
         updateSession.mutate({
@@ -63,7 +67,8 @@ export default function Home() {
         if (questionId < 4) {
           setCurrentQuestion((questionId + 1) as QuestionId);
         } else {
-          // All 4 questions done - progress should be 20%
+          // All 4 questions done - set circuit to 100% and change phase
+          setCircuitReveal(100);
           setTotalSats(prev => prev + 150);
           setPhase("phase_1_complete");
         }
