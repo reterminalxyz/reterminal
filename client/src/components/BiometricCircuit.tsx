@@ -389,11 +389,18 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
           >
             <defs>
               <linearGradient id="chipGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#1a1a1a" />
-                <stop offset="30%" stopColor="#2d2d2d" />
-                <stop offset="50%" stopColor="#1f1f1f" />
-                <stop offset="70%" stopColor="#2a2a2a" />
-                <stop offset="100%" stopColor="#151515" />
+                <stop offset="0%" stopColor="#4a4a4a" />
+                <stop offset="15%" stopColor="#6a6a6a" />
+                <stop offset="30%" stopColor="#3d3d3d" />
+                <stop offset="50%" stopColor="#5a5a5a" />
+                <stop offset="70%" stopColor="#404040" />
+                <stop offset="85%" stopColor="#555555" />
+                <stop offset="100%" stopColor="#3a3a3a" />
+              </linearGradient>
+              <linearGradient id="chipShine" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stopColor="rgba(255,255,255,0.15)" />
+                <stop offset="50%" stopColor="rgba(255,255,255,0)" />
+                <stop offset="100%" stopColor="rgba(0,0,0,0.1)" />
               </linearGradient>
             </defs>
             
@@ -421,6 +428,18 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.4, delay: 0.5 }}
+            />
+            {/* Metallic shine overlay */}
+            <motion.rect
+              x={155}
+              y={310}
+              width={90}
+              height={80}
+              rx={3}
+              fill="url(#chipShine)"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.55 }}
             />
             
             {/* Top pins */}
@@ -513,9 +532,13 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
           </motion.g>
         )}
         
-        {/* ============ PULSING RINGS - ONLY AT 100% ============ */}
+        {/* ============ PULSING RINGS - ONLY AT 100%, delayed until chip is fully visible ============ */}
         {showChip && (
-          <motion.g>
+          <motion.g
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 1.5 }}
+          >
             {/* Inner glow */}
             <motion.circle
               cx={200}
@@ -526,7 +549,7 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
               strokeWidth={1}
               initial={{ opacity: 0 }}
               animate={{ opacity: [0.2, 0.5, 0.2] }}
-              transition={{ duration: 1.5, repeat: Infinity, delay: 1 }}
+              transition={{ duration: 1.5, repeat: Infinity, delay: 1.8 }}
             />
             
             {/* Expanding ring 1 */}
@@ -542,7 +565,7 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
                 opacity: [0.6, 0],
                 scale: [1, 1.8]
               }}
-              transition={{ duration: 2, repeat: Infinity, delay: 1.2 }}
+              transition={{ duration: 2, repeat: Infinity, delay: 2.0 }}
             />
             
             {/* Expanding ring 2 */}
@@ -558,7 +581,7 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
                 opacity: [0.4, 0],
                 scale: [1, 2.2]
               }}
-              transition={{ duration: 2.5, repeat: Infinity, delay: 1.6 }}
+              transition={{ duration: 2.5, repeat: Infinity, delay: 2.4 }}
             />
           </motion.g>
         )}

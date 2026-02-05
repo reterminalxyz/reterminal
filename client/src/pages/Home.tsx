@@ -197,7 +197,7 @@ export default function Home() {
             >
               {/* Title - background only on Q2+ */}
               <motion.h1 
-                className={`text-[16px] text-[#B87333] tracking-[4px] font-bold mb-16 -mt-24 px-6 py-2 ${currentQuestion > 1 ? 'bg-[#F5F5F5]/90 border border-[#B87333]/20' : ''}`}
+                className={`text-[16px] text-[#B87333] tracking-[4px] font-bold mb-16 -mt-32 px-6 py-2 ${currentQuestion > 1 ? 'bg-[#F5F5F5]/90 border border-[#B87333]/20' : ''}`}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
