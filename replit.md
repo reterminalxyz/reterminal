@@ -115,14 +115,16 @@ Bottom-fixed progress indicator:
 - `phase` prop for styling adaptation
 
 ### TerminalChat.tsx
-Phase 2 chat interface:
-- Dark theme (#1A1A1A background)
-- Header: "TERMINAL://SATOSHI_PROTOCOL" with ENCRYPTED label and X close button
+Phase 2 chat interface (final screen, no completion page):
+- Dark pixel theme (#0D0D0D background with scanlines)
+- Header: "TERMINAL://SATOSHI" with ENCRYPTED label (no close button)
 - Initial message: "Привет, я Сатоши." with typewriter effect (30ms per char)
 - User messages in green (#4ADE80), Satoshi messages in copper (#B87333)
-- Text input field with send button
+- Pixelated send icon (SVG with pixel art style)
+- Fixed text input at absolute bottom of screen
+- 8 dialogue blocks that increase independence: 20→31→43→54→66→77→89→100%
+- isLockedRef + isProcessing dual lock prevents double-sends
 - Auto-scroll to latest messages
-- onComplete callback triggers completion (100% independence)
 
 ### BackButton.tsx
 Large prominent navigation button:

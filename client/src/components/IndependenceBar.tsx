@@ -2,16 +2,16 @@ import { motion } from "framer-motion";
 
 interface IndependenceBarProps {
   progress: number;
-  phase: "phase_1" | "phase_2" | "complete";
+  phase: "phase_1" | "phase_2";
   showBackground?: boolean;
 }
 
 export function IndependenceBar({ progress, phase, showBackground = false }: IndependenceBarProps) {
-  const isDark = phase === "phase_2" || phase === "complete";
+  const isDark = phase === "phase_2";
   const isCompact = phase === "phase_2";
   
   return (
-    <div className={`fixed bottom-0 left-0 right-0 z-50 px-4 ${isCompact ? 'pb-3 pt-2' : 'pb-6 pt-3'}`}>
+    <div className={`fixed left-0 right-0 z-40 px-4 ${isCompact ? 'bottom-[68px] pb-2 pt-2' : 'bottom-0 pb-6 pt-3'}`}>
       <motion.div 
         className={`flex ${isCompact ? 'flex-row items-center justify-center gap-4' : 'flex-col items-center gap-2.5'} max-w-md mx-auto`}
         animate={phase === "phase_2" ? { opacity: [0.85, 1, 0.85] } : {}}

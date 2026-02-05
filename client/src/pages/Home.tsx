@@ -8,7 +8,7 @@ import { TerminalChat } from "@/components/TerminalChat";
 import { useCreateSession, useUpdateSession, useSession } from "@/hooks/use-sessions";
 import { Loader2 } from "lucide-react";
 
-type Phase = "loading" | "phase_1" | "phase_1_complete" | "phase_2" | "complete";
+type Phase = "loading" | "phase_1" | "phase_1_complete" | "phase_2";
 type QuestionId = 1 | 2 | 3 | 4;
 
 // 4 questions - each gives 5% independence (5→10→15→20%)
@@ -107,13 +107,8 @@ export default function Home() {
     }
   };
 
-  const handleTerminalProgress = (sats: number) => {
-    setTotalSats(prev => prev + sats);
-  };
-
-  const handleTerminalComplete = () => {
-    setProgress(100);
-    setPhase("complete");
+  const handleTerminalProgress = (newProgress: number) => {
+    setProgress(newProgress);
   };
 
 
@@ -281,89 +276,16 @@ export default function Home() {
     );
   }
 
-  // Phase 2 - Terminal Chat with Satoshi
+  // Phase 2 - Terminal Chat with Satoshi (final screen)
   if (phase === "phase_2") {
     return (
-      <div className="min-h-[100dvh] bg-[#1A1A1A] flex flex-col relative overflow-hidden">
-        {/* Terminal fills most of screen, leaving room for independence bar */}
-        <div className="flex-1 pb-28">
-          <TerminalChat 
-            onProgressUpdate={handleTerminalProgress} 
-            onComplete={handleTerminalComplete}
-          />
+      <div className="min-h-[100dvh] bg-[#0D0D0D] flex flex-col relative overflow-hidden">
+        {/* Terminal fills entire screen */}
+        <div className="flex-1">
+          <TerminalChat onProgressUpdate={handleTerminalProgress} />
         </div>
         
         <IndependenceBar progress={progress} phase="phase_2" showBackground={false} />
-      </div>
-    );
-  }
-
-  // Complete
-  if (phase === "complete") {
-    return (
-      <div className="min-h-[100dvh] bg-[#2A2A2A] flex items-center justify-center relative overflow-hidden">
-        {/* Animated dark background with orbs */}
-        <GridBackground intensity="low" variant="dark" />
-        
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="flex flex-col items-center text-center px-4 z-10"
-        >
-          <motion.div
-            className="text-[9px] text-[#B87333]/60 tracking-[3px] font-mono font-bold mb-3"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-          >
-            DIGITAL RESISTANCE // COMPLETE
-          </motion.div>
-          
-          <motion.h1 
-            className="text-[18px] text-[#B87333] tracking-[3px] font-bold mb-2"
-            animate={{ opacity: [0.7, 1, 0.7] }}
-            transition={{ duration: 2, repeat: Infinity }}
-          >
-            ПРОТОКОЛ ЗАВЕРШЁН
-          </motion.h1>
-          
-          <motion.p className="text-[#E8E8E8]/70 text-[13px] mb-6 font-mono tracking-wider font-bold">
-            ТЫ АКТИВИРОВАН
-          </motion.p>
-          
-          <motion.div
-            className="text-[36px] text-[#B87333] font-bold font-mono"
-            animate={{ 
-              textShadow: [
-                "0 0 10px rgba(184,115,51,0.3)",
-                "0 0 25px rgba(184,115,51,0.6)",
-                "0 0 10px rgba(184,115,51,0.3)"
-              ]
-            }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-          >
-            +{totalSats} SATS
-          </motion.div>
-          
-          <motion.div
-            className="mt-6 px-5 py-2.5 border-2 border-[#B87333]/60 text-[#B87333] text-[11px] tracking-wider font-mono font-bold"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
-          >
-            INDEPENDENCE: {progress}%
-          </motion.div>
-          
-          <motion.p
-            className="mt-5 text-[10px] text-[#E8E8E8]/50 tracking-wider font-mono max-w-[280px]"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8 }}
-          >
-            Твоя карта теперь полностью активирована. Добро пожаловать в сеть.
-          </motion.p>
-        </motion.div>
-        
-        <IndependenceBar progress={progress} phase="complete" showBackground={true} />
       </div>
     );
   }
