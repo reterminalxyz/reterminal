@@ -380,12 +380,18 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.45 }} />
         </motion.g>
 
-        {/* ============ CHIP - appears at 100% without redrawing traces ============ */}
+        {/* ============ CHIP - appears at 100% with "stick" animation ============ */}
         {showChip && (
           <motion.g
-            initial={skipTraceAnimation ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: skipTraceAnimation ? 0 : 0.6, delay: skipTraceAnimation ? 0 : 0.3 }}
+            initial={{ opacity: 0, scale: 0.5, y: -30 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            transition={{ 
+              duration: 0.5, 
+              delay: skipTraceAnimation ? 0 : 0.3,
+              type: "spring",
+              stiffness: 300,
+              damping: 20
+            }}
           >
             <defs>
               <linearGradient id="chipGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -412,9 +418,9 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
               height={90}
               rx={4}
               fill="#B87333"
-              initial={skipTraceAnimation ? { opacity: 1 } : { opacity: 0 }}
+              initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: skipTraceAnimation ? 0 : 0.3, delay: skipTraceAnimation ? 0 : 0.4 }}
+              transition={{ duration: 0.2 }}
             />
             
             {/* Main chip body - centered */}
@@ -425,9 +431,9 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
               height={80}
               rx={3}
               fill="url(#chipGradient)"
-              initial={skipTraceAnimation ? { opacity: 1 } : { opacity: 0 }}
+              initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: skipTraceAnimation ? 0 : 0.4, delay: skipTraceAnimation ? 0 : 0.5 }}
+              transition={{ duration: 0.2, delay: 0.1 }}
             />
             {/* Metallic shine overlay */}
             <motion.rect
@@ -437,9 +443,9 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
               height={80}
               rx={3}
               fill="url(#chipShine)"
-              initial={skipTraceAnimation ? { opacity: 1 } : { opacity: 0 }}
+              initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: skipTraceAnimation ? 0 : 0.4, delay: skipTraceAnimation ? 0 : 0.55 }}
+              transition={{ duration: 0.2, delay: 0.15 }}
             />
             
             {/* Top pins */}
@@ -448,10 +454,10 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
                 key={`top-pin-${i}`}
                 x={x - 2} y={290} width={4} height={15}
                 fill="#B87333"
-                initial={skipTraceAnimation ? { opacity: 0.9, scaleY: 1 } : { opacity: 0, scaleY: 0 }}
+                initial={{ opacity: 0, scaleY: 0 }}
                 animate={{ opacity: 0.9, scaleY: 1 }}
                 style={{ transformOrigin: `${x}px 305px` }}
-                transition={{ duration: skipTraceAnimation ? 0 : 0.2, delay: skipTraceAnimation ? 0 : 0.6 + i * 0.02 }}
+                transition={{ duration: 0.15, delay: 0.2 + i * 0.02 }}
               />
             ))}
             
@@ -461,10 +467,10 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
                 key={`bottom-pin-${i}`}
                 x={x - 2} y={395} width={4} height={15}
                 fill="#B87333"
-                initial={skipTraceAnimation ? { opacity: 0.9, scaleY: 1 } : { opacity: 0, scaleY: 0 }}
+                initial={{ opacity: 0, scaleY: 0 }}
                 animate={{ opacity: 0.9, scaleY: 1 }}
                 style={{ transformOrigin: `${x}px 395px` }}
-                transition={{ duration: skipTraceAnimation ? 0 : 0.2, delay: skipTraceAnimation ? 0 : 0.65 + i * 0.02 }}
+                transition={{ duration: 0.15, delay: 0.25 + i * 0.02 }}
               />
             ))}
             
@@ -474,10 +480,10 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
                 key={`left-pin-${i}`}
                 x={135} y={y - 2} width={15} height={4}
                 fill="#B87333"
-                initial={skipTraceAnimation ? { opacity: 0.9, scaleX: 1 } : { opacity: 0, scaleX: 0 }}
+                initial={{ opacity: 0, scaleX: 0 }}
                 animate={{ opacity: 0.9, scaleX: 1 }}
                 style={{ transformOrigin: `150px ${y}px` }}
-                transition={{ duration: skipTraceAnimation ? 0 : 0.2, delay: skipTraceAnimation ? 0 : 0.7 + i * 0.02 }}
+                transition={{ duration: 0.15, delay: 0.3 + i * 0.02 }}
               />
             ))}
             
@@ -487,18 +493,18 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
                 key={`right-pin-${i}`}
                 x={250} y={y - 2} width={15} height={4}
                 fill="#B87333"
-                initial={skipTraceAnimation ? { opacity: 0.9, scaleX: 1 } : { opacity: 0, scaleX: 0 }}
+                initial={{ opacity: 0, scaleX: 0 }}
                 animate={{ opacity: 0.9, scaleX: 1 }}
                 style={{ transformOrigin: `250px ${y}px` }}
-                transition={{ duration: skipTraceAnimation ? 0 : 0.2, delay: skipTraceAnimation ? 0 : 0.75 + i * 0.02 }}
+                transition={{ duration: 0.15, delay: 0.35 + i * 0.02 }}
               />
             ))}
             
             {/* Chip grid pattern */}
             <motion.g
-              initial={skipTraceAnimation ? { opacity: 0.4 } : { opacity: 0 }}
+              initial={{ opacity: 0 }}
               animate={{ opacity: 0.4 }}
-              transition={{ duration: skipTraceAnimation ? 0 : 0.3, delay: skipTraceAnimation ? 0 : 0.8 }}
+              transition={{ duration: 0.2, delay: 0.4 }}
             >
               <line x1={172} y1={320} x2={228} y2={320} stroke="#B87333" strokeWidth={0.5} />
               <line x1={172} y1={335} x2={228} y2={335} stroke="#B87333" strokeWidth={0.5} />
@@ -523,23 +529,23 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
               fontWeight="bold"
               fontFamily="monospace"
               letterSpacing={1}
-              initial={skipTraceAnimation ? { opacity: 1 } : { opacity: 0 }}
+              initial={{ opacity: 0 }}
               animate={{ opacity: [0.3, 1, 0.3, 0.8, 0.5, 1] }}
-              transition={{ duration: 2, repeat: Infinity, delay: skipTraceAnimation ? 0 : 0.9 }}
+              transition={{ duration: 2, repeat: Infinity, delay: 0.5 }}
             >
               FREEDOM
             </motion.text>
           </motion.g>
         )}
         
-        {/* ============ PULSING RINGS - ONLY AT 100%, delayed until chip is fully visible ============ */}
+        {/* ============ PULSING RINGS - start immediately after chip appears ============ */}
         {showChip && (
           <motion.g
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 1.5 }}
+            transition={{ delay: 0.6 }}
           >
-            {/* Inner glow */}
+            {/* Inner glow - fast pulse */}
             <motion.circle
               cx={200}
               cy={350}
@@ -548,11 +554,11 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
               stroke="#B87333"
               strokeWidth={1}
               initial={{ opacity: 0 }}
-              animate={{ opacity: [0.2, 0.5, 0.2] }}
-              transition={{ duration: 1.5, repeat: Infinity, delay: 1.8 }}
+              animate={{ opacity: [0.3, 0.7, 0.3] }}
+              transition={{ duration: 0.8, repeat: Infinity, delay: 0.7 }}
             />
             
-            {/* Expanding ring 1 */}
+            {/* Expanding ring 1 - faster */}
             <motion.circle
               cx={200}
               cy={350}
@@ -562,13 +568,13 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
               strokeWidth={2}
               initial={{ opacity: 0, scale: 1 }}
               animate={{ 
-                opacity: [0.6, 0],
-                scale: [1, 1.8]
+                opacity: [0.7, 0],
+                scale: [1, 1.6]
               }}
-              transition={{ duration: 2, repeat: Infinity, delay: 2.0 }}
+              transition={{ duration: 1.2, repeat: Infinity, delay: 0.8 }}
             />
             
-            {/* Expanding ring 2 */}
+            {/* Expanding ring 2 - faster */}
             <motion.circle
               cx={200}
               cy={350}
@@ -578,10 +584,10 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
               strokeWidth={1.5}
               initial={{ opacity: 0, scale: 1 }}
               animate={{ 
-                opacity: [0.4, 0],
-                scale: [1, 2.2]
+                opacity: [0.5, 0],
+                scale: [1, 2]
               }}
-              transition={{ duration: 2.5, repeat: Infinity, delay: 2.4 }}
+              transition={{ duration: 1.5, repeat: Infinity, delay: 1.2 }}
             />
           </motion.g>
         )}
