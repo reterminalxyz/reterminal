@@ -116,8 +116,8 @@ export function TerminalChat({ onBack }: TerminalChatProps) {
 
   return (
     <div className="flex flex-col h-full bg-[#0A0A0A] text-[#E8E8E8] font-mono">
-      {/* Pixel-style header with X button */}
-      <div className="flex items-center justify-between px-4 py-3 border-b-2 border-[#B87333]/60 bg-[#111111]">
+      {/* Sticky header - always visible at top */}
+      <div className="flex-shrink-0 flex items-center justify-between px-4 py-3 border-b-2 border-[#B87333]/60 bg-[#111111] z-50">
         <div className="flex items-center gap-3">
           <div className="w-3 h-3 bg-[#B87333]" />
           <span className="text-[11px] tracking-[4px] font-bold text-[#B87333] uppercase">
@@ -142,7 +142,7 @@ export function TerminalChat({ onBack }: TerminalChatProps) {
         </div>
       </div>
 
-      {/* Messages area with heavy scanlines */}
+      {/* Scrollable messages area */}
       <div 
         className="flex-1 overflow-y-auto px-4 py-6 space-y-5"
         style={{
@@ -198,11 +198,11 @@ export function TerminalChat({ onBack }: TerminalChatProps) {
           </motion.div>
         )}
 
-        <div ref={messagesEndRef} className="h-40" />
+        <div ref={messagesEndRef} />
       </div>
 
-      {/* Fixed input at bottom */}
-      <div className="fixed bottom-[90px] left-0 right-0 px-4 py-3 border-t-2 border-[#B87333]/60 bg-[#111111] z-50">
+      {/* Input area at bottom */}
+      <div className="flex-shrink-0 px-4 py-3 border-t-2 border-[#B87333]/60 bg-[#111111]">
         <div className="flex items-center gap-3 max-w-[400px] mx-auto">
           <div className="flex-1 relative">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[#B87333]/60 text-[14px] font-bold">&gt;</span>

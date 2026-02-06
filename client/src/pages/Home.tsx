@@ -104,25 +104,27 @@ export default function Home() {
   };
 
   const handleBack = () => {
+    // Reset answering lock in case it got stuck
+    isAnsweringRef.current = false;
+    
     if (phase === "phase_1" && currentQuestion > 1) {
-      // Go to previous question
       const prevQ = (currentQuestion - 1) as QuestionId;
-      setCurrentQuestion(prevQ);
-      // Remove the answer for current question so user can re-answer
+      // Remove BOTH current and target question from answered set
+      // so the target question can be re-answered
       setAnsweredQuestions(prev => {
         const newSet = new Set(prev);
         newSet.delete(currentQuestion);
+        newSet.delete(prevQ);
         return newSet;
       });
-      // Recalculate progress based on remaining answered questions
-      const newAnsweredCount = answeredQuestions.size - (answeredQuestions.has(currentQuestion) ? 1 : 0);
-      setProgress(Math.min(20, newAnsweredCount * 5));
+      setCurrentQuestion(prevQ);
+      // Progress = (prevQ - 1) * 5 (only questions before the target count)
+      setProgress((prevQ - 1) * 5);
       setCircuitReveal(Math.max(0, (prevQ - 1) * 25));
     } else if (phase === "phase_1_complete") {
-      // Go back to Q4
       setPhase("phase_1");
       setCurrentQuestion(4 as QuestionId);
-      // Remove Q4 answer so user can re-answer
+      // Remove Q4 so it can be re-answered
       setAnsweredQuestions(prev => {
         const newSet = new Set(prev);
         newSet.delete(4 as QuestionId);
@@ -314,13 +316,16 @@ export default function Home() {
   // Phase 2 - Terminal Chat with Satoshi (final screen)
   if (phase === "phase_2") {
     return (
-      <div className="min-h-[100dvh] bg-[#0D0D0D] flex flex-col relative overflow-hidden">
-        {/* Terminal fills entire screen */}
-        <div className="flex-1">
+      <div className="h-[100dvh] bg-[#0D0D0D] flex flex-col overflow-hidden">
+        {/* Terminal fills screen above independence bar */}
+        <div className="flex-1 min-h-0">
           <TerminalChat key={terminalKey} onBack={handleTerminalBack} />
         </div>
         
-        <IndependenceBar progress={progress} phase="phase_2" showBackground={false} />
+        {/* Independence bar at very bottom */}
+        <div className="flex-shrink-0">
+          <IndependenceBar progress={progress} phase="phase_2" showBackground={false} />
+        </div>
       </div>
     );
   }

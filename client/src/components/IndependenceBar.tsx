@@ -10,7 +10,7 @@ export function IndependenceBar({ progress, phase, showBackground = false }: Ind
   const isDark = phase === "phase_2";
   
   return (
-    <div className={`fixed bottom-0 left-0 right-0 z-40 px-4 pb-4 pt-3 ${isDark ? 'bg-[#0A0A0A] border-t-2 border-[#B87333]/40' : ''}`}>
+    <div className={`${isDark ? 'relative' : 'fixed bottom-0 left-0 right-0'} z-40 px-4 pb-4 pt-3 ${isDark ? 'bg-[#0A0A0A] border-t-2 border-[#B87333]/40' : ''}`}>
       <motion.div 
         className="flex flex-col items-center gap-2 max-w-md mx-auto"
         animate={phase === "phase_2" ? { opacity: [0.85, 1, 0.85] } : {}}
