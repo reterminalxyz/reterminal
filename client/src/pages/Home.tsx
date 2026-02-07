@@ -10,14 +10,14 @@ import { Loader2 } from "lucide-react";
 import { playClick, playError, playPhaseComplete, playTransition } from "@/lib/sounds";
 
 type Phase = "loading" | "phase_1" | "phase_1_complete" | "phase_2";
-type QuestionId = 1 | 2 | 3 | 4;
+type QuestionId = 1 | 2 | 3;
 
-// 4 questions - each gives 5% independence (5→10→15→20%)
+const PROGRESS_PER_QUESTION = [7, 14, 20];
+
 const QUESTIONS = [
-  { id: 1, title: "Хочешь стать свободнее?", options: [{ label: "ДА", correct: true }, { label: "НЕТ", correct: false }] },
-  { id: 2, title: "ВОПРОС 1", options: [{ label: "ОТВЕТ 1", correct: true }, { label: "ОТВЕТ 2", correct: false }] },
-  { id: 3, title: "ВОПРОС 2", options: [{ label: "ОТВЕТ 1", correct: true }, { label: "ОТВЕТ 2", correct: false }] },
-  { id: 4, title: "ВОПРОС 3", options: [{ label: "ОТВЕТ 1", correct: true }, { label: "ОТВЕТ 2", correct: false }] },
+  { id: 1, title: "Как думаешь, государства и корпорации хотят забрать свободу людей?", options: [{ label: "ДА", correct: true }, { label: "НЕТ", correct: false }] },
+  { id: 2, title: "Можно ли с этим что-то сделать?", options: [{ label: "ДА", correct: true }, { label: "НЕТ", correct: false }] },
+  { id: 3, title: "Готов что-то делать с этим?", options: [{ label: "ДА", correct: true }, { label: "ПОКА НЕТ", correct: false }] },
 ];
 
 
@@ -25,9 +25,9 @@ export default function Home() {
   const [sessionId, setSessionId] = useState<number | null>(null);
   const [phase, setPhase] = useState<Phase>("loading");
   const [currentQuestion, setCurrentQuestion] = useState<QuestionId>(1);
-  const [circuitReveal, setCircuitReveal] = useState(0); // 0, 25, 50, 75, 100
+  const [circuitReveal, setCircuitReveal] = useState(0); // 0, 33, 66, 100
   const [totalSats, setTotalSats] = useState(0);
-  const [progress, setProgress] = useState(0); // Independence % (5 per answer, max 20%)
+  const [progress, setProgress] = useState(0); // Independence % (7→14→20 for 3 questions)
   const [shakeScreen, setShakeScreen] = useState(false);
   const [showError, setShowError] = useState(false);
   const [terminalKey, setTerminalKey] = useState(0);
@@ -62,14 +62,11 @@ export default function Home() {
       playClick();
       setAnsweredQuestions(prev => new Set(prev).add(questionId));
       
-      // Progress is strictly based on answered questions count (each = 5%)
-      const newProgress = answeredQuestions.size * 5 + 5; // +5 for current
-      setProgress(Math.min(20, newProgress));
+      const newProgress = PROGRESS_PER_QUESTION[answeredQuestions.size];
+      setProgress(newProgress);
       
-      // For Q1-Q3: immediately reveal circuit traces (25%, 50%, 75%)
-      // For Q4: delay circuit reveal to 100% until phase changes (to avoid chip animating twice)
-      if (questionId < 4) {
-        setCircuitReveal(questionId * 25);
+      if (questionId < 3) {
+        setCircuitReveal(questionId * 33);
       }
       
       if (sessionId) {
@@ -82,12 +79,11 @@ export default function Home() {
       }
 
       setTimeout(() => {
-        if (questionId < 4) {
+        if (questionId < 3) {
           setCurrentQuestion((questionId + 1) as QuestionId);
         } else {
-          // All 4 questions done - set circuit to 100% and change phase
           setCircuitReveal(100);
-          setProgress(20); // Ensure exactly 20%
+          setProgress(20);
           setTotalSats(prev => prev + 100);
           setPhase("phase_1_complete");
         }
@@ -120,20 +116,18 @@ export default function Home() {
         return newSet;
       });
       setCurrentQuestion(prevQ);
-      // Progress = (prevQ - 1) * 5 (only questions before the target count)
-      setProgress((prevQ - 1) * 5);
-      setCircuitReveal(Math.max(0, (prevQ - 1) * 25));
+      setProgress(prevQ > 1 ? PROGRESS_PER_QUESTION[prevQ - 2] : 0);
+      setCircuitReveal(Math.max(0, (prevQ - 1) * 33));
     } else if (phase === "phase_1_complete") {
       setPhase("phase_1");
-      setCurrentQuestion(4 as QuestionId);
-      // Remove Q4 so it can be re-answered
+      setCurrentQuestion(3 as QuestionId);
       setAnsweredQuestions(prev => {
         const newSet = new Set(prev);
-        newSet.delete(4 as QuestionId);
+        newSet.delete(3 as QuestionId);
         return newSet;
       });
-      setProgress(15); // Q1-Q3 answered = 15%
-      setCircuitReveal(75);
+      setProgress(14);
+      setCircuitReveal(66);
     }
   };
 
@@ -242,7 +236,7 @@ export default function Home() {
             >
               {/* Title - background only on Q2+ */}
               <motion.h1 
-                className={`text-[16px] text-[#B87333] tracking-[4px] font-bold mb-16 -mt-32 px-6 py-2 ${currentQuestion > 1 ? 'bg-[#F5F5F5]/90 border border-[#B87333]/20' : ''}`}
+                className={`text-[14px] text-[#B87333] tracking-[2px] font-bold mb-16 -mt-32 px-6 py-2 text-center max-w-[340px] leading-relaxed ${currentQuestion > 1 ? 'bg-[#F5F5F5]/90 border border-[#B87333]/20' : ''}`}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
@@ -307,7 +301,7 @@ export default function Home() {
           className="absolute bottom-36 left-1/2 -translate-x-1/2 text-center z-10 bg-[#F5F5F5]/90 px-6 py-3 border border-[#B87333]/20"
         >
           <p className="text-[22px] text-[#B87333] tracking-[3px] font-mono font-bold">
-            НАЖМИТЕ НА ЧИП
+            Жми на чип
           </p>
         </motion.div>
 

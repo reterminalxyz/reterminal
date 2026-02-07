@@ -15,35 +15,34 @@ A state-machine driven onboarding flow for a Bitcoin Lightning Network card prod
 
 ### Color Palette
 - **Phase 1 Background**: Light aluminum (#F5F5F5)
-- **Phase 2 Background**: Dark terminal (#2A2A2A)
+- **Phase 2 Background**: Dark terminal (#0A0A0A)
 - **Primary Accent**: Copper (#B87333)
 - **Text Light**: E-ink dark brown (#3E3129)
 - **Text Dark**: Light aluminum (#E8E8E8)
 - **Success Text**: Green (#4ADE80) for user messages
+- **Notification Gold**: (#FFD700) for SATS toast
 
 ### Visual Elements
 - **Grid Background**: Animated grid pattern with scan lines (digital resistance vibe)
 - **NFC Circuit**: Antenna loops that connect to central chip (like physical card)
 - **Vertical Transition**: Top/bottom panels slide apart to reveal Phase 2
-- **Typewriter Effect**: Character-by-character text reveal (25ms/char)
+- **Typewriter Effect**: Character-by-character text reveal (20ms/char)
 
 ## App Flow (Two-Phase Structure)
 
 ### Phase 1: СБОРКА ПРОТОКОЛА (20% independence)
-Four quick questions with biometric circuit reveal:
-1. **СВОБОДА**: ПРАВО (correct) vs СЕРВИС → 5%
-2. **СОБСТВЕННОСТЬ**: БАНК vs Я (correct) → 10%
-3. **СУВЕРЕНИТЕТ**: ИНСТРУМЕНТ (correct) vs РИСК → 15%
-4. **КОНТРОЛЬ**: СИСТЕМА vs ТЫ (correct) → 20%
+Three yes/no questions with biometric circuit reveal:
+1. "Как думаешь, государства и корпорации хотят забрать свободу людей?" → ДА/НЕТ → 7%
+2. "Можно ли с этим что-то сделать?" → ДА/НЕТ → 14%
+3. "Готов что-то делать с этим?" → ДА/ПОКА НЕТ → 20%
 
-Progressive biometric-style circuit reveal:
-- Question 1 (5%): Circuit lines from TOP (25% revealed)
-- Question 2 (10%): Circuit lines from RIGHT (50% revealed)
-- Question 3 (15%): Circuit lines from BOTTOM (75% revealed)
-- Question 4 (20%): Circuit lines from LEFT + central chip (100% revealed)
+Progressive biometric-style circuit reveal (3 stages):
+- Question 1 (7%): Circuit traces wave 1 (33% revealed)
+- Question 2 (14%): Circuit traces waves 2+3 (66% revealed)
+- Question 3 (20%): Circuit traces wave 4 + central chip (100% revealed)
 
-The chip becomes a clickable CTA button when all answers are correct.
-Reward: 150 SATS
+The chip becomes a clickable CTA ("Жми на чип") when all answers are correct.
+Reward: 100 SATS + 100 SATS on chip click
 
 ### Transition: Vertical Split
 - Top and bottom aluminum panels slide apart (up/down)
@@ -53,13 +52,20 @@ Reward: 150 SATS
 
 ### Phase 2: ДИАЛОГ С САТОШИ (80% independence)
 Terminal-style chat interface:
-- Dark background (#2A2A2A)
-- "TERMINAL://SATOSHI_PROTOCOL" header with ENCRYPTED label
-- Typewriter effect for Satoshi messages (copper text)
+- Dark background (#0A0A0A with scanlines)
+- "TERMINAL://SATOSHI" header with dynamic SATS counter
+- Typewriter effect for Satoshi messages (20ms/char, copper text)
 - User messages in green (#4ADE80)
-- Text input field with send button
-- Branching dialogue with user choices (equal-size buttons 160px x 56px)
-- 7 dialogue blocks with 50 SATS each (350 SATS total)
+- Text input + send button (arrow up icon)
+- Option buttons for choices — primary interaction via buttons
+- 8 learning blocks + 1 finale, sequential progression
+- Block 2 has intermediate_question (mid-speech question then speech_continued)
+- Actions: next_block, restart, go_back, show_conditional_text, create_wallet, initialize_wallet
+- Toast notifications: "+100 SATS" pixelated gold, animates from header down over text area with glow
+- Independence updates: progress_target 21→22→23→25→26→27→28→29%
+- Bottom bar shows "1/8 ФИНАНСОВАЯ СВОБОДА"
+- isLockedRef prevents double-clicks during transitions
+- Props: onBack, onProgressUpdate, onSatsUpdate, totalSats, skipFirstTypewriter
 
 ### Completion Screen
 - "ПРОТОКОЛ ЗАВЕРШЁН. ТЫ АКТИВИРОВАН."
@@ -74,37 +80,19 @@ Mesmerizing animated background:
 - Aluminum gradient base
 - intensity="high": Large animated copper orbs, flowing light beams, pulsing corner accents
 - intensity="low": Subtle orbs only
-- Orbs move slowly with scale/opacity animation
-- Light beams flow horizontally and vertically
-- Corner brackets pulse
 
 ### BiometricCircuit.tsx
 PCB-style circuit assembly with geometric components:
 - **Straight traces with 90° angles only** (L-shapes, T-junctions) - no curves
 - **SMD components**: Small rectangles with terminal pads
-- **Resistors**: Rectangles with color bands
-- **Capacitors**: Two parallel lines with lead wires
 - **Vias**: Concentric circles (outer ring + inner dot)
 
-Progressive reveal after EACH correct answer:
-- Q1 (25%): 4 traces + 4 components in TOP margin (y < 100)
-- Q2 (50%): 4 traces + 4 components in RIGHT margin (x > 330)
-- Q3 (75%): 4 traces + 4 components in BOTTOM margin (y > 340)
-- Q4 (100%): 4 traces + 4 components in LEFT margin (x < 70) + central chip
+Progressive reveal with 3-stage thresholds:
+- revealProgress >= 33: Wave 1 traces
+- revealProgress >= 66: Waves 2+3 traces (appear together)
+- revealProgress >= 100: Wave 4 traces + central chip
 
 **SAFE ZONE**: x=70-330, y=100-340 - NO elements overlap content
-Central chip has pins on all 4 sides, connecting traces from margins
-
-### Microchip.tsx
-Microchip assembly animation:
-- 12 circuit elements total (4 per question)
-- Q1: elements appear from TOP
-- Q2: elements appear from SIDES
-- Q3: elements appear from BOTTOM
-- Central chip appears after Q2, becomes clickable after Q3
-- `completedLayers` prop (0-3)
-- `onChipClick` callback when ready
-- `showOnly` prop for minimal display on completion screen
 
 ### IndependenceBar.tsx
 Bottom-fixed progress indicator:
@@ -115,20 +103,15 @@ Bottom-fixed progress indicator:
 - `phase` prop for styling adaptation
 
 ### TerminalChat.tsx
-Phase 2 block-based learning interface (buttons-only, no text input):
-- Dark pixel theme (#0D0D0D background with scanlines)
-- Header: "TERMINAL://SATOSHI" with dynamic SATS counter (props from Home.tsx)
+Phase 2 block-based learning interface:
+- Dark pixel theme (#0A0A0A background with scanlines)
+- Header: "TERMINAL://SATOSHI" with enlarged SATS counter (14px count, 10px label, 22x22 coin)
+- PixelCoin: brighter glow (1.2s cycle), stronger shimmer, scale pulse animation
+- PixelSendIcon: arrow pointing UP (pixelated)
 - 9 learning blocks embedded (8 main + 1 finale), sequential progression
-- Typewriter effect for Satoshi messages (30ms per char)
-- User messages in green (#4ADE80), Satoshi messages in copper (#B87333)
-- Option buttons replace text input — all interaction via buttons
-- Block 2 has intermediate_question (mid-speech question then speech_continued)
-- Actions: next_block, restart, show_conditional_text, create_wallet, initialize_wallet
-- Toast notifications: "+100 SATS" and "SKILL UNLOCKED: [skill]" on block transitions
-- Independence updates: progress_target 21→22→23→25→26→27→28→29%
-- Bottom bar shows "БЛОК X/8" with block title
-- isLockedRef prevents double-clicks during transitions
-- Props: onBack, onProgressUpdate, onSatsUpdate, totalSats
+- Block 7 final option: "Хорошо, готов забрать SATS"
+- Toast notification: pixelated gold text, slides from header area down over messages, glow/shine, 1.8s duration
+- Text input enabled: responds with "сначала пройди первый блок, все вопросы потом"
 
 ### BackButton.tsx
 Large prominent navigation button:
@@ -144,34 +127,51 @@ Large prominent navigation button:
 - `POST /api/sessions/:id/action` - Update session with action
 
 ## Reward Distribution
-- Phase 1: 100 SATS (20% independence after 4 questions, each gives 5%)
+- Phase 1: 100 SATS (20% independence after 3 questions: 7%→14%→20%)
 - Chip click: 100 SATS (total entering terminal: 200 SATS always)
 - Phase 2: 800 SATS (8 blocks x 100 SATS each)
 - Total: 1000 SATS (100% independence)
 - SATS always reset to 200 on terminal entry (no accumulation on re-entry)
 
 ## Sound Effects (Web Audio API)
-- `client/src/lib/sounds.ts` - Synthesized cyberpunk sounds, no external files
-- `playClick()` - Button press (square wave sweep down)
-- `playTypeTick()` - Typewriter tick (noise burst, every 3rd char)
-- `playSatsChime()` - SATS reward (ascending sine notes)
-- `playTransition()` - Block transition (sawtooth sweep)
-- `playError()` - Wrong answer (low square wave)
-- `playPhaseComplete()` - Chip activation (ascending triangle notes)
+- `client/src/lib/sounds.ts` - Mechanical/spaceship-style sounds, no external files
+- `playClick()` - Mechanical relay click (low sine thud 100→55Hz + metallic ping 2400→1600Hz)
+- `playTypeTick()` - Warm typing tick (sine wave 340→180Hz with lowpass filter, soft)
+- `playSatsChime()` - SATS reward (ascending sine notes 523→1047Hz)
+- `playTransition()` - Block transition (sine sweep 80→400→120Hz + metallic overtone)
+- `playError()` - Mechanical warning buzz (two sawtooth tones at 120Hz)
+- `playPhaseComplete()` - System activation (ascending sine notes 200→800Hz, spaceship-like)
+
+## Terminal Block Content Summary
+1. Disclaimer: Alpha test intro, no registration needed, earn SATS
+2. Banking slavery: "Who owns your money?" intermediate question, bank control explanation
+3. Bitcoin: Mathematical gold, 17 years running, 21M limit
+4. Keys: Seed phrase, personal ownership, no intermediaries
+5. Privacy: System surveillance, Bitcoin anonymity, basic digital hygiene
+6. Lightning: SATS explained (100M per BTC), instant global payments
+7. Card/Club: Digital resistance club, 7 modules upcoming, "Передай карту тому, кто поймёт"
+8. Final choice: 1000 SATS ≈ 6 euros, create wallet prompt
+9. Finale: Wallet creation instructions
 
 ## Recent Changes (Feb 2026)
+- Phase 1 reduced to 3 questions with yes/no format about freedom/corporations
+- Question titles: text-[14px], tracking-[2px], centered, max-w-[340px] for mobile fit
+- BiometricCircuit: 3-stage thresholds (33/66/100) instead of 4-stage (25/50/75/100)
+- Independence percentages: 7→14→20 (was 5→10→15→20)
+- "Жми на чип" instead of "НАЖМИТЕ НА ЧИП" (casual tone)
+- All 8 block texts rewritten with updated content
+- Block 1: starts "Слушай внимательно" (removed "Меня зовут Сатоши")
+- Block 2: single speech_continued for both answers (removed speech_continued_banku)
+- Block 3: "Это Bitcoin!" (with !), "17 лет", simplified gold analogy
+- Block 4: simplified key explanation, no Coinbase/Binance mention
+- Block 5: shortened privacy text, removed "Ты можешь быть тенью"
+- Block 6: "биткоинами можно оплачивать", "100 миллионов" per BTC, "SATS" capitalized
+- Block 7: "клуб цифрового сопротивления авторитаризму", 7 modules (not 8), final option "Хорошо, готов забрать SATS"
+- Block 8: "1000 SATS это примерно 6 евро", shorter/more direct
+- Send button arrow points UP instead of right
+- SATS field enlarged: 14px count, 10px label, 22x22 pixel coin
+- PixelCoin: brighter glow (1.2s cycle), scale pulse, stronger shimmer
+- Notification: pixelated gold toast, animates from header down, glow/shine effect, 1.8s duration
+- Sounds: mechanical/spaceship-like for Phase 1 (sine-based click, sawtooth error)
+- Typing sound: warm sine wave (340→180Hz) with lowpass filter instead of noise burst
 - SATS always reset to 200 on terminal entry (absolute value, no accumulation)
-- Pixel coin: constant shimmer glow + prominent increment animation (scale 1.6x, brightness flash)
-- Cyberpunk sound effects via Web Audio API (clicks, typing, chimes, transitions)
-- Text input enabled in terminal: responds with "сначала пройди первый блок, все вопросы потом"
-- Block 1 speech: starts "Меня зовут Сатоши", "Для начала 10-15 минут", removed 3 sentences
-- Block 3 speech: replaced with new Bitcoin text (user-provided)
-- Skip typewriter on re-entry after "Нет" choice (instant speech display)
-- onSatsUpdate uses absolute values (not deltas) with internalSatsRef tracking
-- skipFirstTypewriter prop on TerminalChat for instant Block 1 display
-- Teenage Engineering-inspired background (aluminum + copper, animated accents)
-- Biometric-style circuit reveal (lines from 4 directions converging to chip)
-- 4 questions now (each gives 5% independence: 5→10→15→20%)
-- Central chip becomes clickable CTA (like a lock opening Satoshi dialogue)
-- Mobile-first design (400px viewport optimized)
-- "DIGITAL RESISTANCE" branding throughout
