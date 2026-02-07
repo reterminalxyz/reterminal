@@ -7,6 +7,7 @@ import { BackButton } from "@/components/BackButton";
 import { TerminalChat } from "@/components/TerminalChat";
 import { useCreateSession, useUpdateSession, useSession } from "@/hooks/use-sessions";
 import { Loader2 } from "lucide-react";
+import { playClick, playError, playPhaseComplete, playTransition } from "@/lib/sounds";
 
 type Phase = "loading" | "phase_1" | "phase_1_complete" | "phase_2";
 type QuestionId = 1 | 2 | 3 | 4;
@@ -29,7 +30,8 @@ export default function Home() {
   const [progress, setProgress] = useState(0); // Independence % (5 per answer, max 20%)
   const [shakeScreen, setShakeScreen] = useState(false);
   const [showError, setShowError] = useState(false);
-  const [terminalKey, setTerminalKey] = useState(0); // Key for resetting terminal state
+  const [terminalKey, setTerminalKey] = useState(0);
+  const [skipTypewriter, setSkipTypewriter] = useState(false);
   const [answeredQuestions, setAnsweredQuestions] = useState<Set<QuestionId>>(new Set()); // Track which questions answered
   const isAnsweringRef = useRef(false); // Synchronous lock to prevent any race conditions
   
@@ -57,7 +59,7 @@ export default function Home() {
     isAnsweringRef.current = true; // Lock immediately (synchronous)
     
     if (isCorrect) {
-      // Mark question as answered
+      playClick();
       setAnsweredQuestions(prev => new Set(prev).add(questionId));
       
       // Progress is strictly based on answered questions count (each = 5%)
@@ -92,7 +94,7 @@ export default function Home() {
         isAnsweringRef.current = false; // Unlock after transition
       }, 800);
     } else {
-      // Wrong answer - shake screen and show error notification
+      playError();
       setShakeScreen(true);
       setShowError(true);
       setTimeout(() => {
@@ -137,14 +139,15 @@ export default function Home() {
 
   const handleChipClick = () => {
     if (circuitReveal >= 100) {
-      setTotalSats(prev => prev + 100);
+      playPhaseComplete();
+      setTotalSats(200);
       setTerminalKey(prev => prev + 1);
       setPhase("phase_2");
     }
   };
 
   const handleTerminalBack = () => {
-    // Go back to chip screen from terminal
+    setSkipTypewriter(true);
     setPhase("phase_1_complete");
   };
 
@@ -323,8 +326,9 @@ export default function Home() {
             key={terminalKey} 
             onBack={handleTerminalBack}
             onProgressUpdate={(p) => setProgress(p)}
-            onSatsUpdate={(sats) => setTotalSats(prev => prev + sats)}
+            onSatsUpdate={(sats) => setTotalSats(sats)}
             totalSats={totalSats}
+            skipFirstTypewriter={skipTypewriter}
           />
         </div>
         

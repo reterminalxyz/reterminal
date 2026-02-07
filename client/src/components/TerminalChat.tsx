@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X } from "lucide-react";
+import { playClick, playTypeTick, playSatsChime, playTransition } from "@/lib/sounds";
 
 interface BlockOption {
   text: string;
@@ -38,13 +39,14 @@ interface TerminalChatProps {
   onProgressUpdate: (progress: number) => void;
   onSatsUpdate: (sats: number) => void;
   totalSats: number;
+  skipFirstTypewriter?: boolean;
 }
 
 const LEARNING_BLOCKS: LearningBlock[] = [
   {
     id: 1,
     title: "Дисклеймер (Первый удар)",
-    speech: "Слушай внимательно.\n\nТы попал сюда не случайно. Это альфа-тест проекта о цифровой свободе. Я дам тебе инструменты, которые изменят то, как ты думаешь о свободе в интернете.\n\n10-15 минут. Это всё, что тебе нужно.\n\nНикаких навыков. Это проще, чем заказать пиццу в Glovo. Серьезно.\n\nНикаких:\n- Регистраций\n- Подписок\n- Личных данных\n- Банковских карт\n\nТолько ты и этот чат.\n\nВот сделка: За каждый правильный ответ ты получаешь части настоящих биткоинов. Не баллы. Не \"виртуальную валюту\". Настоящие деньги.\n\nШкала внизу показывает твой прогресс. Каждый процент — это деньги.\n\nВерить или нет — твой выбор.\n\nНо если ты здесь, значит чувствуешь, что что-то не так с системой. Что банки, правительства, приложения — все хотят контролировать твою жизнь.\n\nГотов сделать первый шаг из системы?",
+    speech: "Меня зовут Сатоши.\n\nСлушай внимательно.\n\nТы попал сюда не случайно. Это альфа-тест проекта о цифровой свободе. Я дам тебе инструменты, которые изменят то, как ты думаешь о свободе в интернете.\n\nДля начала 10-15 минут. Это всё, что тебе нужно.\n\nНикаких навыков. Это проще, чем заказать пиццу в Glovo. Серьезно.\n\nНикаких:\n- Регистраций\n- Подписок\n- Личных данных\n- Банковских карт\n\nТолько ты и этот чат.\n\nВот сделка: За каждый правильный ответ ты получаешь части настоящих биткоинов.\n\nШкала внизу показывает твой прогресс. Каждый процент — это деньги.\n\nВерить или нет — твой выбор.\n\nНо если ты здесь, значит чувствуешь, что что-то не так с системой.\n\nГотов сделать первый шаг?",
     skill: null,
     reward: 100,
     progress_target: 21,
@@ -85,7 +87,7 @@ const LEARNING_BLOCKS: LearningBlock[] = [
   {
     id: 3,
     title: "Bitcoin — выход (Математика против обещаний)",
-    speech: "Хорошо. Ты готов увидеть выход.\n\nBitcoin.\n\nЗабудь всё, что ты слышал. Забудь \"криптовалюта\", \"инвестиция\", \"спекуляция\".\n\nВот что такое Bitcoin на самом деле:\n\nЭто математика, которую невозможно подделать.\n\nПредставь золото. Его нельзя напечатать. Его количество ограничено. Его ценность признают люди во всем мире.\n\nТеперь представь, что это золото:\n- Помещается в твоем телефоне\n- Его можно отправить за секунды в любую страну\n- Никто не может его конфисковать\n- Никакой банк не контролирует его\n\nЭто и есть Bitcoin.\n\n21 миллион монет. Больше никогда не будет. Никакой президент, никакой центральный банк не может напечатать еще.\n\nЭто не обещание. Это математический закон.\n\nБанк может обанкротиться. Правительство может обесценить деньги.\n\nBitcoin? Работает 16 лет без остановки. 24/7. Без выходных. Без банкротств.\n\nЭто первый в истории способ хранить результат твоего труда там, где его не достанет ни одно правительство.\n\nЦифровое золото, которое всегда с тобой.",
+    speech: "Хорошо. Ты готов увидеть выход.\n\nBitcoin.\n\nЗабудь всё, что ты слышал о нём: \"криптовалюта\", \"инвестиция\", \"спекуляция\".\nНа самом деле Bitcoin это математика, которую невозможно подделать.\nПредставь золото. Его нельзя напечатать. Его количество ограничено. Его ценность признают люди во всем мире.\n\nТеперь представь, что это золото:\n- Помещается в твоем телефоне\n- Его можно отправить за секунды в любую страну\n- Никто не может его конфисковать\n- Никакой банк не контролирует его\nЭто и есть Bitcoin.\n\n21 миллион монет. Больше никогда не будет. Никакой центральный банк не может напечатать еще.\nЭто не обещание. Это математический закон.\nБанк может обанкротиться. Правительство может обесценить деньги.\nBitcoin? Работает 16 лет без остановки. 24/7. Без выходных. Без банкротств.\nЭто первый в истории способ хранить результат твоего труда там, где его не достанет ни одно правительство.",
     skill: "Bitcoin = математика + редкость + свобода",
     reward: 100,
     progress_target: 23,
@@ -191,28 +193,42 @@ const PixelSendIcon = () => (
 );
 
 const PixelCoin = ({ animating }: { animating: boolean }) => (
-  <motion.svg
-    width="16" height="16" viewBox="0 0 16 16"
-    style={{ imageRendering: 'pixelated' }}
-    animate={animating ? { rotate: [0, 360], scale: [1, 1.3, 1] } : {}}
-    transition={{ duration: 0.5 }}
-  >
-    <rect x="5" y="1" width="6" height="2" fill="#B87333" />
-    <rect x="3" y="3" width="2" height="2" fill="#B87333" />
-    <rect x="11" y="3" width="2" height="2" fill="#B87333" />
-    <rect x="1" y="5" width="2" height="6" fill="#B87333" />
-    <rect x="13" y="5" width="2" height="6" fill="#B87333" />
-    <rect x="3" y="11" width="2" height="2" fill="#B87333" />
-    <rect x="11" y="11" width="2" height="2" fill="#B87333" />
-    <rect x="5" y="13" width="6" height="2" fill="#B87333" />
-    <rect x="3" y="5" width="10" height="6" fill="#D4943D" />
-    <rect x="5" y="3" width="6" height="2" fill="#D4943D" />
-    <rect x="5" y="11" width="6" height="2" fill="#D4943D" />
-    <rect x="7" y="4" width="2" height="2" fill="#B87333" />
-    <rect x="6" y="6" width="4" height="2" fill="#B87333" />
-    <rect x="7" y="8" width="2" height="2" fill="#B87333" />
-    <rect x="7" y="10" width="2" height="1" fill="#B87333" />
-  </motion.svg>
+  <div className="relative">
+    <motion.div
+      className="absolute inset-[-4px] rounded-full"
+      style={{ background: "radial-gradient(circle, rgba(184,115,51,0.4) 0%, transparent 70%)" }}
+      animate={{ opacity: [0.3, 0.7, 0.3], scale: [0.9, 1.1, 0.9] }}
+      transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+    />
+    <motion.svg
+      width="16" height="16" viewBox="0 0 16 16"
+      style={{ imageRendering: 'pixelated', position: 'relative', zIndex: 1 }}
+      animate={animating
+        ? { rotate: [0, 360], scale: [1, 1.6, 1], filter: ["brightness(1)", "brightness(2)", "brightness(1)"] }
+        : { filter: ["brightness(1)", "brightness(1.3)", "brightness(1)"] }
+      }
+      transition={animating
+        ? { duration: 0.6 }
+        : { duration: 2, repeat: Infinity, ease: "easeInOut" }
+      }
+    >
+      <rect x="5" y="1" width="6" height="2" fill="#B87333" />
+      <rect x="3" y="3" width="2" height="2" fill="#B87333" />
+      <rect x="11" y="3" width="2" height="2" fill="#B87333" />
+      <rect x="1" y="5" width="2" height="6" fill="#B87333" />
+      <rect x="13" y="5" width="2" height="6" fill="#B87333" />
+      <rect x="3" y="11" width="2" height="2" fill="#B87333" />
+      <rect x="11" y="11" width="2" height="2" fill="#B87333" />
+      <rect x="5" y="13" width="6" height="2" fill="#B87333" />
+      <rect x="3" y="5" width="10" height="6" fill="#D4943D" />
+      <rect x="5" y="3" width="6" height="2" fill="#D4943D" />
+      <rect x="5" y="11" width="6" height="2" fill="#D4943D" />
+      <rect x="7" y="4" width="2" height="2" fill="#B87333" />
+      <rect x="6" y="6" width="4" height="2" fill="#B87333" />
+      <rect x="7" y="8" width="2" height="2" fill="#B87333" />
+      <rect x="7" y="10" width="2" height="1" fill="#B87333" />
+    </motion.svg>
+  </div>
 );
 
 type BlockPhase = 
@@ -224,7 +240,7 @@ type BlockPhase =
   | "waiting_conditional_options"
   | "completed";
 
-export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats }: TerminalChatProps) {
+export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats, skipFirstTypewriter }: TerminalChatProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [displayedText, setDisplayedText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
@@ -232,10 +248,13 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
   const [blockPhase, setBlockPhase] = useState<BlockPhase>("typing_speech");
   const [currentOptions, setCurrentOptions] = useState<BlockOption[]>([]);
   const [notification, setNotification] = useState<{ sats: number; skill: string | null } | null>(null);
+  const [inputText, setInputText] = useState("");
 
   const isLockedRef = useRef(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const typeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const skippedFirstRef = useRef(false);
+  const typeTickCounterRef = useRef(0);
 
   const scrollToBottom = useCallback(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -256,11 +275,16 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     
     setIsTyping(true);
     setDisplayedText("");
+    typeTickCounterRef.current = 0;
     let charIndex = 0;
 
     typeIntervalRef.current = setInterval(() => {
       if (charIndex < text.length) {
         setDisplayedText(text.slice(0, charIndex + 1));
+        typeTickCounterRef.current++;
+        if (typeTickCounterRef.current % 3 === 0) {
+          playTypeTick();
+        }
         charIndex++;
       } else {
         if (typeIntervalRef.current) clearInterval(typeIntervalRef.current);
@@ -273,7 +297,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     }, 20);
   }, []);
 
-  const startBlock = useCallback((blockIndex: number) => {
+  const startBlock = useCallback((blockIndex: number, skipTyping?: boolean) => {
     const block = LEARNING_BLOCKS[blockIndex];
     if (!block) return;
 
@@ -282,6 +306,20 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     setCurrentOptions([]);
     isLockedRef.current = true;
 
+    if (skipTyping) {
+      setMessages(prev => [...prev, { id: Date.now(), text: block.speech, sender: "satoshi" }]);
+      isLockedRef.current = false;
+      if (block.intermediate_question) {
+        setBlockPhase("waiting_intermediate");
+        setCurrentOptions(block.intermediate_question.options);
+      } else {
+        setBlockPhase("waiting_options");
+        setCurrentOptions(block.options);
+      }
+      return;
+    }
+
+    playTransition();
     typeMessage(block.speech, "satoshi", () => {
       isLockedRef.current = false;
       if (block.intermediate_question) {
@@ -295,8 +333,12 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
   }, [typeMessage]);
 
   useEffect(() => {
-    startBlock(0);
-  }, [startBlock]);
+    const shouldSkip = skipFirstTypewriter && !skippedFirstRef.current;
+    skippedFirstRef.current = true;
+    startBlock(0, shouldSkip);
+  }, [startBlock, skipFirstTypewriter]);
+
+  const internalSatsRef = useRef(totalSats);
 
   const showNotification = useCallback((sats: number) => {
     setNotification({ sats, skill: null });
@@ -308,15 +350,29 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     if (!block) return;
 
     if (block.reward > 0) {
-      onSatsUpdate(block.reward);
+      internalSatsRef.current += block.reward;
+      onSatsUpdate(internalSatsRef.current);
       showNotification(block.reward);
+      playSatsChime();
     }
     onProgressUpdate(block.progress_target);
   }, [onSatsUpdate, onProgressUpdate, showNotification]);
 
+  const handleInputSend = useCallback(() => {
+    if (!inputText.trim()) return;
+    const userText = inputText.trim();
+    setInputText("");
+    setMessages(prev => [...prev, { id: Date.now(), text: userText, sender: "user" }]);
+    playClick();
+    setTimeout(() => {
+      setMessages(prev => [...prev, { id: Date.now() + 1, text: "сначала пройди первый блок, все вопросы потом", sender: "satoshi" }]);
+    }, 500);
+  }, [inputText]);
+
   const handleOptionClick = useCallback((option: BlockOption) => {
     if (isLockedRef.current || isTyping) return;
     isLockedRef.current = true;
+    playClick();
 
     setMessages(prev => [...prev, { id: Date.now(), text: option.text, sender: "user" }]);
     setCurrentOptions([]);
@@ -619,14 +675,21 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
         <div className="flex items-center gap-2 px-3 py-2">
           <input
             type="text"
-            disabled
-            placeholder="Используй кнопки выше..."
-            className="flex-1 bg-[#1A1A1A] text-[#B87333]/30 text-[12px] font-mono px-3 py-2 border border-[#B87333]/20 outline-none cursor-not-allowed placeholder-[#B87333]/20"
-            data-testid="input-disabled"
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            onKeyDown={(e) => { if (e.key === "Enter") handleInputSend(); }}
+            placeholder="Напиши сообщение..."
+            className="flex-1 bg-[#1A1A1A] text-[#B87333] text-[12px] font-mono px-3 py-2 border border-[#B87333]/20 outline-none focus:border-[#B87333]/50 placeholder-[#B87333]/30"
+            data-testid="input-message"
           />
-          <div className="w-8 h-8 flex items-center justify-center border border-[#B87333]/20 bg-[#1A1A1A] text-[#B87333]/20 cursor-not-allowed">
+          <motion.button
+            onClick={handleInputSend}
+            whileTap={{ scale: 0.9 }}
+            className="w-8 h-8 flex items-center justify-center border border-[#B87333]/40 bg-[#1A1A1A] text-[#B87333] hover:bg-[#B87333]/20 transition-colors"
+            data-testid="button-send"
+          >
             <PixelSendIcon />
-          </div>
+          </motion.button>
         </div>
       </div>
 

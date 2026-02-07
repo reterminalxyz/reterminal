@@ -144,24 +144,34 @@ Large prominent navigation button:
 - `POST /api/sessions/:id/action` - Update session with action
 
 ## Reward Distribution
-- Phase 1: 150 SATS (20% independence after 4 questions, each gives 5%)
-- Phase 2: 350 SATS (80% independence through dialogue)
-- Total: 500 SATS (100% independence)
+- Phase 1: 100 SATS (20% independence after 4 questions, each gives 5%)
+- Chip click: 100 SATS (total entering terminal: 200 SATS always)
+- Phase 2: 800 SATS (8 blocks x 100 SATS each)
+- Total: 1000 SATS (100% independence)
+- SATS always reset to 200 on terminal entry (no accumulation on re-entry)
+
+## Sound Effects (Web Audio API)
+- `client/src/lib/sounds.ts` - Synthesized cyberpunk sounds, no external files
+- `playClick()` - Button press (square wave sweep down)
+- `playTypeTick()` - Typewriter tick (noise burst, every 3rd char)
+- `playSatsChime()` - SATS reward (ascending sine notes)
+- `playTransition()` - Block transition (sawtooth sweep)
+- `playError()` - Wrong answer (low square wave)
+- `playPhaseComplete()` - Chip activation (ascending triangle notes)
 
 ## Recent Changes (Feb 2026)
+- SATS always reset to 200 on terminal entry (absolute value, no accumulation)
+- Pixel coin: constant shimmer glow + prominent increment animation (scale 1.6x, brightness flash)
+- Cyberpunk sound effects via Web Audio API (clicks, typing, chimes, transitions)
+- Text input enabled in terminal: responds with "сначала пройди первый блок, все вопросы потом"
+- Block 1 speech: starts "Меня зовут Сатоши", "Для начала 10-15 минут", removed 3 sentences
+- Block 3 speech: replaced with new Bitcoin text (user-provided)
+- Skip typewriter on re-entry after "Нет" choice (instant speech display)
+- onSatsUpdate uses absolute values (not deltas) with internalSatsRef tracking
+- skipFirstTypewriter prop on TerminalChat for instant Block 1 display
 - Teenage Engineering-inspired background (aluminum + copper, animated accents)
 - Biometric-style circuit reveal (lines from 4 directions converging to chip)
 - 4 questions now (each gives 5% independence: 5→10→15→20%)
-- Circuit reveal: Q1=25%, Q2=50%, Q3=75%, Q4=100% + central chip
 - Central chip becomes clickable CTA (like a lock opening Satoshi dialogue)
-- Vertical transition (top-down panels sliding apart)
-- Text input field added to chat interface
-- Close button in chat header for navigation back
-- Back button fixed positioning (no mobile overlaps)
-- Progress dots REMOVED from questions
-- Independence bar: ONLY shows current % (no 0% or 100% labels)
-- Independence bar: metallic styling with pulsing effect
-- Independence bar stays at 20% during Phase 2 (doesn't increase per dialogue)
-- Toast notification "+150 SATS" REMOVED (was blocking screen)
 - Mobile-first design (400px viewport optimized)
 - "DIGITAL RESISTANCE" branding throughout
