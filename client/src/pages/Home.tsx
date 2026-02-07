@@ -319,7 +319,13 @@ export default function Home() {
       <div className="h-[100dvh] bg-[#0D0D0D] flex flex-col overflow-hidden">
         {/* Terminal fills screen above independence bar */}
         <div className="flex-1 min-h-0">
-          <TerminalChat key={terminalKey} onBack={handleTerminalBack} />
+          <TerminalChat 
+            key={terminalKey} 
+            onBack={handleTerminalBack}
+            onProgressUpdate={(p) => setProgress(p)}
+            onSatsUpdate={(sats) => setTotalSats(prev => prev + sats)}
+            totalSats={totalSats}
+          />
         </div>
         
         {/* Independence bar at very bottom */}
