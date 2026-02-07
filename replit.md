@@ -31,18 +31,21 @@ A state-machine driven onboarding flow for a Bitcoin Lightning Network card prod
 ## App Flow (Two-Phase Structure)
 
 ### Phase 1: СБОРКА ПРОТОКОЛА (20% independence)
-Three yes/no questions with biometric circuit reveal:
-1. "Как думаешь, государства и корпорации хотят забрать свободу людей?" → ДА/НЕТ → 7%
-2. "Можно ли с этим что-то сделать?" → ДА/НЕТ → 14%
-3. "Готов что-то делать с этим?" → ДА/ПОКА НЕТ → 20%
+Four yes/no questions with biometric circuit reveal:
+1. "Хочешь стать свободнее?" → ДА/НЕТ → 5%
+2. "Как думаешь, государства и корпорации хотят забрать свободу людей?" → ДА/НЕТ → 10%
+3. "Можно ли с этим что-то сделать?" → ДА/НЕТ → 15%
+4. "Готов что-то делать с этим?" → ДА/ПОКА НЕТ → 20%
 
-Progressive biometric-style circuit reveal (3 stages):
-- Question 1 (7%): Circuit traces wave 1 (33% revealed)
-- Question 2 (14%): Circuit traces waves 2+3 (66% revealed)
-- Question 3 (20%): Circuit traces wave 4 + central chip (100% revealed)
+Progressive biometric-style circuit reveal (4 stages):
+- Question 1 (5%): Circuit traces wave 1 (25% revealed)
+- Question 2 (10%): Circuit traces wave 2 (50% revealed)
+- Question 3 (15%): Circuit traces wave 3 (75% revealed)
+- Question 4 (20%): Circuit traces wave 4 + central chip (100% revealed)
 
+Each correct answer: +50 SATS (not visible until terminal) + 5% independence
 The chip becomes a clickable CTA ("Жми на чип") when all answers are correct.
-Reward: 100 SATS + 100 SATS on chip click
+Chip click: +100 SATS
 
 ### Transition: Vertical Split
 - Top and bottom aluminum panels slide apart (up/down)
@@ -50,10 +53,10 @@ Reward: 100 SATS + 100 SATS on chip click
 - Reveals dark terminal interface
 - Duration: 1.5 seconds
 
-### Phase 2: ДИАЛОГ С САТОШИ (80% independence)
+### Phase 2: ДИАЛОГ С САТОШИ
 Terminal-style chat interface:
 - Dark background (#0A0A0A with scanlines)
-- "TERMINAL://SATOSHI" header with dynamic SATS counter
+- "TERMINAL://" header with dynamic SATS counter
 - Typewriter effect for Satoshi messages (20ms/char, copper text)
 - User messages in green (#4ADE80)
 - Text input + send button (arrow up icon)
@@ -62,8 +65,8 @@ Terminal-style chat interface:
 - Block 2 has intermediate_question (mid-speech question then speech_continued)
 - Actions: next_block, restart, go_back, show_conditional_text, create_wallet, initialize_wallet
 - Toast notifications: "+100 SATS" pixelated gold, animates from header down over text area with glow
-- Independence updates: progress_target 21→22→23→25→26→27→28→29%
-- Bottom bar shows "1/8 ФИНАНСОВАЯ СВОБОДА"
+- Independence updates: each block +1% (21→22→23→24→25→26→27→28)
+- Block indicator "X/8 ФИНАНСОВАЯ СВОБОДА" at TOP (below header, above messages)
 - isLockedRef prevents double-clicks during transitions
 - Props: onBack, onProgressUpdate, onSatsUpdate, totalSats, skipFirstTypewriter
 
@@ -87,9 +90,10 @@ PCB-style circuit assembly with geometric components:
 - **SMD components**: Small rectangles with terminal pads
 - **Vias**: Concentric circles (outer ring + inner dot)
 
-Progressive reveal with 3-stage thresholds:
-- revealProgress >= 33: Wave 1 traces
-- revealProgress >= 66: Waves 2+3 traces (appear together)
+Progressive reveal with 4-stage thresholds:
+- revealProgress >= 25: Wave 1 traces
+- revealProgress >= 50: Wave 2 traces
+- revealProgress >= 75: Wave 3 traces
 - revealProgress >= 100: Wave 4 traces + central chip
 
 **SAFE ZONE**: x=70-330, y=100-340 - NO elements overlap content
@@ -105,7 +109,7 @@ Bottom-fixed progress indicator:
 ### TerminalChat.tsx
 Phase 2 block-based learning interface:
 - Dark pixel theme (#0A0A0A background with scanlines)
-- Header: "TERMINAL://SATOSHI" with enlarged SATS counter (14px count, 10px label, 22x22 coin)
+- Header: "TERMINAL://" with enlarged SATS counter (14px count, 10px label, 22x22 coin)
 - PixelCoin: brighter glow (1.2s cycle), stronger shimmer, scale pulse animation
 - PixelSendIcon: arrow pointing UP (pixelated)
 - 9 learning blocks embedded (8 main + 1 finale), sequential progression
@@ -127,11 +131,10 @@ Large prominent navigation button:
 - `POST /api/sessions/:id/action` - Update session with action
 
 ## Reward Distribution
-- Phase 1: 100 SATS (20% independence after 3 questions: 7%→14%→20%)
-- Chip click: 100 SATS (total entering terminal: 200 SATS always)
-- Phase 2: 800 SATS (8 blocks x 100 SATS each)
-- Total: 1000 SATS (100% independence)
-- SATS always reset to 200 on terminal entry (no accumulation on re-entry)
+- Phase 1: 200 SATS (4 questions x 50 SATS each, not visible until terminal)
+- Chip click: 100 SATS (total entering terminal: 300 SATS)
+- Phase 2: 800 SATS (8 blocks x 100 SATS each, +1% independence per block)
+- Total: 1100 SATS (28% independence at terminal end)
 
 ## Sound Effects (Web Audio API)
 - `client/src/lib/sounds.ts` - Mechanical/spaceship-style sounds, no external files
@@ -154,20 +157,24 @@ Large prominent navigation button:
 9. Finale: Wallet creation instructions
 
 ## Recent Changes (Feb 2026)
-- Phase 1 reduced to 3 questions with yes/no format about freedom/corporations
+- Phase 1 restored to 4 questions: Q1 "Хочешь стать свободнее?", then 3 new questions about freedom/corporations
+- Each Phase 1 correct answer: +50 SATS (hidden until terminal) + 5% independence
+- BiometricCircuit: 4-stage thresholds (25/50/75/100)
+- Independence percentages: 5→10→15→20
 - Question titles: text-[14px], tracking-[2px], centered, max-w-[340px] for mobile fit
-- BiometricCircuit: 3-stage thresholds (33/66/100) instead of 4-stage (25/50/75/100)
-- Independence percentages: 7→14→20 (was 5→10→15→20)
 - "Жми на чип" instead of "НАЖМИТЕ НА ЧИП" (casual tone)
 - All 8 block texts rewritten with updated content
-- Block 1: starts "Слушай внимательно" (removed "Меня зовут Сатоши")
-- Block 2: single speech_continued for both answers (removed speech_continued_banku)
+- Block 1: starts "Слушай внимательно", removed "Для начала" and "Меня зовут Сатоши"
+- Block 2: removed "Подумай секунду", single speech_continued for both answers
 - Block 3: "Это Bitcoin!" (with !), "17 лет", simplified gold analogy
 - Block 4: simplified key explanation, no Coinbase/Binance mention
 - Block 5: shortened privacy text, removed "Ты можешь быть тенью"
 - Block 6: "биткоинами можно оплачивать", "100 миллионов" per BTC, "SATS" capitalized
 - Block 7: "клуб цифрового сопротивления авторитаризму", 7 modules (not 8), final option "Хорошо, готов забрать SATS"
 - Block 8: "1000 SATS это примерно 6 евро", shorter/more direct
+- Terminal header: "TERMINAL://" (removed "SATOSHI")
+- Block indicator "X/8 ФИНАНСОВАЯ СВОБОДА" moved from bottom to top (below header, above messages)
+- Phase 2: each block gives +1% independence (21→28) instead of larger jumps
 - Send button arrow points UP instead of right
 - SATS field enlarged: 14px count, 10px label, 22x22 pixel coin
 - PixelCoin: brighter glow (1.2s cycle), scale pulse, stronger shimmer

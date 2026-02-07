@@ -10,14 +10,16 @@ import { Loader2 } from "lucide-react";
 import { playClick, playError, playPhaseComplete, playTransition } from "@/lib/sounds";
 
 type Phase = "loading" | "phase_1" | "phase_1_complete" | "phase_2";
-type QuestionId = 1 | 2 | 3;
+type QuestionId = 1 | 2 | 3 | 4;
 
-const PROGRESS_PER_QUESTION = [7, 14, 20];
+const PROGRESS_PER_QUESTION = [5, 10, 15, 20];
+const SATS_PER_QUESTION = 50;
 
 const QUESTIONS = [
-  { id: 1, title: "Как думаешь, государства и корпорации хотят забрать свободу людей?", options: [{ label: "ДА", correct: true }, { label: "НЕТ", correct: false }] },
-  { id: 2, title: "Можно ли с этим что-то сделать?", options: [{ label: "ДА", correct: true }, { label: "НЕТ", correct: false }] },
-  { id: 3, title: "Готов что-то делать с этим?", options: [{ label: "ДА", correct: true }, { label: "ПОКА НЕТ", correct: false }] },
+  { id: 1, title: "Хочешь стать свободнее?", options: [{ label: "ДА", correct: true }, { label: "НЕТ", correct: false }] },
+  { id: 2, title: "Как думаешь, государства и корпорации хотят забрать свободу людей?", options: [{ label: "ДА", correct: true }, { label: "НЕТ", correct: false }] },
+  { id: 3, title: "Можно ли с этим что-то сделать?", options: [{ label: "ДА", correct: true }, { label: "НЕТ", correct: false }] },
+  { id: 4, title: "Готов что-то делать с этим?", options: [{ label: "ДА", correct: true }, { label: "ПОКА НЕТ", correct: false }] },
 ];
 
 
@@ -25,9 +27,9 @@ export default function Home() {
   const [sessionId, setSessionId] = useState<number | null>(null);
   const [phase, setPhase] = useState<Phase>("loading");
   const [currentQuestion, setCurrentQuestion] = useState<QuestionId>(1);
-  const [circuitReveal, setCircuitReveal] = useState(0); // 0, 33, 66, 100
+  const [circuitReveal, setCircuitReveal] = useState(0); // 0, 25, 50, 75, 100
   const [totalSats, setTotalSats] = useState(0);
-  const [progress, setProgress] = useState(0); // Independence % (7→14→20 for 3 questions)
+  const [progress, setProgress] = useState(0); // Independence % (5→10→15→20 for 4 questions)
   const [shakeScreen, setShakeScreen] = useState(false);
   const [showError, setShowError] = useState(false);
   const [terminalKey, setTerminalKey] = useState(0);
@@ -64,9 +66,10 @@ export default function Home() {
       
       const newProgress = PROGRESS_PER_QUESTION[answeredQuestions.size];
       setProgress(newProgress);
+      setTotalSats(prev => prev + SATS_PER_QUESTION);
       
-      if (questionId < 3) {
-        setCircuitReveal(questionId * 33);
+      if (questionId < 4) {
+        setCircuitReveal(questionId * 25);
       }
       
       if (sessionId) {
@@ -79,12 +82,11 @@ export default function Home() {
       }
 
       setTimeout(() => {
-        if (questionId < 3) {
+        if (questionId < 4) {
           setCurrentQuestion((questionId + 1) as QuestionId);
         } else {
           setCircuitReveal(100);
           setProgress(20);
-          setTotalSats(prev => prev + 100);
           setPhase("phase_1_complete");
         }
         isAnsweringRef.current = false; // Unlock after transition
@@ -107,8 +109,6 @@ export default function Home() {
     
     if (phase === "phase_1" && currentQuestion > 1) {
       const prevQ = (currentQuestion - 1) as QuestionId;
-      // Remove BOTH current and target question from answered set
-      // so the target question can be re-answered
       setAnsweredQuestions(prev => {
         const newSet = new Set(prev);
         newSet.delete(currentQuestion);
@@ -117,24 +117,26 @@ export default function Home() {
       });
       setCurrentQuestion(prevQ);
       setProgress(prevQ > 1 ? PROGRESS_PER_QUESTION[prevQ - 2] : 0);
-      setCircuitReveal(Math.max(0, (prevQ - 1) * 33));
+      setTotalSats(prev => Math.max(0, prev - SATS_PER_QUESTION));
+      setCircuitReveal(Math.max(0, (prevQ - 1) * 25));
     } else if (phase === "phase_1_complete") {
       setPhase("phase_1");
-      setCurrentQuestion(3 as QuestionId);
+      setCurrentQuestion(4 as QuestionId);
       setAnsweredQuestions(prev => {
         const newSet = new Set(prev);
-        newSet.delete(3 as QuestionId);
+        newSet.delete(4 as QuestionId);
         return newSet;
       });
-      setProgress(14);
-      setCircuitReveal(66);
+      setProgress(15);
+      setTotalSats(prev => Math.max(0, prev - SATS_PER_QUESTION));
+      setCircuitReveal(75);
     }
   };
 
   const handleChipClick = () => {
     if (circuitReveal >= 100) {
       playPhaseComplete();
-      setTotalSats(200);
+      setTotalSats(prev => prev + 100);
       setTerminalKey(prev => prev + 1);
       setPhase("phase_2");
     }
