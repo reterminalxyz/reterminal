@@ -126,10 +126,9 @@ export function TerminalChat({ onBack }: TerminalChatProps) {
             </span>
           </div>
           <div className="flex items-center gap-3">
-            <div className="px-2 py-1 border-2 border-[#B87333]/50 bg-[#B87333]/10">
-              <span className="text-[9px] tracking-[2px] text-[#B87333] font-bold">
-                ENCRYPTED
-              </span>
+            <div className="flex items-center gap-2 px-2 py-1 border-2 border-[#B87333]/50 bg-[#B87333]/10">
+              <span className="text-[9px] tracking-[3px] text-[#B87333]/60 font-bold">SATS</span>
+              <span className="text-[12px] tracking-[2px] text-[#B87333] font-bold" data-testid="text-sats-count">200</span>
             </div>
             <motion.button
               onClick={onBack}
@@ -140,13 +139,6 @@ export function TerminalChat({ onBack }: TerminalChatProps) {
             >
               <X size={16} strokeWidth={3} />
             </motion.button>
-          </div>
-        </div>
-        {/* SATS counter */}
-        <div className="flex items-center justify-center px-4 pb-2">
-          <div className="flex items-center gap-2 px-4 py-1 border border-[#B87333]/30 bg-[#B87333]/5">
-            <span className="text-[9px] tracking-[3px] text-[#B87333]/60 font-bold">SATS</span>
-            <span className="text-[14px] tracking-[2px] text-[#B87333] font-bold" data-testid="text-sats-count">200</span>
           </div>
         </div>
       </div>
