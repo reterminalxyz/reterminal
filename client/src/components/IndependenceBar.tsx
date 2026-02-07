@@ -25,9 +25,9 @@ export function IndependenceBar({ progress, phase, showBackground = false }: Ind
           НЕЗАВИСИМОСТЬ
         </motion.span>
         
-        {/* Bar container - bigger in phase_2 */}
+        {/* Bar container - same size both phases */}
         <div 
-          className={`w-full ${isDark ? 'h-8' : 'h-6'} rounded-sm overflow-hidden relative`}
+          className="w-full h-6 rounded-sm overflow-hidden relative"
           style={{
             background: isDark 
               ? "linear-gradient(180deg, #151515 0%, #1A1A1A 50%, #151515 100%)"
@@ -72,10 +72,10 @@ export function IndependenceBar({ progress, phase, showBackground = false }: Ind
           </motion.div>
         </div>
         
-        {/* Percentage - bigger in phase_2 */}
+        {/* Percentage - same size both phases */}
         <motion.span 
           key={progress}
-          className={`text-[#B87333] font-bold ${isDark ? 'text-[18px]' : 'text-[16px]'} tracking-[0.3em]`}
+          className="text-[#B87333] font-bold text-[16px] tracking-[0.3em]"
           initial={{ scale: 1.3, opacity: 0.5 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.3 }}
