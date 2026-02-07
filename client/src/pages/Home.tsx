@@ -86,7 +86,7 @@ export default function Home() {
           // All 4 questions done - set circuit to 100% and change phase
           setCircuitReveal(100);
           setProgress(20); // Ensure exactly 20%
-          setTotalSats(prev => prev + 150);
+          setTotalSats(prev => prev + 100);
           setPhase("phase_1_complete");
         }
         isAnsweringRef.current = false; // Unlock after transition
@@ -137,8 +137,8 @@ export default function Home() {
 
   const handleChipClick = () => {
     if (circuitReveal >= 100) {
-      setTotalSats(prev => prev + 150);
-      setTerminalKey(prev => prev + 1); // Reset terminal state
+      setTotalSats(prev => prev + 100);
+      setTerminalKey(prev => prev + 1);
       setPhase("phase_2");
     }
   };

@@ -20,6 +20,7 @@ interface LearningBlock {
   speech: string;
   intermediate_question?: IntermediateQuestion;
   speech_continued?: string;
+  speech_continued_banku?: string;
   skill: string | null;
   reward: number;
   progress_target: number;
@@ -49,7 +50,7 @@ const LEARNING_BLOCKS: LearningBlock[] = [
     progress_target: 21,
     options: [
       { text: "Да, покажи мне выход", action: "next_block" },
-      { text: "Нет, это звучит слишком хорошо", action: "restart", conditional_text: "Понимаю. Система удобна. Если передумаешь — я буду здесь." }
+      { text: "Нет, это звучит слишком хорошо", action: "go_back", conditional_text: "Понимаю. Система удобна. Если передумаешь — я буду здесь." }
     ]
   },
   {
@@ -63,7 +64,8 @@ const LEARNING_BLOCKS: LearningBlock[] = [
         { text: "Банку", action: "continue" }
       ]
     },
-    speech_continued: "Ты думаешь — тебе.\nБанк говорит — тебе.\nПриложение показывает твой баланс.\n\nНо вот правда: деньги в банке — это не твоя собственность. Это запись в их базе данных, которую тебе разрешают использовать.\n\nПопробуй вот что:\n\nОтправь крупную сумму другу в другую страну в субботу вечером. Банк спросит: \"Откуда деньги? Зачем? Кому?\" Они могут заблокировать твой счет просто потому, что их алгоритму не понравилась твоя покупка.\n\nРешил купить что-то, что не нравится твоему правительству? Может быть, пожертвование протестующим, запрещенную книгу или VPN? Счет заморожен. Без суда.\n\nДеньги в банке — это не деньги. Это обещание банка.\n\nИ это обещание работает, пока ты делаешь то, что от тебя ожидают.\n\nОни контролируют доступ к твоему времени, твоему труду, твоей жизни.\n\nТы работаешь всю неделю. Обмениваешь свое время на цифры в приложении. А эти цифры принадлежат не тебе.\n\nБанк — хозяин твоего времени.\n\n\"Баланс в приложении\" — это не владение. Это разрешение.",
+    speech_continued_banku: "Верно, хотя банк говорит тебе, что это твои деньги.\nПриложение показывает твой баланс.\nНо вот правда: деньги в банке — это не твоя собственность. Это запись в их базе данных, которую тебе разрешают использовать.\nПопробуй вот что:\nОтправь крупную сумму другу в другую страну в субботу вечером. Банк спросит: \"Откуда деньги? Зачем? Кому?\" Они могут заблокировать твой счет просто потому, что их алгоритму не понравилась твоя покупка.\nРешил купить что-то, что не нравится твоему правительству? Может быть, пожертвование протестующим, запрещенную книгу или VPN? Счет заморожен. Без суда.\nДеньги в банке — это не деньги. Это обещание банка.\nИ это обещание работает, пока ты делаешь то, что от тебя ожидают.\nОни контролируют доступ к твоему времени, твоему труду, твоей жизни.\nТы работаешь всю неделю. Обмениваешь свое время на цифры в приложении. А эти цифры принадлежат не тебе.\nБанк — хозяин твоего времени.\n\"Баланс в приложении\" — это не владение. Это разрешение.",
+    speech_continued: "Ты думаешь — тебе.\nБанк говорит — тебе.\nПриложение показывает твой баланс.\nНо вот правда: деньги в банке — это не твоя собственность. Это запись в их базе данных, которую тебе разрешают использовать.\nПопробуй вот что:\nОтправь крупную сумму другу в другую страну в субботу вечером. Банк спросит: \"Откуда деньги? Зачем? Кому?\" Они могут заблокировать твой счет просто потому, что их алгоритму не понравилась твоя покупка.\nРешил купить что-то, что не нравится твоему правительству? Может быть, пожертвование протестующим, запрещенную книгу или VPN? Счет заморожен. Без суда.\nДеньги в банке — это не деньги. Это обещание банка.\nИ это обещание работает, пока ты делаешь то, что от тебя ожидают.\nОни контролируют доступ к твоему времени, твоему труду, твоей жизни.\nТы работаешь всю неделю. Обмениваешь свое время на цифры в приложении. А эти цифры принадлежат не тебе.\nБанк — хозяин твоего времени.\n\"Баланс в приложении\" — это не владение. Это разрешение.",
     skill: "Понимание, что баланс в приложении — это не владение, а разрешение",
     reward: 100,
     progress_target: 22,
@@ -188,6 +190,31 @@ const PixelSendIcon = () => (
   </svg>
 );
 
+const PixelCoin = ({ animating }: { animating: boolean }) => (
+  <motion.svg
+    width="16" height="16" viewBox="0 0 16 16"
+    style={{ imageRendering: 'pixelated' }}
+    animate={animating ? { rotate: [0, 360], scale: [1, 1.3, 1] } : {}}
+    transition={{ duration: 0.5 }}
+  >
+    <rect x="5" y="1" width="6" height="2" fill="#B87333" />
+    <rect x="3" y="3" width="2" height="2" fill="#B87333" />
+    <rect x="11" y="3" width="2" height="2" fill="#B87333" />
+    <rect x="1" y="5" width="2" height="6" fill="#B87333" />
+    <rect x="13" y="5" width="2" height="6" fill="#B87333" />
+    <rect x="3" y="11" width="2" height="2" fill="#B87333" />
+    <rect x="11" y="11" width="2" height="2" fill="#B87333" />
+    <rect x="5" y="13" width="6" height="2" fill="#B87333" />
+    <rect x="3" y="5" width="10" height="6" fill="#D4943D" />
+    <rect x="5" y="3" width="6" height="2" fill="#D4943D" />
+    <rect x="5" y="11" width="6" height="2" fill="#D4943D" />
+    <rect x="7" y="4" width="2" height="2" fill="#B87333" />
+    <rect x="6" y="6" width="4" height="2" fill="#B87333" />
+    <rect x="7" y="8" width="2" height="2" fill="#B87333" />
+    <rect x="7" y="10" width="2" height="1" fill="#B87333" />
+  </motion.svg>
+);
+
 type BlockPhase = 
   | "typing_speech"
   | "waiting_intermediate"
@@ -243,7 +270,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
         setDisplayedText("");
         onComplete?.();
       }
-    }, 30);
+    }, 20);
   }, []);
 
   const startBlock = useCallback((blockIndex: number) => {
@@ -271,8 +298,8 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     startBlock(0);
   }, [startBlock]);
 
-  const showNotification = useCallback((sats: number, skill: string | null) => {
-    setNotification({ sats, skill });
+  const showNotification = useCallback((sats: number) => {
+    setNotification({ sats, skill: null });
     setTimeout(() => setNotification(null), 3000);
   }, []);
 
@@ -282,12 +309,9 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
 
     if (block.reward > 0) {
       onSatsUpdate(block.reward);
+      showNotification(block.reward);
     }
     onProgressUpdate(block.progress_target);
-
-    if (block.reward > 0 || block.skill) {
-      showNotification(block.reward, block.skill);
-    }
   }, [onSatsUpdate, onProgressUpdate, showNotification]);
 
   const handleOptionClick = useCallback((option: BlockOption) => {
@@ -301,8 +325,11 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
 
     if (option.action === "continue" && currentBlock.speech_continued) {
       setBlockPhase("typing_speech_continued");
+      const continuedText = (option.text === "Банку" && currentBlock.speech_continued_banku)
+        ? currentBlock.speech_continued_banku
+        : currentBlock.speech_continued!;
       setTimeout(() => {
-        typeMessage(currentBlock.speech_continued!, "satoshi", () => {
+        typeMessage(continuedText, "satoshi", () => {
           isLockedRef.current = false;
           setBlockPhase("waiting_options");
           setCurrentOptions(currentBlock.options);
@@ -335,6 +362,26 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
             startBlock(nextIndex);
           }
         }, 800);
+      }
+      return;
+    }
+
+    if (option.action === "go_back") {
+      if (option.conditional_text) {
+        setBlockPhase("typing_conditional");
+        setTimeout(() => {
+          typeMessage(option.conditional_text!, "satoshi", () => {
+            isLockedRef.current = false;
+            setTimeout(() => {
+              onBack();
+            }, 2000);
+          });
+        }, 400);
+      } else {
+        setTimeout(() => {
+          isLockedRef.current = false;
+          onBack();
+        }, 500);
       }
       return;
     }
@@ -405,13 +452,24 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     }
 
     isLockedRef.current = false;
-  }, [isTyping, currentBlockIndex, typeMessage, startBlock, completeBlock]);
+  }, [isTyping, currentBlockIndex, typeMessage, startBlock, completeBlock, onBack]);
+
+  const [satsAnimating, setSatsAnimating] = useState(false);
+  const prevSatsRef = useRef(totalSats);
+
+  useEffect(() => {
+    if (totalSats > prevSatsRef.current) {
+      setSatsAnimating(true);
+      setTimeout(() => setSatsAnimating(false), 600);
+    }
+    prevSatsRef.current = totalSats;
+  }, [totalSats]);
 
   const currentBlock = LEARNING_BLOCKS[currentBlockIndex];
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
   return (
     <div className="flex flex-col h-full bg-[#0A0A0A] text-[#E8E8E8] font-mono">
-      {/* Notification toast */}
       <AnimatePresence>
         {notification && (
           <motion.div
@@ -425,16 +483,10 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
                 +{notification.sats} SATS
               </div>
             )}
-            {notification.skill && (
-              <div className="bg-[#1E1E1E] text-[#4ADE80] px-5 py-2 text-[11px] tracking-[2px] font-mono font-bold border border-[#4ADE80]/40 shadow-lg max-w-[360px] text-center" data-testid="toast-skill">
-                SKILL UNLOCKED: {notification.skill}
-              </div>
-            )}
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Sticky header */}
       <div className="flex-shrink-0 bg-[#111111] border-b-2 border-[#B87333]/60 z-50">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
@@ -445,16 +497,18 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
           </div>
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 px-2 py-1 border-2 border-[#B87333]/50 bg-[#B87333]/10">
-              <span className="text-[9px] tracking-[3px] text-[#B87333]/60 font-bold">SATS</span>
+              <PixelCoin animating={satsAnimating} />
               <motion.span
                 key={totalSats}
-                initial={{ scale: 1.3 }}
-                animate={{ scale: 1 }}
-                className="text-[12px] tracking-[2px] text-[#B87333] font-bold"
+                initial={{ scale: 1.4, color: "#FFD700" }}
+                animate={{ scale: 1, color: "#B87333" }}
+                transition={{ duration: 0.4 }}
+                className="text-[12px] tracking-[2px] font-bold"
                 data-testid="text-sats-count"
               >
                 {totalSats}
               </motion.span>
+              <span className="text-[9px] tracking-[2px] text-[#B87333]/60 font-bold">SATS</span>
             </div>
             <motion.button
               onClick={onBack}
@@ -469,9 +523,9 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
         </div>
       </div>
 
-      {/* Scrollable messages area */}
       <div 
-        className="flex-1 overflow-y-auto px-4 py-6 space-y-5"
+        ref={messagesContainerRef}
+        className="flex-1 overflow-y-auto px-4 py-4 space-y-2"
         style={{
           background: `
             repeating-linear-gradient(
@@ -482,7 +536,8 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
               rgba(0,0,0,0.15) 6px
             ),
             linear-gradient(180deg, #0A0A0A 0%, #0F0F0F 100%)
-          `
+          `,
+          overscrollBehavior: "contain",
         }}
       >
         <AnimatePresence>
@@ -495,7 +550,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
               className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
             >
               <div
-                className={`max-w-[90%] px-4 py-3 text-[13px] leading-relaxed whitespace-pre-line ${
+                className={`max-w-[90%] px-3 py-2 text-[13px] leading-snug whitespace-pre-line ${
                   message.sender === "user"
                     ? "bg-[#4ADE80]/10 text-[#4ADE80] border-l-4 border-[#4ADE80]"
                     : message.sender === "system"
@@ -503,7 +558,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
                     : "bg-[#B87333]/10 text-[#B87333] border-l-4 border-[#B87333]"
                 }`}
               >
-                <span className="text-[10px] opacity-60 block mb-1 tracking-wider">
+                <span className="text-[10px] opacity-60 block mb-0.5 tracking-wider">
                   {message.sender === "user" ? "[ USER ]" : message.sender === "system" ? "[ SYSTEM ]" : "[ SATOSHI ]"}
                 </span>
                 {message.text}
@@ -512,29 +567,27 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
           ))}
         </AnimatePresence>
 
-        {/* Typing indicator */}
         {isTyping && displayedText && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             className="flex justify-start"
           >
-            <div className="max-w-[90%] px-4 py-3 text-[13px] leading-relaxed bg-[#B87333]/10 text-[#B87333] border-l-4 border-[#B87333] whitespace-pre-line">
-              <span className="text-[10px] opacity-60 block mb-1 tracking-wider">[ SATOSHI ]</span>
+            <div className="max-w-[90%] px-3 py-2 text-[13px] leading-snug bg-[#B87333]/10 text-[#B87333] border-l-4 border-[#B87333] whitespace-pre-line">
+              <span className="text-[10px] opacity-60 block mb-0.5 tracking-wider">[ SATOSHI ]</span>
               {displayedText}
               <span className="inline-block w-3 h-4 ml-1 bg-[#B87333] animate-pulse" />
             </div>
           </motion.div>
         )}
 
-        {/* Option buttons */}
         <AnimatePresence>
           {currentOptions.length > 0 && !isTyping && (
             <motion.div
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
-              className="flex flex-col gap-3 pt-2"
+              className="flex flex-col gap-2 pt-1"
             >
               {currentOptions.map((option, idx) => (
                 <motion.button
@@ -544,7 +597,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
                   transition={{ delay: idx * 0.15 }}
                   onClick={() => handleOptionClick(option)}
                   disabled={isLockedRef.current}
-                  className="w-full px-5 py-4 text-left text-[13px] font-mono font-bold tracking-wide
+                  className="w-full px-4 py-3 text-left text-[13px] font-mono font-bold tracking-wide
                            border-2 border-[#B87333]/50 bg-[#B87333]/5 text-[#B87333]
                            hover:bg-[#B87333]/15 hover:border-[#B87333] 
                            active:scale-[0.98] transition-all duration-200
@@ -562,14 +615,25 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Block title indicator at bottom */}
-      <div className="flex-shrink-0 px-4 py-2 border-t-2 border-[#B87333]/60 bg-[#111111]">
-        <div className="flex items-center justify-between max-w-[400px] mx-auto">
+      <div className="flex-shrink-0 border-t border-[#B87333]/30 bg-[#111111]">
+        <div className="flex items-center gap-2 px-3 py-2">
+          <input
+            type="text"
+            disabled
+            placeholder="Используй кнопки выше..."
+            className="flex-1 bg-[#1A1A1A] text-[#B87333]/30 text-[12px] font-mono px-3 py-2 border border-[#B87333]/20 outline-none cursor-not-allowed placeholder-[#B87333]/20"
+            data-testid="input-disabled"
+          />
+          <div className="w-8 h-8 flex items-center justify-center border border-[#B87333]/20 bg-[#1A1A1A] text-[#B87333]/20 cursor-not-allowed">
+            <PixelSendIcon />
+          </div>
+        </div>
+      </div>
+
+      <div className="flex-shrink-0 px-4 py-1.5 border-t border-[#B87333]/30 bg-[#0D0D0D]">
+        <div className="flex items-center justify-center max-w-[400px] mx-auto">
           <span className="text-[9px] tracking-[2px] text-[#B87333]/40 font-bold">
-            БЛОК {currentBlock?.id || 1}/8
-          </span>
-          <span className="text-[9px] tracking-[2px] text-[#B87333]/40 font-bold truncate ml-3">
-            {currentBlock?.title || ""}
+            1/8 ФИНАНСОВАЯ СВОБОДА
           </span>
         </div>
       </div>
