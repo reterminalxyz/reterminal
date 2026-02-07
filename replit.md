@@ -115,16 +115,20 @@ Bottom-fixed progress indicator:
 - `phase` prop for styling adaptation
 
 ### TerminalChat.tsx
-Phase 2 chat interface (final screen, no completion page):
+Phase 2 block-based learning interface (buttons-only, no text input):
 - Dark pixel theme (#0D0D0D background with scanlines)
-- Header: "TERMINAL://SATOSHI" with ENCRYPTED label (no close button)
-- Initial message: "Привет, я Сатоши." with typewriter effect (30ms per char)
+- Header: "TERMINAL://SATOSHI" with dynamic SATS counter (props from Home.tsx)
+- 9 learning blocks embedded (8 main + 1 finale), sequential progression
+- Typewriter effect for Satoshi messages (30ms per char)
 - User messages in green (#4ADE80), Satoshi messages in copper (#B87333)
-- Pixelated send icon (SVG with pixel art style)
-- Fixed text input at absolute bottom of screen
-- 8 dialogue blocks that increase independence: 20→31→43→54→66→77→89→100%
-- isLockedRef + isProcessing dual lock prevents double-sends
-- Auto-scroll to latest messages
+- Option buttons replace text input — all interaction via buttons
+- Block 2 has intermediate_question (mid-speech question then speech_continued)
+- Actions: next_block, restart, show_conditional_text, create_wallet, initialize_wallet
+- Toast notifications: "+100 SATS" and "SKILL UNLOCKED: [skill]" on block transitions
+- Independence updates: progress_target 21→22→23→25→26→27→28→29%
+- Bottom bar shows "БЛОК X/8" with block title
+- isLockedRef prevents double-clicks during transitions
+- Props: onBack, onProgressUpdate, onSatsUpdate, totalSats
 
 ### BackButton.tsx
 Large prominent navigation button:
