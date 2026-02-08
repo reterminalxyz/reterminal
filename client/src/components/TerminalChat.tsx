@@ -265,6 +265,89 @@ const PixelSendIcon = () => (
   </svg>
 );
 
+const PixelThumbsUp = ({ size = 24, color = "#FFD700" }: { size?: number; color?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 16 16" fill={color} style={{ imageRendering: 'pixelated' }}>
+    <rect x="5" y="1" width="2" height="2" />
+    <rect x="5" y="3" width="2" height="2" />
+    <rect x="5" y="5" width="2" height="2" />
+    <rect x="3" y="7" width="2" height="2" />
+    <rect x="5" y="7" width="2" height="2" />
+    <rect x="7" y="7" width="2" height="2" />
+    <rect x="9" y="7" width="2" height="2" />
+    <rect x="11" y="7" width="2" height="2" />
+    <rect x="3" y="9" width="2" height="2" />
+    <rect x="5" y="9" width="2" height="2" />
+    <rect x="7" y="9" width="2" height="2" />
+    <rect x="9" y="9" width="2" height="2" />
+    <rect x="11" y="9" width="2" height="2" />
+    <rect x="3" y="11" width="2" height="2" />
+    <rect x="5" y="11" width="2" height="2" />
+    <rect x="7" y="11" width="2" height="2" />
+    <rect x="9" y="11" width="2" height="2" />
+    <rect x="11" y="11" width="2" height="2" />
+    <rect x="3" y="13" width="2" height="2" />
+    <rect x="5" y="13" width="2" height="2" />
+    <rect x="7" y="13" width="2" height="2" />
+    <rect x="9" y="13" width="2" height="2" />
+    <rect x="11" y="13" width="2" height="2" />
+  </svg>
+);
+
+const CELEBRATION_PARTICLES = Array.from({ length: 20 }, (_, i) => ({
+  id: i,
+  x: Math.random() * 100,
+  delay: Math.random() * 1.5,
+  duration: 2 + Math.random() * 2,
+  size: 18 + Math.floor(Math.random() * 18),
+  rotation: -30 + Math.random() * 60,
+  color: ["#FFD700", "#B87333", "#4ADE80", "#FFD700", "#E8A317"][i % 5],
+}));
+
+const CelebrationOverlay = () => (
+  <motion.div
+    className="fixed inset-0 z-[100] pointer-events-none overflow-hidden"
+    initial={{ opacity: 0 }}
+    animate={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    transition={{ duration: 0.5 }}
+  >
+    {CELEBRATION_PARTICLES.map((p) => (
+      <motion.div
+        key={p.id}
+        className="absolute"
+        style={{ left: `${p.x}%` }}
+        initial={{ y: "110vh", rotate: 0, opacity: 0.9 }}
+        animate={{
+          y: "-20vh",
+          rotate: p.rotation,
+          opacity: [0, 1, 1, 0.8, 0],
+        }}
+        transition={{
+          duration: p.duration,
+          delay: p.delay,
+          ease: "easeOut",
+        }}
+      >
+        <motion.div
+          animate={{ scale: [0.8, 1.2, 0.9, 1.1, 1] }}
+          transition={{ duration: 0.8, repeat: Infinity, repeatType: "mirror" }}
+        >
+          <PixelThumbsUp size={p.size} color={p.color} />
+        </motion.div>
+      </motion.div>
+    ))}
+    <motion.div
+      className="absolute inset-0"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: [0, 0.15, 0.05, 0.1, 0] }}
+      transition={{ duration: 3, times: [0, 0.2, 0.4, 0.6, 1] }}
+      style={{
+        background: "radial-gradient(circle at center, rgba(255,215,0,0.3) 0%, transparent 70%)",
+      }}
+    />
+  </motion.div>
+);
+
 const PixelCoin = ({ animating }: { animating: boolean }) => (
   <div className="relative">
     <motion.div
@@ -327,6 +410,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
   const [walletButtons, setWalletButtons] = useState<WalletStepButton[]>([]);
   const [showTroubleshooting, setShowTroubleshooting] = useState(false);
   const [flowCompleted, setFlowCompleted] = useState(false);
+  const [showCelebration, setShowCelebration] = useState(false);
 
   const isLockedRef = useRef(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -484,6 +568,11 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     isLockedRef.current = true;
 
     playTransition();
+
+    if (stepId === "step_5") {
+      setShowCelebration(true);
+      setTimeout(() => setShowCelebration(false), 4000);
+    }
 
     typeMessage(step.instruction, "satoshi", () => {
       isLockedRef.current = false;
@@ -735,6 +824,10 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
             </motion.div>
           </motion.div>
         )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showCelebration && <CelebrationOverlay />}
       </AnimatePresence>
 
       <div className="flex-shrink-0 bg-[#111111] border-b-2 border-[#B87333]/60 z-50">
