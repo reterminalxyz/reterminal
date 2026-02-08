@@ -66,7 +66,7 @@ Terminal-style chat interface:
 - Actions: next_block, restart, go_back, show_conditional_text, create_wallet, initialize_wallet
 - Toast notifications: "+100 SATS" pixelated gold, animates from header down over text area with glow
 - Independence updates: each block +1% (21→22→23→24→25→26→27→28)
-- Block indicator "X/8 ФИНАНСОВАЯ СВОБОДА" at TOP (below header, above messages)
+- Block indicator "1/7 ФИНАНСОВАЯ СВОБОДА" at TOP (below header, above messages), static
 - isLockedRef prevents double-clicks during transitions
 - Props: onBack, onProgressUpdate, onSatsUpdate, totalSats, skipFirstTypewriter
 
@@ -138,9 +138,10 @@ Large prominent navigation button:
 
 ## Reward Distribution
 - Phase 1: 200 SATS (4 questions x 50 SATS each, not visible until terminal)
-- Chip click: 100 SATS (total entering terminal: 300 SATS)
+- Chip click: sets SATS to 200 (entering terminal: exactly 200 SATS)
 - Phase 2: 800 SATS (8 blocks x 100 SATS each, +1% independence per block)
-- Total: 1100 SATS (28% independence at terminal end)
+- Total: 1000 SATS max (27% independence at terminal end)
+- SATS cap: 1000, Independence cap: 27%
 
 ## Sound Effects (Web Audio API)
 - `client/src/lib/sounds.ts` - Mechanical/spaceship-style sounds, no external files
@@ -171,7 +172,7 @@ Large prominent navigation button:
 - "Жми на чип" instead of "НАЖМИТЕ НА ЧИП" (casual tone)
 - All 8 block texts rewritten with updated content
 - Block 1: starts "Слушай внимательно", removed "Для начала" and "Меня зовут Сатоши"
-- Block 2: removed "Подумай секунду", single speech_continued for both answers
+- Block 2: branching speech_continued ("Мне" → "На самом деле нет...", "Банку" → "Верно...")
 - Block 3: "Это Bitcoin!" (with !), "17 лет", simplified gold analogy
 - Block 4: simplified key explanation, no Coinbase/Binance mention
 - Block 5: shortened privacy text, removed "Ты можешь быть тенью"
@@ -179,7 +180,7 @@ Large prominent navigation button:
 - Block 7: "клуб цифрового сопротивления авторитаризму", 7 modules (not 8), final option "Хорошо, готов забрать SATS"
 - Block 8: "1000 SATS это примерно 6 евро", shorter/more direct
 - Terminal header: "TERMINAL://" (removed "SATOSHI")
-- Block indicator "X/8 ФИНАНСОВАЯ СВОБОДА" moved from bottom to top (below header, above messages)
+- Block indicator "1/7 ФИНАНСОВАЯ СВОБОДА" static at top (below header, above messages)
 - Phase 2: each block gives +1% independence (21→28) instead of larger jumps
 - Send button arrow points UP instead of right
 - SATS field enlarged: 14px count, 10px label, 22x22 pixel coin

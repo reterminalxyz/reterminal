@@ -8,6 +8,7 @@ interface BlockOption {
   action: string;
   conditional_text?: string;
   conditional_options?: BlockOption[];
+  continued_text?: string;
 }
 
 interface IntermediateQuestion {
@@ -21,7 +22,6 @@ interface LearningBlock {
   speech: string;
   intermediate_question?: IntermediateQuestion;
   speech_continued?: string;
-
   skill: string | null;
   reward: number;
   progress_target: number;
@@ -62,8 +62,16 @@ const LEARNING_BLOCKS: LearningBlock[] = [
     intermediate_question: {
       text: "Кому принадлежат деньги на твоем счету?",
       options: [
-        { text: "Мне", action: "continue" },
-        { text: "Банку", action: "continue" }
+        {
+          text: "Мне",
+          action: "continue",
+          continued_text: "На самом деле нет, хотя банк говорит тебе, что это твои деньги.\n\nНесмотря на то, что их приложение и показывает баланс, эти деньги не твоя собственность. Это запись в ИХ базе данных, которую тебе РАЗРЕШАЮТ использовать.\nПопробуй вот что:\nОтправь крупную сумму другу в другую страну. Банк обязательно спросит: «Откуда деньги? Зачем? Кому?» Они могут заблокировать твой счет просто потому, что их алгоритму не понравилась твоя покупка.\nРешил купить что-то, что не нравится твоему правительству? Может быть, пожертвование протестующим, запрещенную книгу или VPN? Счет заморожен. Без суда.\nДеньги в банке — это не деньги. Это обещание банка.\nИ это обещание работает, пока ты делаешь то, что от тебя ожидают.\nОни контролируют доступ к твоему времени, твоему труду, твоей жизни.\nТы работаешь всю неделю и обмениваешь это время на цифры в приложении. А цифры принадлежат не тебе.\nБанк — хозяин твоего времени.\n«Баланс в приложении» — это не владение, разрешение."
+        },
+        {
+          text: "Банку",
+          action: "continue",
+          continued_text: "Верно, хотя банк говорит тебе, что это твои деньги.\n\nХотя их приложение и показывает баланс, эти деньги не твоя собственность. Это запись в их базе данных, которую тебе разрешают использовать.\nПопробуй вот что:\nОтправь крупную сумму другу в другую страну. Банк обязательно спросит: «Откуда деньги? Зачем? Кому?» Они могут заблокировать твой счет просто потому, что их алгоритму не понравилась твоя покупка.\nРешил купить что-то, что не нравится твоему правительству? Может быть, пожертвование протестующим, запрещенную книгу или VPN? Счет заморожен. Без суда.\nДеньги в банке — это не деньги. Это обещание банка.\nИ это обещание работает, пока ты делаешь то, что от тебя ожидают.\nОни контролируют доступ к твоему времени, твоему труду, твоей жизни.\nТы работаешь всю неделю и обмениваешь это время на цифры в приложении. А цифры принадлежат не тебе.\nБанк — хозяин твоего времени.\n«Баланс в приложении» — это не владение, разрешение."
+        }
       ]
     },
     speech_continued: "На самом деле нет, хотя банк говорит тебе, что это твои деньги.\n\nНесмотря на то, что их приложение и показывает баланс, эти деньги не твоя собственность. Это запись в ИХ базе данных, которую тебе РАЗРЕШАЮТ использовать.\nПопробуй вот что:\nОтправь крупную сумму другу в другую страну. Банк обязательно спросит: «Откуда деньги? Зачем? Кому?» Они могут заблокировать твой счет просто потому, что их алгоритму не понравилась твоя покупка.\nРешил купить что-то, что не нравится твоему правительству? Может быть, пожертвование протестующим, запрещенную книгу или VPN? Счет заморожен. Без суда.\nДеньги в банке — это не деньги. Это обещание банка.\nИ это обещание работает, пока ты делаешь то, что от тебя ожидают.\nОни контролируют доступ к твоему времени, твоему труду, твоей жизни.\nТы работаешь всю неделю и обмениваешь это время на цифры в приложении. А цифры принадлежат не тебе.\nБанк — хозяин твоего времени.\n«Баланс в приложении» — это не владение, разрешение.",
@@ -91,7 +99,7 @@ const LEARNING_BLOCKS: LearningBlock[] = [
     reward: 100,
     progress_target: 23,
     options: [
-      { text: "Понял, но как это устроено", action: "next_block" },
+      { text: "Понял, но как это устроено?", action: "next_block" },
       { text: "Какие еще преимущества?", action: "next_block" }
     ]
   },
@@ -255,20 +263,27 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
   const typeTickCounterRef = useRef(0);
   const userScrolledRef = useRef(false);
   const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isProgrammaticScrollRef = useRef(false);
 
   const scrollToBottom = useCallback(() => {
     if (!userScrolledRef.current) {
-      requestAnimationFrame(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-      });
+      const container = messagesContainerRef.current;
+      if (container) {
+        isProgrammaticScrollRef.current = true;
+        container.scrollTop = container.scrollHeight;
+        setTimeout(() => {
+          isProgrammaticScrollRef.current = false;
+        }, 50);
+      }
     }
   }, []);
 
   const handleUserScroll = useCallback(() => {
+    if (isProgrammaticScrollRef.current) return;
     const container = messagesContainerRef.current;
     if (!container) return;
     const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
-    if (distanceFromBottom < 40) {
+    if (distanceFromBottom < 50) {
       userScrolledRef.current = false;
     } else {
       userScrolledRef.current = true;
@@ -342,6 +357,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     }
 
     playTransition();
+
     typeMessage(block.speech, "satoshi", () => {
       isLockedRef.current = false;
       if (block.intermediate_question) {
@@ -401,9 +417,9 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
 
     const currentBlock = LEARNING_BLOCKS[currentBlockIndex];
 
-    if (option.action === "continue" && currentBlock.speech_continued) {
+    if (option.action === "continue") {
       setBlockPhase("typing_speech_continued");
-      const continuedText = currentBlock.speech_continued!;
+      const continuedText = option.continued_text || currentBlock.speech_continued || "";
       setTimeout(() => {
         typeMessage(continuedText, "satoshi", () => {
           isLockedRef.current = false;
@@ -618,7 +634,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
       <div className="flex-shrink-0 px-4 py-1.5 border-b border-[#B87333]/30 bg-[#0D0D0D]">
         <div className="flex items-center justify-center max-w-[400px] mx-auto">
           <span className="text-[9px] tracking-[2px] text-[#B87333]/40 font-bold" data-testid="text-block-indicator">
-            1/8 ФИНАНСОВАЯ СВОБОДА
+            1/7 ФИНАНСОВАЯ СВОБОДА
           </span>
         </div>
       </div>
@@ -641,77 +657,61 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
           overscrollBehavior: "contain",
         }}
       >
-        <AnimatePresence>
-          {messages.map((message) => (
-            <motion.div
-              key={message.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
+        {messages.map((message) => (
+          <div
+            key={message.id}
+            className={`flex ${message.sender === "user" ? "justify-end" : "justify-start"}`}
+          >
+            <div
+              className={`max-w-[90%] px-3 py-2 text-[13px] leading-snug whitespace-pre-line ${
+                message.sender === "user"
+                  ? "bg-[#4ADE80]/10 text-[#4ADE80] border-l-4 border-[#4ADE80]"
+                  : message.sender === "system"
+                  ? "bg-[#B87333]/20 text-[#B87333] border-l-4 border-[#B87333] text-center w-full"
+                  : "bg-[#B87333]/10 text-[#B87333] border-l-4 border-[#B87333]"
+              }`}
             >
-              <div
-                className={`max-w-[90%] px-3 py-2 text-[13px] leading-snug whitespace-pre-line ${
-                  message.sender === "user"
-                    ? "bg-[#4ADE80]/10 text-[#4ADE80] border-l-4 border-[#4ADE80]"
-                    : message.sender === "system"
-                    ? "bg-[#B87333]/20 text-[#B87333] border-l-4 border-[#B87333] text-center w-full"
-                    : "bg-[#B87333]/10 text-[#B87333] border-l-4 border-[#B87333]"
-                }`}
-              >
-                <span className="text-[10px] opacity-60 block mb-0.5 tracking-wider">
-                  {message.sender === "user" ? "[ USER ]" : message.sender === "system" ? "[ SYSTEM ]" : "[ SATOSHI ]"}
-                </span>
-                {message.text}
-              </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
+              <span className="text-[10px] opacity-60 block mb-0.5 tracking-wider">
+                {message.sender === "user" ? "[ USER ]" : message.sender === "system" ? "[ SYSTEM ]" : "[ SATOSHI ]"}
+              </span>
+              {message.text}
+            </div>
+          </div>
+        ))}
 
         {isTyping && displayedText && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="flex justify-start"
-          >
+          <div className="flex justify-start">
             <div className="max-w-[90%] px-3 py-2 text-[13px] leading-snug bg-[#B87333]/10 text-[#B87333] border-l-4 border-[#B87333] whitespace-pre-line">
               <span className="text-[10px] opacity-60 block mb-0.5 tracking-wider">[ SATOSHI ]</span>
               {displayedText}
               <span className="inline-block w-3 h-4 ml-1 bg-[#B87333] animate-pulse" />
             </div>
-          </motion.div>
+          </div>
         )}
 
-        <AnimatePresence>
-          {currentOptions.length > 0 && !isTyping && (
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              className="flex flex-col gap-2 pt-1"
-            >
-              {currentOptions.map((option, idx) => (
-                <motion.button
-                  key={`${currentBlock?.id}-${blockPhase}-${idx}`}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: idx * 0.15 }}
-                  onClick={() => handleOptionClick(option)}
-                  disabled={isLockedRef.current}
-                  className="w-full px-4 py-3 text-left text-[13px] font-mono font-bold tracking-wide
-                           border-2 border-[#B87333]/50 bg-[#B87333]/5 text-[#B87333]
-                           hover:bg-[#B87333]/15 hover:border-[#B87333] 
-                           active:scale-[0.98] transition-all duration-200
-                           disabled:opacity-30 disabled:cursor-not-allowed"
-                  data-testid={`button-option-${idx}`}
-                >
-                  <span className="text-[#B87333]/40 mr-2">&gt;</span>
-                  {option.text}
-                </motion.button>
-              ))}
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {currentOptions.length > 0 && !isTyping && (
+          <div className="flex flex-col gap-2 pt-1">
+            {currentOptions.map((option, idx) => (
+              <motion.button
+                key={`${currentBlock?.id}-${blockPhase}-${idx}`}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: idx * 0.15 }}
+                onClick={() => handleOptionClick(option)}
+                disabled={isLockedRef.current}
+                className="w-full px-4 py-3 text-left text-[13px] font-mono font-bold tracking-wide
+                         border-2 border-[#B87333]/50 bg-[#B87333]/5 text-[#B87333]
+                         hover:bg-[#B87333]/15 hover:border-[#B87333] 
+                         active:scale-[0.98] transition-all duration-200
+                         disabled:opacity-30 disabled:cursor-not-allowed"
+                data-testid={`button-option-${idx}`}
+              >
+                <span className="text-[#B87333]/40 mr-2">&gt;</span>
+                {option.text}
+              </motion.button>
+            ))}
+          </div>
+        )}
 
         <div ref={messagesEndRef} />
       </div>
