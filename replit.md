@@ -139,8 +139,9 @@ Large prominent navigation button:
 ## Reward Distribution
 - Phase 1: 200 SATS (4 questions x 50 SATS each, not visible until terminal)
 - Chip click: sets SATS to 200 (entering terminal: exactly 200 SATS)
-- Phase 2: 800 SATS (8 blocks x 100 SATS each, +1% independence per block)
+- Phase 2: 800 SATS (blocks 1-6: 100 each, block 7: 200, block 8: 0), +1% independence per block
 - Total: 1000 SATS max (27% independence at terminal end)
+- After "Хорошо, готов забрать SATS" (block 7) = exactly 1000 SATS
 - SATS cap: 1000, Independence cap: 27%
 
 ## Sound Effects (Web Audio API)
