@@ -263,35 +263,39 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
   const typeTickCounterRef = useRef(0);
   const userScrolledRef = useRef(false);
   const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const isProgrammaticScrollRef = useRef(false);
+  const lastScrollTopRef = useRef(0);
 
   const scrollToBottom = useCallback(() => {
     if (!userScrolledRef.current) {
       const container = messagesContainerRef.current;
       if (container) {
-        isProgrammaticScrollRef.current = true;
         container.scrollTop = container.scrollHeight;
-        setTimeout(() => {
-          isProgrammaticScrollRef.current = false;
-        }, 50);
+        lastScrollTopRef.current = container.scrollTop;
       }
     }
   }, []);
 
   const handleUserScroll = useCallback(() => {
-    if (isProgrammaticScrollRef.current) return;
     const container = messagesContainerRef.current;
     if (!container) return;
-    const distanceFromBottom = container.scrollHeight - container.scrollTop - container.clientHeight;
-    if (distanceFromBottom < 50) {
-      userScrolledRef.current = false;
-    } else {
+    const currentScrollTop = container.scrollTop;
+    const prevScrollTop = lastScrollTopRef.current;
+    lastScrollTopRef.current = currentScrollTop;
+    const distanceFromBottom = container.scrollHeight - currentScrollTop - container.clientHeight;
+    const isScrollingUp = currentScrollTop < prevScrollTop - 2;
+    if (isScrollingUp) {
       userScrolledRef.current = true;
       if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
       scrollTimeoutRef.current = setTimeout(() => {
         userScrolledRef.current = false;
         scrollToBottom();
       }, 8000);
+    } else if (distanceFromBottom < 10) {
+      userScrolledRef.current = false;
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+        scrollTimeoutRef.current = null;
+      }
     }
   }, [scrollToBottom]);
 
