@@ -523,7 +523,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
           onComplete?.();
         });
       }
-    }, 1);
+    }, 12);
   }, []);
 
   const startBlock = useCallback((blockIndex: number, skipTyping?: boolean) => {
