@@ -136,7 +136,7 @@ export default function Home() {
   const handleChipClick = () => {
     if (circuitReveal >= 100) {
       playPhaseComplete();
-      setTotalSats(prev => prev + 100);
+      setTotalSats(200);
       setTerminalKey(prev => prev + 1);
       setPhase("phase_2");
     }

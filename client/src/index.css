@@ -364,23 +364,27 @@ body {
   background: var(--copper); 
 }
 
-/* Terminal dark scrollbar */
+/* Terminal pixel scrollbar */
 .terminal-scrollbar::-webkit-scrollbar {
-  width: 4px;
+  width: 6px;
 }
 .terminal-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
+  background: rgba(184, 115, 51, 0.05);
 }
 .terminal-scrollbar::-webkit-scrollbar-thumb {
-  background: rgba(184, 115, 51, 0.2);
-  border-radius: 2px;
+  background: rgba(184, 115, 51, 0.35);
+  border: 1px solid rgba(184, 115, 51, 0.15);
+  border-radius: 0;
 }
 .terminal-scrollbar::-webkit-scrollbar-thumb:hover {
-  background: rgba(184, 115, 51, 0.4);
+  background: rgba(184, 115, 51, 0.55);
+}
+.terminal-scrollbar::-webkit-scrollbar-thumb:active {
+  background: rgba(184, 115, 51, 0.7);
 }
 .terminal-scrollbar {
   scrollbar-width: thin;
-  scrollbar-color: rgba(184, 115, 51, 0.2) transparent;
+  scrollbar-color: rgba(184, 115, 51, 0.35) rgba(184, 115, 51, 0.05);
 }
 
 @layer utilities {
