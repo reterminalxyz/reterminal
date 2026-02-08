@@ -413,6 +413,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
   const [showCelebration, setShowCelebration] = useState(false);
 
   const isLockedRef = useRef(false);
+  const mountedRef = useRef(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const typeIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -421,6 +422,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
   const userScrolledRef = useRef(false);
   const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastScrollTopRef = useRef(0);
+  const pendingTimeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
   const scrollToBottom = useCallback(() => {
     if (!userScrolledRef.current) {
@@ -460,15 +462,37 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     scrollToBottom();
   }, [messages, displayedText, scrollToBottom]);
 
+  const safeTimeout = useCallback((fn: () => void, ms: number) => {
+    const id = setTimeout(() => {
+      if (!mountedRef.current) return;
+      pendingTimeoutsRef.current = pendingTimeoutsRef.current.filter(t => t !== id);
+      fn();
+    }, ms);
+    pendingTimeoutsRef.current.push(id);
+    return id;
+  }, []);
+
   useEffect(() => {
+    mountedRef.current = true;
     return () => {
+      mountedRef.current = false;
       if (typeIntervalRef.current) clearInterval(typeIntervalRef.current);
       if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
+      pendingTimeoutsRef.current.forEach(t => clearTimeout(t));
+      pendingTimeoutsRef.current = [];
     };
   }, []);
 
   const typeMessage = useCallback((text: string, sender: "satoshi" | "system", onComplete?: () => void) => {
-    if (typeIntervalRef.current) clearInterval(typeIntervalRef.current);
+    if (typeIntervalRef.current) {
+      clearInterval(typeIntervalRef.current);
+      typeIntervalRef.current = null;
+    }
+    
+    if (!text) {
+      onComplete?.();
+      return;
+    }
     
     setIsTyping(true);
     setDisplayedText("");
@@ -476,6 +500,11 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     let charIndex = 0;
 
     typeIntervalRef.current = setInterval(() => {
+      if (!mountedRef.current) {
+        if (typeIntervalRef.current) clearInterval(typeIntervalRef.current);
+        typeIntervalRef.current = null;
+        return;
+      }
       if (charIndex < text.length) {
         setDisplayedText(text.slice(0, charIndex + 1));
         typeTickCounterRef.current++;
@@ -486,10 +515,13 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
       } else {
         if (typeIntervalRef.current) clearInterval(typeIntervalRef.current);
         typeIntervalRef.current = null;
-        setIsTyping(false);
-        setDisplayedText("");
-        setMessages(prev => [...prev, { id: Date.now(), text, sender }]);
-        onComplete?.();
+        requestAnimationFrame(() => {
+          if (!mountedRef.current) return;
+          setIsTyping(false);
+          setDisplayedText("");
+          setMessages(prev => [...prev, { id: Date.now(), text, sender }]);
+          onComplete?.();
+        });
       }
     }, 20);
   }, []);
@@ -541,8 +573,8 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
 
   const showNotification = useCallback((sats: number) => {
     setNotification({ sats, skill: null });
-    setTimeout(() => setNotification(null), 1800);
-  }, []);
+    safeTimeout(() => setNotification(null), 1800);
+  }, [safeTimeout]);
 
   const completeBlock = useCallback((blockIndex: number) => {
     const block = LEARNING_BLOCKS[blockIndex];
@@ -571,7 +603,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
 
     if (stepId === "step_5") {
       setShowCelebration(true);
-      setTimeout(() => setShowCelebration(false), 4000);
+      safeTimeout(() => setShowCelebration(false), 4000);
     }
 
     typeMessage(step.instruction, "satoshi", () => {
@@ -581,7 +613,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
         setFlowCompleted(true);
       }
     });
-  }, [typeMessage]);
+  }, [typeMessage, safeTimeout]);
 
   const handleWalletButtonClick = useCallback((button: WalletStepButton) => {
     if (isLockedRef.current || isTyping) return;
@@ -602,22 +634,28 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
         a.style.display = "none";
         document.body.appendChild(a);
         a.click();
-        document.body.removeChild(a);
+        setTimeout(() => {
+          try { document.body.removeChild(a); } catch (_) {}
+        }, 100);
       } catch (_) {}
       if (button.target) {
         const targetStep = button.target;
-        const onReturn = () => {
+        let alreadyFired = false;
+        const fireOnce = () => {
+          if (alreadyFired) return;
+          alreadyFired = true;
           document.removeEventListener("visibilitychange", onReturn);
           window.removeEventListener("focus", onReturn);
-          setTimeout(() => {
-            startWalletStep(targetStep);
-          }, 500);
+          startWalletStep(targetStep);
+        };
+        const onReturn = () => {
+          if (document.visibilityState === "visible" || document.hasFocus()) {
+            setTimeout(fireOnce, 500);
+          }
         };
         document.addEventListener("visibilitychange", onReturn);
         window.addEventListener("focus", onReturn);
-        setTimeout(() => {
-          startWalletStep(targetStep);
-        }, 3000);
+        setTimeout(fireOnce, 3000);
       } else {
         isLockedRef.current = false;
       }
@@ -628,12 +666,12 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
       isLockedRef.current = true;
       setWalletButtons([]);
       setMessages(prev => [...prev, { id: Date.now(), text: button.text, sender: "user" }]);
-      setTimeout(() => {
+      safeTimeout(() => {
         startWalletStep(button.target!);
       }, 800);
       return;
     }
-  }, [isTyping, startWalletStep]);
+  }, [isTyping, startWalletStep, safeTimeout]);
 
   const lastWisdomRef = useRef(-1);
 
@@ -651,15 +689,15 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
       }
       lastWisdomRef.current = idx;
       const wisdom = SATOSHI_WISDOM[idx];
-      setTimeout(() => {
+      safeTimeout(() => {
         typeMessage(wisdom, "satoshi", () => {});
       }, 500);
     } else {
-      setTimeout(() => {
+      safeTimeout(() => {
         setMessages(prev => [...prev, { id: Date.now() + 1, text: "сначала пройди первый блок, все вопросы потом", sender: "satoshi" }]);
       }, 500);
     }
-  }, [inputText, flowCompleted, typeMessage]);
+  }, [inputText, flowCompleted, typeMessage, safeTimeout]);
 
   const handleOptionClick = useCallback((option: BlockOption) => {
     if (isLockedRef.current || isTyping) return;
@@ -674,7 +712,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     if (option.action === "continue") {
       setBlockPhase("typing_speech_continued");
       const continuedText = option.continued_text || currentBlock.speech_continued || "";
-      setTimeout(() => {
+      safeTimeout(() => {
         typeMessage(continuedText, "satoshi", () => {
           isLockedRef.current = false;
           setBlockPhase("waiting_options");
@@ -687,11 +725,11 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     if (option.action === "next_block") {
       if (option.conditional_text) {
         setBlockPhase("typing_conditional");
-        setTimeout(() => {
+        safeTimeout(() => {
           typeMessage(option.conditional_text!, "satoshi", () => {
             isLockedRef.current = false;
             completeBlock(currentBlockIndex);
-            setTimeout(() => {
+            safeTimeout(() => {
               const nextIndex = currentBlockIndex + 1;
               if (nextIndex < LEARNING_BLOCKS.length) {
                 startBlock(nextIndex);
@@ -701,7 +739,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
         }, 400);
       } else {
         completeBlock(currentBlockIndex);
-        setTimeout(() => {
+        safeTimeout(() => {
           isLockedRef.current = false;
           const nextIndex = currentBlockIndex + 1;
           if (nextIndex < LEARNING_BLOCKS.length) {
@@ -715,16 +753,16 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     if (option.action === "go_back") {
       if (option.conditional_text) {
         setBlockPhase("typing_conditional");
-        setTimeout(() => {
+        safeTimeout(() => {
           typeMessage(option.conditional_text!, "satoshi", () => {
             isLockedRef.current = false;
-            setTimeout(() => {
+            safeTimeout(() => {
               onBack();
             }, 2000);
           });
         }, 400);
       } else {
-        setTimeout(() => {
+        safeTimeout(() => {
           isLockedRef.current = false;
           onBack();
         }, 500);
@@ -735,17 +773,17 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     if (option.action === "restart") {
       if (option.conditional_text) {
         setBlockPhase("typing_conditional");
-        setTimeout(() => {
+        safeTimeout(() => {
           typeMessage(option.conditional_text!, "satoshi", () => {
             isLockedRef.current = false;
-            setTimeout(() => {
+            safeTimeout(() => {
               setMessages([]);
               startBlock(0);
             }, 2000);
           });
         }, 400);
       } else {
-        setTimeout(() => {
+        safeTimeout(() => {
           isLockedRef.current = false;
           setMessages([]);
           startBlock(0);
@@ -756,7 +794,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
 
     if (option.action === "show_conditional_text" && option.conditional_text) {
       setBlockPhase("typing_conditional");
-      setTimeout(() => {
+      safeTimeout(() => {
         typeMessage(option.conditional_text!, "satoshi", () => {
           isLockedRef.current = false;
           if (option.conditional_options && option.conditional_options.length > 0) {
@@ -774,7 +812,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     if (option.action === "create_wallet") {
       completeBlock(currentBlockIndex);
       setWalletMode(true);
-      setTimeout(() => {
+      safeTimeout(() => {
         isLockedRef.current = false;
         startWalletStep("step_1");
       }, 800);
@@ -782,7 +820,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     }
 
     isLockedRef.current = false;
-  }, [isTyping, currentBlockIndex, typeMessage, startBlock, completeBlock, onBack, startWalletStep]);
+  }, [isTyping, currentBlockIndex, typeMessage, startBlock, completeBlock, onBack, startWalletStep, safeTimeout]);
 
   const [satsAnimating, setSatsAnimating] = useState(false);
   const prevSatsRef = useRef(totalSats);
@@ -790,7 +828,9 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
   useEffect(() => {
     if (totalSats > prevSatsRef.current) {
       setSatsAnimating(true);
-      setTimeout(() => setSatsAnimating(false), 600);
+      const id = setTimeout(() => setSatsAnimating(false), 600);
+      prevSatsRef.current = totalSats;
+      return () => clearTimeout(id);
     }
     prevSatsRef.current = totalSats;
   }, [totalSats]);

@@ -35,8 +35,29 @@ export default function Home() {
   const [terminalKey, setTerminalKey] = useState(0);
   const [skipTypewriter, setSkipTypewriter] = useState(false);
   const [answeredQuestions, setAnsweredQuestions] = useState<Set<QuestionId>>(new Set()); // Track which questions answered
-  const isAnsweringRef = useRef(false); // Synchronous lock to prevent any race conditions
+  const isAnsweringRef = useRef(false);
+  const mountedRef = useRef(true);
+  const pendingTimeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   
+  const safeTimeout = useCallback((fn: () => void, ms: number) => {
+    const id = setTimeout(() => {
+      if (!mountedRef.current) return;
+      pendingTimeoutsRef.current = pendingTimeoutsRef.current.filter(t => t !== id);
+      fn();
+    }, ms);
+    pendingTimeoutsRef.current.push(id);
+    return id;
+  }, []);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      pendingTimeoutsRef.current.forEach(t => clearTimeout(t));
+      pendingTimeoutsRef.current = [];
+    };
+  }, []);
+
   const { data: session, isLoading: isSessionLoading } = useSession(sessionId);
   const createSession = useCreateSession();
   const updateSession = useUpdateSession();
@@ -81,7 +102,7 @@ export default function Home() {
         });
       }
 
-      setTimeout(() => {
+      safeTimeout(() => {
         if (questionId < 4) {
           setCurrentQuestion((questionId + 1) as QuestionId);
         } else {
@@ -89,17 +110,17 @@ export default function Home() {
           setProgress(20);
           setPhase("phase_1_complete");
         }
-        isAnsweringRef.current = false; // Unlock after transition
+        isAnsweringRef.current = false;
       }, 800);
     } else {
       playError();
       setShakeScreen(true);
       setShowError(true);
-      setTimeout(() => {
+      safeTimeout(() => {
         setShakeScreen(false);
-        isAnsweringRef.current = false; // Unlock after error animation
+        isAnsweringRef.current = false;
       }, 500);
-      setTimeout(() => setShowError(false), 2000);
+      safeTimeout(() => setShowError(false), 2000);
     }
   };
 
@@ -251,11 +272,12 @@ export default function Home() {
               <div className="flex gap-3">
                 {question.options.map((option, idx) => (
                   <motion.button
+                    type="button"
                     key={option.label}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 + idx * 0.1 }}
-                    onClick={() => handleQuestionAnswer(question.id as QuestionId, option.correct)}
+                    onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleQuestionAnswer(question.id as QuestionId, option.correct); }}
                     className={`w-36 h-12 border-2 border-[#B87333] text-[#3E3129] 
                              text-[13px] font-bold tracking-wider font-mono
                              hover:bg-[#B87333] hover:text-[#F5F5F5] 
