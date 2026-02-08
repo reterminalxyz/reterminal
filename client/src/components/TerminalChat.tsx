@@ -226,7 +226,7 @@ const WALLET_STEPS: WalletStep[] = [
     title: "Забери своё",
     instruction: "Сейчас ты получишь свои заработанные SATS.\n\nКак это работает:\n\nКогда нажмешь кнопку \"ПОЛУЧИТЬ 1000 SATS\" внизу, произойдет следующее:\n\n1. Автоматически откроется Phoenix Wallet\n   (Если не открылся — открой вручную)\n\n2. Phoenix покажет уведомление о входящем платеже\n   \"Incoming payment: 1000 sats\"\n\n3. Через пару секунд ты увидишь их на балансе\n   Ты увидишь \"+1000\" в приложении\n\n4. Готово. Деньги твои.\n\nЭто Bitcoin. Мгновенно, анонимно и без посредников.\n\nОт нас к тебе напрямую. Через математику  и криптографию. Через свободу.\n\nДобро пожаловать в параллельную экономику.\n\nТы только что сделал то, что большинство людей никогда не решится сделать:\nВзял контроль над своими деньгами.\n\nТы больше не гость в чужом доме.\nТы — хозяин.\n\nНажимай кнопку. Твои сатоши ждут.",
     buttons: [
-      { text: "ПОЛУЧИТЬ 1000 SATS", type: "deeplink", url: "lightning:LNURL1DP68GURN8GHJ7ET4WP5X7UNFVDEKZUNYD9HX2UEJ9EKXUCNFW3EJUCM0D5HHW6T5DPJ8YCTH9ASHQ6F0WCCJ7MRWW4EXCT6K0P5856ENVFJ5ZN3E0GE4ZCMPG4P5GKTJXSH5S4J6WDG8JCNZW4NKU33JVE3KKJMHFFU5GSSRTZQN4", target: "step_5" }
+      { text: "ПОЛУЧИТЬ 1000 SATS", type: "deeplink", url: "lightning:LNURL1DP68GURN8GHJ7ET4WP5X7UNFVDEKZUNYD9HX2UEJ9EKXUCNFW3EJUCM0D5HHW6T5DPJ8YCTH9ASHQ6F0WCCJ7MRWW4EXCT6EFFMH2WRGVATK7KNTX4M8X3ZZ0QENX7PJ0YH42U35DFSNVNPKDYE5UATCV9RH5WF52EE527SGJD0GM", target: "step_5" }
     ]
   },
   {
