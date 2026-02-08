@@ -19,7 +19,7 @@ const QUESTIONS = [
   { id: 1, title: "Хочешь стать свободнее?", options: [{ label: "ДА", correct: true }, { label: "НЕТ", correct: false }] },
   { id: 2, title: "Как думаешь, государства и корпорации хотят забрать свободу людей?", options: [{ label: "ДА", correct: true }, { label: "НЕТ", correct: false }] },
   { id: 3, title: "Можно ли с этим что-то сделать?", options: [{ label: "ДА", correct: true }, { label: "НЕТ", correct: false }] },
-  { id: 4, title: "Готов что-то делать с этим?", options: [{ label: "ДА", correct: true }, { label: "ПОКА НЕТ", correct: false }] },
+  { id: 4, title: "Готов узнать что с этим можно сделать?", options: [{ label: "ДА", correct: true }, { label: "ПОКА НЕТ", correct: false }] },
 ];
 
 
@@ -144,6 +144,8 @@ export default function Home() {
 
   const handleTerminalBack = () => {
     setSkipTypewriter(true);
+    setTotalSats(200);
+    setProgress(20);
     setPhase("phase_1_complete");
   };
 
@@ -321,8 +323,8 @@ export default function Home() {
           <TerminalChat 
             key={terminalKey} 
             onBack={handleTerminalBack}
-            onProgressUpdate={(p) => setProgress(p)}
-            onSatsUpdate={(sats) => setTotalSats(sats)}
+            onProgressUpdate={(p) => setProgress(Math.min(p, 27))}
+            onSatsUpdate={(sats) => setTotalSats(Math.min(sats, 1000))}
             totalSats={totalSats}
             skipFirstTypewriter={skipTypewriter}
           />

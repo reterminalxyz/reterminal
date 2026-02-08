@@ -110,12 +110,18 @@ Bottom-fixed progress indicator:
 Phase 2 block-based learning interface:
 - Dark pixel theme (#0A0A0A background with scanlines)
 - Header: "TERMINAL://" with enlarged SATS counter (14px count, 10px label, 22x22 coin)
+- Block indicator: static "1/8 ФИНАНСОВАЯ СВОБОДА" (never changes)
 - PixelCoin: brighter glow (1.2s cycle), stronger shimmer, scale pulse animation
 - PixelSendIcon: arrow pointing UP (pixelated)
 - 9 learning blocks embedded (8 main + 1 finale), sequential progression
 - Block 7 final option: "Хорошо, готов забрать SATS"
 - Toast notification: pixelated gold text, slides from header area down over messages, glow/shine, 1.8s duration
 - Text input enabled: responds with "сначала пройди первый блок, все вопросы потом"
+- Custom dark scrollbar (4px, copper-tinted, transparent track)
+- User can scroll during typewriter animation (auto-scroll pauses on user scroll)
+- No flicker on typing completion (requestAnimationFrame transition)
+- Max SATS: 1000, Max independence: 27%
+- Back from terminal resets SATS to 200, progress to 20%
 
 ### BackButton.tsx
 Large prominent navigation button:

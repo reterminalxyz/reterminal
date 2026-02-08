@@ -364,6 +364,25 @@ body {
   background: var(--copper); 
 }
 
+/* Terminal dark scrollbar */
+.terminal-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+.terminal-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.terminal-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(184, 115, 51, 0.2);
+  border-radius: 2px;
+}
+.terminal-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(184, 115, 51, 0.4);
+}
+.terminal-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(184, 115, 51, 0.2) transparent;
+}
+
 @layer utilities {
   .no-default-hover-elevate {}
   .no-default-active-elevate {}
