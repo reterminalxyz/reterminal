@@ -237,6 +237,19 @@ const WALLET_STEPS: WalletStep[] = [
   }
 ];
 
+const SATOSHI_WISDOM = [
+  "Корень проблемы традиционных валют — доверие. Нужно доверять центральному банку, что он не обесценит валюту. История полна примеров нарушения этого доверия.",
+  "Bitcoin — это первая реализация концепции криптовалюты. Главное нововведение: сеть без доверенного центра или третьих сторон.",
+  "Природа Bitcoin такова, что после выхода версии 0.1 ядро протокола высечено в камне. Я хочу, чтобы вы могли представить его как неизменный.",
+  "Потерянные монеты только делают монеты других чуть более ценными. Думайте об этом как о пожертвовании всем остальным.",
+  "Сеть устойчива в своей неструктурированной простоте. Узлы работают одновременно с небольшой координацией. Они не нуждаются в идентификации, поскольку сообщения не направляются в конкретное место.",
+  "Проблема двойной траты решена через peer-to-peer сеть. Сеть ставит метку времени на транзакции, хешируя их в непрерывную цепь доказательств работы.",
+  "Если вы не верите мне или не понимаете — у меня нет времени убеждать вас, извините.",
+  "Bitcoin генерируется скоростью, приближающейся к запланированному графику, и это остается верным независимо от того, сколько майнеров участвует.",
+  "Через несколько десятилетий, когда награда станет слишком маленькой, комиссия за транзакции станет основным стимулом для узлов.",
+  "Написание описания для этого для обычных людей чертовски сложно. Здесь нет ничего, к чему можно привязаться.",
+];
+
 const PixelSendIcon = () => (
   <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" style={{ imageRendering: 'pixelated' }}>
     <rect x="7" y="2" width="2" height="2" />
@@ -312,6 +325,8 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
   const [walletMode, setWalletMode] = useState(false);
   const [currentWalletStepId, setCurrentWalletStepId] = useState<string | null>(null);
   const [walletButtons, setWalletButtons] = useState<WalletStepButton[]>([]);
+  const [showTroubleshooting, setShowTroubleshooting] = useState(false);
+  const [flowCompleted, setFlowCompleted] = useState(false);
 
   const isLockedRef = useRef(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -473,6 +488,9 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     typeMessage(step.instruction, "satoshi", () => {
       isLockedRef.current = false;
       setWalletButtons(step.buttons);
+      if (stepId === "step_5") {
+        setFlowCompleted(true);
+      }
     });
   }, [typeMessage]);
 
@@ -521,16 +539,31 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     }
   }, [isTyping, startWalletStep]);
 
+  const lastWisdomRef = useRef(-1);
+
   const handleInputSend = useCallback(() => {
     if (!inputText.trim()) return;
     const userText = inputText.trim();
     setInputText("");
     setMessages(prev => [...prev, { id: Date.now(), text: userText, sender: "user" }]);
     playClick();
-    setTimeout(() => {
-      setMessages(prev => [...prev, { id: Date.now() + 1, text: "сначала пройди первый блок, все вопросы потом", sender: "satoshi" }]);
-    }, 500);
-  }, [inputText]);
+
+    if (flowCompleted) {
+      let idx = Math.floor(Math.random() * SATOSHI_WISDOM.length);
+      if (idx === lastWisdomRef.current) {
+        idx = (idx + 1) % SATOSHI_WISDOM.length;
+      }
+      lastWisdomRef.current = idx;
+      const wisdom = SATOSHI_WISDOM[idx];
+      setTimeout(() => {
+        typeMessage(wisdom, "satoshi", () => {});
+      }, 500);
+    } else {
+      setTimeout(() => {
+        setMessages(prev => [...prev, { id: Date.now() + 1, text: "сначала пройди первый блок, все вопросы потом", sender: "satoshi" }]);
+      }, 500);
+    }
+  }, [inputText, flowCompleted, typeMessage]);
 
   const handleOptionClick = useCallback((option: BlockOption) => {
     if (isLockedRef.current || isTyping) return;
@@ -728,6 +761,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
               <span className="text-[10px] tracking-[2px] text-[#B87333]/60 font-bold">SATS</span>
             </div>
             <motion.button
+              type="button"
               onClick={onBack}
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
@@ -802,11 +836,12 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
           <div className="flex flex-col gap-2 pt-1">
             {currentOptions.map((option, idx) => (
               <motion.button
+                type="button"
                 key={`${currentBlock?.id}-${blockPhase}-${idx}`}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: idx * 0.15 }}
-                onClick={() => handleOptionClick(option)}
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleOptionClick(option); }}
                 disabled={isLockedRef.current}
                 className="w-full px-4 py-3 text-left text-[13px] font-mono font-bold tracking-wide
                          border-2 border-[#B87333]/50 bg-[#B87333]/5 text-[#B87333]
@@ -826,11 +861,12 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
           <div className="flex flex-col gap-2 pt-1">
             {walletButtons.map((button, idx) => (
               <motion.button
+                type="button"
                 key={`wallet-${currentWalletStepId}-${idx}`}
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: idx * 0.15 }}
-                onClick={() => handleWalletButtonClick(button)}
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleWalletButtonClick(button); }}
                 disabled={isLockedRef.current}
                 className={`w-full px-4 py-3 text-left text-[13px] font-mono font-bold tracking-wide
                          border-2 active:scale-[0.98] transition-all duration-200
@@ -856,6 +892,45 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
           </div>
         )}
 
+        {flowCompleted && !isTyping && (
+          <div className="pt-3">
+            <motion.button
+              type="button"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.5 }}
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); setShowTroubleshooting(prev => !prev); }}
+              className="w-full px-4 py-3 text-left text-[11px] font-mono font-bold tracking-[2px]
+                       border border-[#B87333]/30 bg-[#B87333]/5 text-[#B87333]/60
+                       hover:bg-[#B87333]/10 hover:text-[#B87333] transition-all duration-200"
+              data-testid="button-troubleshooting"
+            >
+              <span className="mr-2 text-[#B87333]/30">{showTroubleshooting ? "[-]" : "[+]"}</span>
+              TROUBLESHOOTING
+            </motion.button>
+
+            <AnimatePresence>
+              {showTroubleshooting && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="overflow-hidden"
+                >
+                  <div className="px-4 py-3 text-[12px] font-mono leading-relaxed text-[#B87333]/70 border border-t-0 border-[#B87333]/20 bg-[#0A0A0A]">
+                    <p className="text-[#B87333] font-bold mb-2 tracking-wider text-[11px]">ЕСЛИ ДЕНЬГИ НЕ ПРИШЛИ:</p>
+                    <p className="mb-1">- Проверь интернет-соединение</p>
+                    <p className="mb-1">- Подожди 30-60 секунд</p>
+                    <p className="mb-1">- Перезапусти Phoenix Wallet</p>
+                    <p>- Если через 5 минут деньги не пришли — свяжись с нами в чате</p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        )}
+
         <div ref={messagesEndRef} />
       </div>
 
@@ -871,6 +946,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
             data-testid="input-message"
           />
           <motion.button
+            type="button"
             onClick={handleInputSend}
             whileTap={{ scale: 0.9 }}
             className="w-8 h-8 flex items-center justify-center border border-[#B87333]/40 bg-[#1A1A1A] text-[#B87333] hover:bg-[#B87333]/20 transition-colors"
