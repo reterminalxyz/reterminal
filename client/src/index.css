@@ -8,11 +8,9 @@
 html, body, #root {
   min-height: 100dvh;
   min-height: -webkit-fill-available;
-  background-color: #F5F5F5;
-}
-
-body {
-  padding-bottom: env(safe-area-inset-bottom);
+  background-color: #0A0A0A;
+  margin: 0;
+  padding: 0;
 }
 
 :root {
