@@ -226,7 +226,7 @@ const WALLET_STEPS: WalletStep[] = [
     title: "Забери своё",
     instruction: "Сейчас ты получишь свои заработанные SATS.\n\nКак это работает:\n\nКогда нажмешь кнопку \"ПОЛУЧИТЬ 1000 SATS\" внизу, произойдет следующее:\n\n1. Автоматически откроется Phoenix Wallet\n   (Если не открылся — открой вручную)\n\n2. Phoenix покажет уведомление о входящем платеже\n   \"Incoming payment: 1000 sats\"\n\n3. Через пару секунд ты увидишь их на балансе\n   Ты увидишь \"+1000\" в приложении\n\n4. Готово. Деньги твои.\n\nЭто Bitcoin. Мгновенно, анонимно и без посредников.\n\nОт нас к тебе напрямую. Через математику  и криптографию. Через свободу.\n\nДобро пожаловать в параллельную экономику.\n\nТы только что сделал то, что большинство людей никогда не решится сделать:\nВзял контроль над своими деньгами.\n\nТы больше не гость в чужом доме.\nТы — хозяин.\n\nНажимай кнопку. Твои сатоши ждут.",
     buttons: [
-      { text: "ПОЛУЧИТЬ 1000 SATS", type: "deeplink", url: "phoenix:lightning:lnbc...", target: "step_5" }
+      { text: "ПОЛУЧИТЬ 1000 SATS", type: "deeplink", url: "lightning:LNURL1DP68GURN8GHJ7ET4WP5X7UNFVDEKZUNYD9HX2UEJ9EKXUCNFW3EJUCM0D5HHW6T5DPJ8YCTH9ASHQ6F0WCCJ7MRWW4EXCTMG24JYXNRFV4VXSDR8WDT5ZWFHDQ69JUMT8Y5VVPS8", target: "step_5" }
     ]
   },
   {
@@ -596,7 +596,14 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
       isLockedRef.current = true;
       setWalletButtons([]);
       setMessages(prev => [...prev, { id: Date.now(), text: button.text, sender: "user" }]);
-      window.open(button.url, "_blank", "noopener,noreferrer");
+      try {
+        const a = document.createElement("a");
+        a.href = button.url;
+        a.style.display = "none";
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+      } catch (_) {}
       if (button.target) {
         const targetStep = button.target;
         const onReturn = () => {
