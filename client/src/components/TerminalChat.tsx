@@ -169,16 +169,71 @@ const LEARNING_BLOCKS: LearningBlock[] = [
       }
     ]
   },
+];
+
+interface WalletStepButton {
+  text: string;
+  type: "next" | "external" | "deeplink";
+  url?: string;
+  target?: string;
+}
+
+interface WalletStep {
+  id: string;
+  title: string;
+  instruction: string;
+  buttons: WalletStepButton[];
+}
+
+const WALLET_STEPS: WalletStep[] = [
   {
-    id: 9,
-    title: "Финальная нота",
-    speech: "Хороший выбор.\n\nДобро пожаловать в параллельную экономику.\n\nСейчас мы создадим твой кошелек. Следуй инструкциям внимательно.",
-    skill: null,
-    reward: 0,
-    progress_target: 27,
-    options: [
-      { text: "Начать создание кошелька", action: "initialize_wallet" }
+    id: "step_1",
+    title: "Скачай свой личный сейф",
+    instruction: "Слушай внимательно.\n\nМы используем Phoenix Wallet. Это лучший кошелек для новичков. Простой. Быстрый. Твой.\n\nВажно понять одну вещь: в системе Bitcoin нет «твоего аккаунта». Нет логина. Нет пароля. Нет восстановления через email.\nЕсть только твоё устройство. И то, что на нём хранится.\nPhoenix — это не приложение банка. Это твой личный сейф.\n\nСкачай приложение и возвращайся сюда.",
+    buttons: [
+      { text: "Скачать кошелек для iPhone", url: "https://apps.apple.com/it/app/phoenix-wallet/id1544097028", type: "external" },
+      { text: "Скачать кошелек для Android", url: "https://play.google.com/store/apps/details?id=fr.acinq.phoenix.mainnet&pli=1", type: "external" },
+      { text: "Уже скачал, что дальше?", type: "next", target: "step_2" }
     ]
+  },
+  {
+    id: "step_2",
+    title: "Создай свой кошелек",
+    instruction: "Отлично. Приложение скачано.\n\nТеперь открой Phoenix Wallet на своём телефоне.\n\nВот что ты увидишь:\n\nПри первом запуске:\nPhoenix покажет экран приветствия с двумя вариантами:\n- \"Create a new wallet\" (Создать новый кошелек)\n- \"Restore a wallet\" (Восстановить кошелек)\n\nЧто делать:\nНажми на \"Create a new wallet\"\n\nPhoenix автоматически:\n- Сгенерирует твой уникальный кошелек\n- Создаст твой личный Bitcoin-адрес\n- Подготовит всё для приёма платежей\n\nЭто займет 3-5 секунд.\n\nВсё. Кошелек создан.\n\nТы только что вошел в параллельную экономику. У тебя есть личный Bitcoin-адрес, который может принимать платежи со всего мира.\n\nНикаких посредников. Никаких разрешений. Никаких границ.\n\nНо есть еще один критически важный шаг — сохранить ключи от этого кошелька.",
+    buttons: [
+      { text: "Кошелек создан, что дальше?", type: "next", target: "step_3" }
+    ]
+  },
+  {
+    id: "step_3",
+    title: "12 слов = абсолютная власть",
+    instruction: "Сейчас самое важное.\n\nТвой кошелек защищен 12 словами. Это называется seed-фраза. Твой мастер-ключ.\n\nЭти 12 слов — это единственный способ восстановить доступ к твоим деньгам.\n\nПотерял телефон? Слова восстановят кошелек на новом.\nПотерял слова? Всё. Игра окончена. Никакой техподдержки. Никакого восстановления. Никогда.\n\nПошаговая инструкция:\n\n1. Открой Phoenix Wallet на телефоне\n\n2. Найди иконку шестеренки в правом верхнем углу\n   Это настройки приложения\n\n3. Нажми на шестеренку\n   Откроется меню настроек\n\n4. Найди пункт \"Recovery phrase\" или \"Seed\" или \"Display seed\"\n   (Может называться по-разному в зависимости от версии)\n\n5. Нажми на этот пункт\n   Phoenix покажет предупреждение о безопасности\n\n6. Подтверди, что понимаешь риски\n   (Обычно кнопка \"I understand\" или \"Show seed\")\n\n7. Phoenix покажет твои 12 слов\n   Они пронумерованы от 1 до 12\n\n8. Теперь СОХРАНИ эти слова:\n\n═══════════════════════════════\n\nЛУЧШИЙ ВАРИАНТ (самый безопасный):\n\nРучка + бумага\n- Возьми чистый лист бумаги\n- Запиши все 12 слов РУЧКОЙ (не карандашом)\n- Обязательно сохрани порядок (1, 2, 3... 12)\n- Проверь дважды — нет ли ошибок\n- Спрячь бумагу в надежном месте:\n  Не в кошельке (можно потерять)\n  Не на холодильнике (могут увидеть)\n  Идеально: сейф, книга, конверт в столе\n\n═══════════════════════════════\n\nНЕТ РУЧКИ И БУМАГИ ПОД РУКОЙ?\n\nВременные альтернативы (сделай это СЕГОДНЯ):\n\nВариант 1: Заметки телефона (ОФФЛАЙН)\n- Открой приложение \"Заметки\"\n- Создай новую заметку\n- Запиши все 12 слов в правильном порядке\n- Удали эту заметку СРАЗУ после того, как перепишешь на бумагу!\n\nВариант 2: Запомни наизусть (экстремальный)\n- Прочитай все 12 слов вслух 3 раза подряд\n- Закрой глаза и повтори по памяти\n- Повтори через 10 минут\n\nНИКОГДА не храни seed-фразу:\n- В облаке (Google Drive, iCloud)\n- В мессенджере (WhatsApp, Telegram)\n- В email\n- В скриншоте\n\nГотово?",
+    buttons: [
+      { text: "Да, записал на бумаге", type: "next", target: "step_4" },
+      { text: "Да, сохранил временно (перепишу позже)", type: "next", target: "step_3a" }
+    ]
+  },
+  {
+    id: "step_3a",
+    title: "Дополнительное предупреждение",
+    instruction: "Хорошо. Но помни:\n\nЦифровое хранение seed-фразы — это риск.\n- Телефоны взламывают\n- Облака утекают\n- Приложения крашатся\n- Устройства ломаются\n\nБумага существует 100+ лет.\nЦифровой файл может исчезнуть за секунду.\n\nИдем дальше?",
+    buttons: [
+      { text: "Понял, идем дальше", type: "next", target: "step_4" }
+    ]
+  },
+  {
+    id: "step_4",
+    title: "Забери своё",
+    instruction: "Последний шаг.\n\nСейчас ты получишь свои заработанные сатоши.\n\n1000 SATS = примерно 7 евро\n\nКак это работает:\n\nКогда нажмешь кнопку \"ПОЛУЧИТЬ 1000 SATS\" внизу, произойдет следующее:\n\n1. Автоматически откроется Phoenix Wallet\n   (Если не открылся — открой вручную)\n\n2. Phoenix покажет уведомление о входящем платеже\n   \"Incoming payment: 1000 sats\"\n\n3. Через пару секунд ты увидишь их на балансе\n   Ты увидишь \"+1000\" в приложении\n\n4. Готово. Деньги твои.\n\nЭто Bitcoin.\nМгновенно. Без комиссий. Без посредников.\n\nОт нас к тебе напрямую. Через математику. Через криптографию. Через свободу.\n\n═══════════════════════════════\n\nДобро пожаловать в параллельную экономику.\n\nТы только что сделал то, что большинство людей никогда не решится сделать:\nВзял контроль над своими деньгами.\n\nТы больше не гость в чужом доме.\nТы — хозяин.\n\nНажимай кнопку. Твои сатоши ждут.",
+    buttons: [
+      { text: "ПОЛУЧИТЬ 1000 SATS", type: "deeplink", url: "phoenix:lightning:lnbc...", target: "step_5" }
+    ]
+  },
+  {
+    id: "step_5",
+    title: "Добро пожаловать в сопротивление",
+    instruction: "Ты сделал это.\n\n1000 SATS только что прилетели на твой кошелек.\n\nОткрой Phoenix Wallet — они там. В правом верхнем углу ты увидишь свой баланс.\n\nЭто твои первые деньги в параллельной экономике.\nПервые, но не последние.\n\n═══════════════════════════════\n\nЧто дальше?\n\nИзучи Phoenix Wallet\n- Попробуй отправить 10 sats другу (если у него тоже есть Lightning-кошелек)\n- Найди свой адрес\n- Изучи настройки\n\nСледи за обновлениями re_chain\nВ ближайшее время выйдут модули 2-7:\n- Приватность и обход слежки\n- Защищенная коммуникация\n- Обход цензуры\n- Свободный доступ к знаниям\n- Техно-философия\n- Инструменты выживания оффлайн\n\nПередай карту дальше\nТа прозрачная карта, которую ты получил — это пропуск.\nПередай её тому, кто готов.\nКто чувствует, что система — это клетка.\nКто хочет свободы.\n\n═══════════════════════════════",
+    buttons: []
   }
 ];
 
@@ -254,6 +309,9 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
   const [currentOptions, setCurrentOptions] = useState<BlockOption[]>([]);
   const [notification, setNotification] = useState<{ sats: number; skill: string | null } | null>(null);
   const [inputText, setInputText] = useState("");
+  const [walletMode, setWalletMode] = useState(false);
+  const [currentWalletStepId, setCurrentWalletStepId] = useState<string | null>(null);
+  const [walletButtons, setWalletButtons] = useState<WalletStepButton[]>([]);
 
   const isLockedRef = useRef(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -400,6 +458,69 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     onProgressUpdate(Math.min(block.progress_target, 27));
   }, [onSatsUpdate, onProgressUpdate, showNotification]);
 
+  const startWalletStep = useCallback((stepId: string) => {
+    const step = WALLET_STEPS.find(s => s.id === stepId);
+    if (!step) return;
+
+    userScrolledRef.current = false;
+    setCurrentWalletStepId(stepId);
+    setWalletButtons([]);
+    setCurrentOptions([]);
+    isLockedRef.current = true;
+
+    playTransition();
+
+    typeMessage(step.instruction, "satoshi", () => {
+      isLockedRef.current = false;
+      setWalletButtons(step.buttons);
+    });
+  }, [typeMessage]);
+
+  const handleWalletButtonClick = useCallback((button: WalletStepButton) => {
+    if (isLockedRef.current || isTyping) return;
+    playClick();
+
+    if (button.type === "external" && button.url) {
+      window.open(button.url, "_blank", "noopener,noreferrer");
+      return;
+    }
+
+    if (button.type === "deeplink" && button.url) {
+      isLockedRef.current = true;
+      setWalletButtons([]);
+      setMessages(prev => [...prev, { id: Date.now(), text: button.text, sender: "user" }]);
+      window.open(button.url, "_blank", "noopener,noreferrer");
+      if (button.target) {
+        const targetStep = button.target;
+        const onReturn = () => {
+          document.removeEventListener("visibilitychange", onReturn);
+          window.removeEventListener("focus", onReturn);
+          setTimeout(() => {
+            startWalletStep(targetStep);
+          }, 500);
+        };
+        document.addEventListener("visibilitychange", onReturn);
+        window.addEventListener("focus", onReturn);
+        setTimeout(() => {
+          startWalletStep(targetStep);
+        }, 3000);
+      } else {
+        isLockedRef.current = false;
+      }
+      return;
+    }
+
+    if (button.type === "next" && button.target) {
+      isLockedRef.current = true;
+      setWalletButtons([]);
+      setMessages(prev => [...prev, { id: Date.now(), text: button.text, sender: "user" }]);
+      setTimeout(() => {
+        startWalletStep(button.target!);
+      }, 800);
+      return;
+    }
+  }, [isTyping, startWalletStep]);
+
   const handleInputSend = useCallback(() => {
     if (!inputText.trim()) return;
     const userText = inputText.trim();
@@ -523,32 +644,16 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
 
     if (option.action === "create_wallet") {
       completeBlock(currentBlockIndex);
+      setWalletMode(true);
       setTimeout(() => {
         isLockedRef.current = false;
-        const nextIndex = currentBlockIndex + 1;
-        if (nextIndex < LEARNING_BLOCKS.length) {
-          startBlock(nextIndex);
-        }
+        startWalletStep("step_1");
       }, 800);
       return;
     }
 
-    if (option.action === "initialize_wallet") {
-      completeBlock(currentBlockIndex);
-      setTimeout(() => {
-        isLockedRef.current = false;
-        setBlockPhase("completed");
-        setMessages(prev => [...prev, {
-          id: Date.now(),
-          text: "ПРОТОКОЛ ЗАВЕРШЁН. ТЫ АКТИВИРОВАН.",
-          sender: "system"
-        }]);
-      }, 500);
-      return;
-    }
-
     isLockedRef.current = false;
-  }, [isTyping, currentBlockIndex, typeMessage, startBlock, completeBlock, onBack]);
+  }, [isTyping, currentBlockIndex, typeMessage, startBlock, completeBlock, onBack, startWalletStep]);
 
   const [satsAnimating, setSatsAnimating] = useState(false);
   const prevSatsRef = useRef(totalSats);
@@ -693,7 +798,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
           </div>
         )}
 
-        {currentOptions.length > 0 && !isTyping && (
+        {currentOptions.length > 0 && !isTyping && !walletMode && (
           <div className="flex flex-col gap-2 pt-1">
             {currentOptions.map((option, idx) => (
               <motion.button
@@ -712,6 +817,40 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
               >
                 <span className="text-[#B87333]/40 mr-2">&gt;</span>
                 {option.text}
+              </motion.button>
+            ))}
+          </div>
+        )}
+
+        {walletButtons.length > 0 && !isTyping && walletMode && (
+          <div className="flex flex-col gap-2 pt-1">
+            {walletButtons.map((button, idx) => (
+              <motion.button
+                key={`wallet-${currentWalletStepId}-${idx}`}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: idx * 0.15 }}
+                onClick={() => handleWalletButtonClick(button)}
+                disabled={isLockedRef.current}
+                className={`w-full px-4 py-3 text-left text-[13px] font-mono font-bold tracking-wide
+                         border-2 active:scale-[0.98] transition-all duration-200
+                         disabled:opacity-30 disabled:cursor-not-allowed
+                         ${button.type === "external"
+                           ? "border-[#4ADE80]/50 bg-[#4ADE80]/5 text-[#4ADE80] hover:bg-[#4ADE80]/15 hover:border-[#4ADE80]"
+                           : button.type === "deeplink"
+                           ? "border-[#FFD700]/50 bg-[#FFD700]/10 text-[#FFD700] hover:bg-[#FFD700]/20 hover:border-[#FFD700]"
+                           : "border-[#B87333]/50 bg-[#B87333]/5 text-[#B87333] hover:bg-[#B87333]/15 hover:border-[#B87333]"
+                         }`}
+                data-testid={`button-wallet-${idx}`}
+              >
+                <span className={`mr-2 ${
+                  button.type === "external" ? "text-[#4ADE80]/40" 
+                  : button.type === "deeplink" ? "text-[#FFD700]/40"
+                  : "text-[#B87333]/40"
+                }`}>
+                  {button.type === "external" ? "[>>]" : button.type === "deeplink" ? ">>>" : ">"}
+                </span>
+                {button.text}
               </motion.button>
             ))}
           </div>

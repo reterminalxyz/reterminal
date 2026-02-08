@@ -110,11 +110,16 @@ Bottom-fixed progress indicator:
 Phase 2 block-based learning interface:
 - Dark pixel theme (#0A0A0A background with scanlines)
 - Header: "TERMINAL://" with enlarged SATS counter (14px count, 10px label, 22x22 coin)
-- Block indicator: static "1/8 ФИНАНСОВАЯ СВОБОДА" (never changes)
+- Block indicator: static "1/7 ФИНАНСОВАЯ СВОБОДА" (never changes)
 - PixelCoin: brighter glow (1.2s cycle), stronger shimmer, scale pulse animation
 - PixelSendIcon: arrow pointing UP (pixelated)
-- 9 learning blocks embedded (8 main + 1 finale), sequential progression
+- 8 learning blocks + Phase 3 wallet setup (6 steps), sequential progression
 - Block 7 final option: "Хорошо, готов забрать SATS"
+- Phase 3: Wallet setup steps (step_1 through step_5 + step_3a branch)
+  - Triggered by "Давай создадим кошелек" (create_wallet action)
+  - Button types: "external" (green, opens URL), "deeplink" (gold, opens Lightning), "next" (copper, advances step)
+  - Step branching: step_3 → step_3a (temporary save warning) → step_4
+  - Step_5 is final (no buttons)
 - Toast notification: pixelated gold text, slides from header area down over messages, glow/shine, 1.8s duration
 - Text input enabled: responds with "сначала пройди первый блок, все вопросы потом"
 - Custom dark scrollbar (4px, copper-tinted, transparent track)
