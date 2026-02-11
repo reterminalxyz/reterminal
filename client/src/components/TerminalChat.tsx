@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Sparkles, Cpu } from "lucide-react";
+import { X, Cpu } from "lucide-react";
 import { playClick, playTypeTick, playSatsChime, playTransition } from "@/lib/sounds";
 import { SKILL_META, type SkillKey } from "@shared/schema";
 import ProfileOverlay from "./ProfileOverlay";
@@ -422,114 +422,41 @@ function clearWalletState() {
   try { localStorage.removeItem("liberta_wallet_state"); } catch (_) {}
 }
 
-function LevelUpPopupInline({ skillKey, onClose, flyToRef }: { skillKey: SkillKey; onClose: () => void; flyToRef?: React.RefObject<HTMLButtonElement | null> }) {
+function SkillNotificationBanner({ skillKey, onClose }: { skillKey: SkillKey; onClose: () => void }) {
   const meta = SKILL_META[skillKey];
-  const [phase, setPhase] = useState<"show" | "flying" | "done">("show");
-  const contentRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (phase === "show") {
-      const timer = setTimeout(() => {
-        if (flyToRef?.current && contentRef.current) {
-          setPhase("flying");
-        } else {
-          onClose();
-        }
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-    if (phase === "flying") {
-      const timer = setTimeout(() => {
-        setPhase("done");
-        onClose();
-      }, 800);
-      return () => clearTimeout(timer);
-    }
-  }, [phase, onClose, flyToRef]);
-
-  const getFlyToPosition = () => {
-    if (!flyToRef?.current) return { x: 0, y: 0 };
-    const rect = flyToRef.current.getBoundingClientRect();
-    return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
-  };
-
-  const flyTarget = getFlyToPosition();
+    const timer = setTimeout(onClose, 2800);
+    return () => clearTimeout(timer);
+  }, [onClose]);
 
   return (
     <motion.div
-      className="fixed inset-0 z-[99999] flex items-center justify-center"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: phase === "flying" ? 0 : 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: phase === "flying" ? 0.6 : 0.3 }}
-      onClick={() => { if (phase === "show") { if (flyToRef?.current) { setPhase("flying"); } else { onClose(); } } }}
+      initial={{ opacity: 0, y: -40 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -30 }}
+      transition={{ duration: 0.35, ease: "easeOut" }}
+      className="fixed top-12 left-0 right-0 z-[100] pointer-events-none flex justify-center"
       data-testid="popup-level-up"
     >
-      <div className="absolute inset-0 bg-black/80 backdrop-blur-md" />
-      <motion.div
-        ref={contentRef}
-        className="relative flex flex-col items-center gap-4 p-8"
-        initial={{ scale: 0.5, y: 30 }}
-        animate={
-          phase === "flying"
-            ? {
-                scale: 0.1,
-                x: flyTarget.x - (typeof window !== "undefined" ? window.innerWidth / 2 : 200),
-                y: flyTarget.y - (typeof window !== "undefined" ? window.innerHeight / 2 : 360),
-                opacity: 0,
-              }
-            : { scale: 1, y: 0 }
-        }
-        transition={
-          phase === "flying"
-            ? { duration: 0.7, ease: [0.4, 0, 0.2, 1] }
-            : { type: "spring", damping: 15 }
-        }
-        onClick={(e) => e.stopPropagation()}
+      <div
+        className="flex items-center gap-3 px-4 py-2.5 border-2"
+        style={{
+          background: "#0A0A0A",
+          borderColor: "#00e5ff",
+          boxShadow: "0 0 20px rgba(0,229,255,0.4), 0 0 40px rgba(0,229,255,0.15)",
+        }}
       >
-        <motion.div
-          className="w-20 h-20 flex items-center justify-center"
-          style={{
-            border: "3px solid #B87333",
-            background: "rgba(184,115,51,0.1)",
-            boxShadow: "0 0 40px rgba(184,115,51,0.3), 0 0 80px rgba(184,115,51,0.1)",
-          }}
-          animate={{
-            boxShadow: [
-              "0 0 40px rgba(184,115,51,0.3), 0 0 80px rgba(184,115,51,0.1)",
-              "0 0 60px rgba(255,215,0,0.5), 0 0 120px rgba(184,115,51,0.2)",
-              "0 0 40px rgba(184,115,51,0.3), 0 0 80px rgba(184,115,51,0.1)",
-            ]
-          }}
-          transition={{ duration: 2, repeat: Infinity }}
-        >
-          <Sparkles className="w-10 h-10 text-[#FFD700]" />
-        </motion.div>
-        <motion.div
-          className="text-[10px] tracking-[6px] text-[#B87333]/60 font-bold uppercase"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-        >
-          НОВЫЙ СКИЛЛ ПОЛУЧЕН
-        </motion.div>
-        <motion.div
-          className="text-[18px] tracking-[4px] text-[#FFD700] font-bold uppercase text-center"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-        >
-          {meta.name}
-        </motion.div>
-        <motion.div
-          className="text-[12px] text-[#A0A0A0] text-center max-w-[280px] leading-relaxed"
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.6 }}
-        >
-          {meta.description}
-        </motion.div>
-      </motion.div>
+        <Cpu className="w-[18px] h-[18px] flex-shrink-0" style={{ color: "#00e5ff", filter: "drop-shadow(0 0 6px rgba(0,229,255,0.6))" }} />
+        <div className="flex flex-col">
+          <span className="text-[8px] tracking-[3px] font-mono font-bold uppercase" style={{ color: "#00e5ff" }}>
+            НОВЫЙ СКИЛЛ
+          </span>
+          <span className="text-[12px] tracking-[2px] font-mono font-bold uppercase" style={{ color: "#e0e0e0", textShadow: "0 0 6px rgba(0,229,255,0.3)" }}>
+            {meta.name}
+          </span>
+        </div>
+      </div>
     </motion.div>
   );
 }
@@ -574,6 +501,7 @@ function loadTerminalProgress(): { blockIndex: number; sats: number; progress: n
 
 export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats, skipFirstTypewriter, userStats, userToken, onGrantSkill, levelUpSkill, onDismissLevelUp }: TerminalChatProps) {
   const [showProfile, setShowProfile] = useState(false);
+  const [iconBlinking, setIconBlinking] = useState(false);
   const dosierIconRef = useRef<HTMLButtonElement>(null);
   const savedState = useRef(loadWalletState());
   const savedProgress = useRef(loadTerminalProgress());
@@ -784,7 +712,8 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     onProgressUpdate(newProgress);
 
     if (block.grantSkillKey && onGrantSkill) {
-      onGrantSkill(block.grantSkillKey);
+      const skillKey = block.grantSkillKey;
+      safeTimeout(() => onGrantSkill(skillKey), 2000);
     }
 
     saveTerminalProgress({
@@ -792,7 +721,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
       sats: internalSatsRef.current,
       progress: newProgress,
     });
-  }, [onSatsUpdate, onProgressUpdate, showNotification, onGrantSkill]);
+  }, [onSatsUpdate, onProgressUpdate, showNotification, onGrantSkill, safeTimeout]);
 
   const startWalletStep = useCallback((stepId: string) => {
     const step = WALLET_STEPS.find(s => s.id === stepId);
@@ -1125,15 +1054,37 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
             </span>
           </div>
           <div className="flex items-center gap-3">
-            <button
+            <motion.button
               ref={dosierIconRef}
               type="button"
               onClick={() => setShowProfile(true)}
-              className="w-7 h-7 flex items-center justify-center opacity-40 hover:opacity-80 transition-opacity"
+              className="w-9 h-9 flex items-center justify-center hover:opacity-90 transition-opacity"
+              style={{ opacity: iconBlinking ? 1 : 0.5 }}
+              animate={iconBlinking ? {
+                opacity: [0.5, 1, 0.5, 1, 0.5, 1, 0.5, 1, 0.5],
+                filter: [
+                  "drop-shadow(0 0 0px transparent)",
+                  "drop-shadow(0 0 8px rgba(0,229,255,0.8))",
+                  "drop-shadow(0 0 0px transparent)",
+                  "drop-shadow(0 0 8px rgba(0,229,255,0.8))",
+                  "drop-shadow(0 0 0px transparent)",
+                  "drop-shadow(0 0 8px rgba(0,229,255,0.8))",
+                  "drop-shadow(0 0 0px transparent)",
+                  "drop-shadow(0 0 8px rgba(0,229,255,0.8))",
+                  "drop-shadow(0 0 0px transparent)",
+                ],
+              } : {}}
+              transition={iconBlinking ? { duration: 2.4, ease: "easeInOut" } : {}}
               data-testid="button-profile-avatar"
             >
-              <Cpu className="w-[14px] h-[14px] text-[#B87333]" />
-            </button>
+              <Cpu
+                className="w-[22px] h-[22px]"
+                style={{
+                  color: iconBlinking ? "#00e5ff" : "#B87333",
+                  transition: "color 0.3s",
+                }}
+              />
+            </motion.button>
             <div className="flex items-center gap-2.5 px-3 py-1.5 border-2 border-[#B87333]/60 bg-[#B87333]/10">
               <PixelCoin animating={satsAnimating} />
               <motion.span
@@ -1345,11 +1296,18 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
         </div>
       </div>
 
-      {levelUpSkill && onDismissLevelUp && (
-        <AnimatePresence>
-          <LevelUpPopupInline skillKey={levelUpSkill} onClose={onDismissLevelUp} flyToRef={dosierIconRef} />
-        </AnimatePresence>
-      )}
+      <AnimatePresence>
+        {levelUpSkill && onDismissLevelUp && (
+          <SkillNotificationBanner
+            skillKey={levelUpSkill}
+            onClose={() => {
+              onDismissLevelUp();
+              setIconBlinking(true);
+              setTimeout(() => setIconBlinking(false), 2600);
+            }}
+          />
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {showProfile && (

@@ -224,9 +224,14 @@ function SkillRow({ skillKey, granted, isNew }: { skillKey: SkillKey; granted: b
               exit={{ scale: 0 }}
               transition={{ type: "spring", damping: 10 }}
             >
-              <svg width="14" height="14" viewBox="0 0 14 14">
-                <rect x="2" y="6" width="3" height="6" fill={color} transform="rotate(-45 3.5 9)" />
-                <rect x="5" y="8" width="3" height="8" fill={color} transform="rotate(45 6.5 12)" />
+              <svg width="14" height="14" viewBox="0 0 14 14" style={{ imageRendering: "pixelated" }}>
+                <rect x="1" y="7" width="2" height="2" fill={color} />
+                <rect x="3" y="9" width="2" height="2" fill={color} />
+                <rect x="5" y="11" width="2" height="2" fill={color} />
+                <rect x="7" y="9" width="2" height="2" fill={color} />
+                <rect x="9" y="7" width="2" height="2" fill={color} />
+                <rect x="11" y="5" width="2" height="2" fill={color} />
+                <rect x="13" y="3" width="1" height="2" fill={color} />
               </svg>
             </motion.div>
           )}
@@ -351,8 +356,8 @@ export default function ProfileOverlay({ onClose, token }: ProfileOverlayProps) 
             <ArrowLeft className="w-4 h-4" />
             <span className="text-[9px] tracking-[2px] font-bold uppercase font-mono">ТЕРМИНАЛ</span>
           </button>
-          <span className="text-[10px] tracking-[4px] font-bold uppercase font-mono" style={{ color: "#00e5ff", textShadow: "0 0 8px rgba(0,229,255,0.3)" }}>
-            ТАКТИЧЕСКОЕ СКАНИРОВАНИЕ
+          <span className="text-[12px] tracking-[4px] font-bold uppercase font-mono" style={{ color: "#e0e0e0" }}>
+            НАБОР НАВЫКОВ
           </span>
           <div className="w-16" />
         </div>
