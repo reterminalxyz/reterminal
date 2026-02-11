@@ -49,15 +49,32 @@ export function BootScreen({ onDismiss }: BootScreenProps) {
       transition={{ duration: 0.4 }}
       className="fixed inset-0 z-[10000] flex items-center justify-center bg-black"
     >
+      <div className="boot-scanlines absolute inset-0 pointer-events-none" />
+
+      <div className="boot-noise absolute inset-0 pointer-events-none" />
+
+      <div className="boot-flicker absolute inset-0 pointer-events-none" />
+
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {Array.from({ length: 30 }).map((_, i) => (
-          <div
+        {Array.from({ length: 6 }).map((_, i) => (
+          <motion.div
             key={i}
-            className="absolute w-full h-px bg-[#B87333]/5"
-            style={{ top: `${(i / 30) * 100}%`, animationDelay: `${i * 0.1}s` }}
+            className="absolute w-full h-[1px] bg-[#B87333]/20"
+            initial={{ x: "-100%" }}
+            animate={{ x: "100%" }}
+            transition={{
+              duration: 0.15,
+              delay: 2 + i * 4.5 + Math.random() * 2,
+              repeat: Infinity,
+              repeatDelay: 8 + Math.random() * 12,
+              ease: "linear",
+            }}
+            style={{ top: `${10 + Math.random() * 80}%` }}
           />
         ))}
       </div>
+
+      <div className="boot-vignette absolute inset-0 pointer-events-none" />
 
       <div className="relative z-10 flex flex-col items-center px-8 max-w-[380px] w-full">
         <motion.div
@@ -90,12 +107,12 @@ export function BootScreen({ onDismiss }: BootScreenProps) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.9, duration: 0.5 }}
-          className="flex flex-col items-center gap-4 w-full"
+          className="flex flex-col items-center gap-3 w-full"
         >
           <button
             type="button"
             onClick={handleInstall}
-            className="install-btn-glitch relative w-full py-4 border-2 border-[#B87333] bg-[#B87333]/10 text-[#B87333] font-mono text-[13px] font-bold tracking-[3px] uppercase transition-all duration-200 active:scale-95"
+            className="install-btn-glitch relative w-full py-4 border-2 border-[#B87333] bg-[#B87333]/10 text-[#B87333] font-mono text-[13px] font-bold tracking-[3px] uppercase transition-all duration-200 active:scale-[0.97]"
             data-testid="button-install-terminal"
             data-text="Установить терминал"
           >
@@ -106,7 +123,7 @@ export function BootScreen({ onDismiss }: BootScreenProps) {
           <button
             type="button"
             onClick={onDismiss}
-            className="w-full py-3 text-[#555] font-mono text-[11px] tracking-[2px] transition-colors"
+            className="relative w-full py-4 border-2 border-[#555] bg-[#555]/10 text-[#999] font-mono text-[13px] font-bold tracking-[3px] uppercase transition-all duration-200 active:scale-[0.97] hover:border-[#777] hover:text-[#bbb]"
             data-testid="button-stay-browser"
           >
             Остаться в браузере
