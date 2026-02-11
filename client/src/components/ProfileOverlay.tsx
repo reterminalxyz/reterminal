@@ -44,8 +44,11 @@ function AvatarModel({ skills }: { skills: GrantedSkill[] }) {
         const mesh = child as THREE.Mesh;
         if (mesh.material) {
           const mat = (mesh.material as THREE.MeshStandardMaterial).clone();
-          mat.roughness = 0.6;
-          mat.metalness = 0.7;
+          mat.roughness = 0.4;
+          mat.metalness = 0.3;
+          if (!mat.map) {
+            mat.color = new THREE.Color("#ffffff");
+          }
           mesh.material = mat;
         }
       }
@@ -71,18 +74,20 @@ function AvatarModel({ skills }: { skills: GrantedSkill[] }) {
 
   const scale = useMemo(() => {
     const maxDim = Math.max(bbox.size.x, bbox.size.y, bbox.size.z);
-    return maxDim > 0 ? 2.5 / maxDim : 1;
+    return maxDim > 0 ? 2.0 / maxDim : 1;
   }, [bbox]);
+
+  const offsetY = -bbox.center.y * scale;
 
   return (
     <group ref={groupRef}>
-      <group scale={[scale, scale, scale]} position={[-bbox.center.x * scale, -bbox.center.y * scale + 0.2, -bbox.center.z * scale]}>
+      <group scale={[scale, scale, scale]} position={[-bbox.center.x * scale, offsetY, -bbox.center.z * scale]}>
         <primitive object={clonedScene} />
       </group>
 
-      <group name="equipment_head" position={[0, bbox.size.y * scale * 0.45 + 0.2, 0]} />
-      <group name="equipment_body" position={[0, 0.2, 0]} />
-      <group name="equipment_hands" position={[0, bbox.size.y * scale * 0.15 + 0.2, 0]} />
+      <group name="equipment_head" position={[0, bbox.size.y * scale * 0.45 + offsetY, 0]} />
+      <group name="equipment_body" position={[0, offsetY, 0]} />
+      <group name="equipment_hands" position={[0, bbox.size.y * scale * 0.15 + offsetY, 0]} />
     </group>
   );
 }
@@ -149,29 +154,27 @@ function AvatarScene({ skills }: { skills: GrantedSkill[] }) {
   return (
     <WebGLErrorBoundary fallback={<AvatarFallback skills={skills} />}>
       <Canvas
-        camera={{ position: [0, 0.8, 3.5], fov: 35 }}
+        camera={{ position: [0, 0.5, 4.5], fov: 45 }}
         style={{ background: "transparent" }}
-        gl={{ alpha: true, antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 0.9 }}
+        gl={{ alpha: true, antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.2 }}
         onCreated={({ gl }) => {
           gl.setClearColor(0x000000, 0);
         }}
       >
-        <ambientLight intensity={0.08} color="#1a1a2e" />
+        <ambientLight intensity={0.5} color="#ffffff" />
 
-        <pointLight position={[3, 2, 1]} intensity={2.5} color="#FF6B1A" distance={10} decay={2} />
-
-        <pointLight position={[-2.5, 0.5, 2]} intensity={0.4} color="#1a1a3e" distance={8} decay={2} />
-
-        <pointLight position={[0, -2, 1]} intensity={0.15} color="#B87333" distance={6} decay={2} />
+        <pointLight position={[5, 5, 5]} intensity={2.0} color="#FF8C42" distance={20} decay={1.5} />
 
         <spotLight
-          position={[-1, 3, -2]}
-          angle={0.5}
-          penumbra={0.8}
-          intensity={0.6}
-          color="#FF4500"
+          position={[-5, 2, -5]}
+          angle={0.6}
+          penumbra={1}
+          intensity={1.5}
+          color="#4488CC"
           target-position={[0, 0, 0]}
         />
+
+        <pointLight position={[0, -2, 3]} intensity={0.3} color="#B87333" distance={10} decay={1.5} />
 
         <Suspense fallback={null}>
           <AvatarModel skills={skills} />
@@ -181,7 +184,7 @@ function AvatarScene({ skills }: { skills: GrantedSkill[] }) {
           enablePan={false}
           minPolarAngle={Math.PI / 4}
           maxPolarAngle={Math.PI / 1.5}
-          target={[0, 0.5, 0]}
+          target={[0, 0, 0]}
           autoRotate={false}
         />
       </Canvas>

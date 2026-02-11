@@ -205,8 +205,9 @@ Large prominent navigation button:
 - Profile overlay (inside TerminalChat, NOT separate route): Dossier Mode fullscreen overlay preserving chat state
   - 3D Avatar: @react-three/fiber + @react-three/drei, GLB model (/avatar.glb) loaded via useGLTF with Suspense
   - OrbitControls for finger/mouse rotation, auto-rotation (0.003 rad/frame), sine-wave levitation (0.08 amplitude)
-  - Cyberpunk lighting: orange rim-light (#FF6B1A), cold fill (#1a1a3e), copper under-light, ACES filmic tone mapping
-  - Materials overridden: roughness 0.6, metalness 0.7 for dark metal look
+  - Studio lighting: ambient 0.5 white, orange key light (#FF8C42) at [5,5,5], blue rim spotlight (#4488CC) at [-5,2,-5], copper fill below, ACES filmic tone mapping (exposure 1.2)
+  - Camera: FOV 45, position [0, 0.5, 4.5], model auto-centered via bbox
+  - Materials: roughness 0.4, metalness 0.3, white fallback for textureless meshes
   - WebGL fallback: SVG avatar if WebGL unavailable (headless browsers)
   - Equipment containers: equipment_head, equipment_body, equipment_hands (empty groups for future gear)
   - Dynamic equipment (currently disabled, containers ready): TRUTH_SEEKER visor, HARD_MONEY chest chip, GRID_RUNNER wireframe
