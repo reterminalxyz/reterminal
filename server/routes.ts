@@ -17,7 +17,6 @@ export async function registerRoutes(
         nodeId,
         independenceScore: 0,
         currentStepId: "step_0",
-        history: []
       });
       res.status(201).json(session);
     } catch (err) {
@@ -61,6 +60,19 @@ export async function registerRoutes(
       return res.status(404).json({ message: "Session not found" });
     }
     res.json(session);
+  });
+
+  app.post('/api/sync-user', async (req, res) => {
+    try {
+      const { token } = req.body;
+      if (!token || typeof token !== 'string') {
+        return res.status(400).json({ message: "Token is required" });
+      }
+      const user = await storage.syncUser(token);
+      res.json({ level: user.level, xp: user.xp });
+    } catch (err) {
+      res.status(500).json({ message: "Internal server error" });
+    }
   });
 
   return httpServer;

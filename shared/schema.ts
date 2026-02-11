@@ -2,6 +2,17 @@ import { pgTable, text, serial, integer, boolean, timestamp, jsonb } from "drizz
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
+export const users = pgTable("users", {
+  id: serial("id").primaryKey(),
+  token: text("token").notNull().unique(),
+  xp: integer("xp").default(0).notNull(),
+  level: integer("level").default(1).notNull(),
+});
+
+export const insertUserSchema = createInsertSchema(users).omit({ id: true });
+export type User = typeof users.$inferSelect;
+export type InsertUser = z.infer<typeof insertUserSchema>;
+
 export const sessions = pgTable("sessions", {
   id: serial("id").primaryKey(),
   nodeId: text("node_id").notNull(), // e.g. "#RE_CHAIN_1234"

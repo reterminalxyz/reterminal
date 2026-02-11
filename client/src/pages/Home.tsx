@@ -10,6 +10,15 @@ import { useCreateSession, useUpdateSession, useSession } from "@/hooks/use-sess
 import { Loader2 } from "lucide-react";
 import { playClick, playError, playPhaseComplete, playTransition } from "@/lib/sounds";
 
+function getOrCreateToken(): string {
+  let token = localStorage.getItem('liberta_token');
+  if (!token) {
+    token = crypto.randomUUID();
+    localStorage.setItem('liberta_token', token);
+  }
+  return token;
+}
+
 function isInStandaloneMode(): boolean {
   return (
     ("standalone" in window.navigator && (window.navigator as any).standalone) ||
@@ -42,7 +51,8 @@ export default function Home() {
   const [showError, setShowError] = useState(false);
   const [terminalKey, setTerminalKey] = useState(0);
   const [skipTypewriter, setSkipTypewriter] = useState(false);
-  const [answeredQuestions, setAnsweredQuestions] = useState<Set<QuestionId>>(new Set()); // Track which questions answered
+  const [answeredQuestions, setAnsweredQuestions] = useState<Set<QuestionId>>(new Set());
+  const [userStats, setUserStats] = useState<{ level: number; xp: number } | null>(null);
   const isAnsweringRef = useRef(false);
   const mountedRef = useRef(true);
   const pendingTimeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -56,6 +66,18 @@ export default function Home() {
     const metaTheme = document.querySelector('meta[name="theme-color"]');
     if (metaTheme) metaTheme.setAttribute('content', bgColor);
   }, [phase]);
+
+  useEffect(() => {
+    const token = getOrCreateToken();
+    fetch('/api/sync-user', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token }),
+    })
+      .then(r => r.json())
+      .then(data => setUserStats(data))
+      .catch(() => {});
+  }, []);
 
   const safeTimeout = useCallback((fn: () => void, ms: number) => {
     const id = setTimeout(() => {
@@ -190,6 +212,20 @@ export default function Home() {
   };
 
 
+  const userStatsOverlay = userStats ? (
+    <div 
+      className="fixed top-2 right-2 z-[9999] font-mono text-[10px] px-2 py-1 rounded-sm pointer-events-none"
+      style={{ 
+        background: phase === "phase_2" || phase === "boot" ? 'rgba(184,115,51,0.15)' : 'rgba(184,115,51,0.1)',
+        color: '#B87333',
+        border: '1px solid rgba(184,115,51,0.3)'
+      }}
+      data-testid="text-user-stats"
+    >
+      Lvl {userStats.level} · XP {userStats.xp}
+    </div>
+  ) : null;
+
   // Boot screen (install gateway)
   if (phase === "boot") {
     return (
@@ -201,6 +237,7 @@ export default function Home() {
   if (phase === "loading" || !sessionId || isSessionLoading) {
     return (
       <div className="fixed inset-0 bg-[#F5F5F5] flex items-center justify-center">
+        {userStatsOverlay}
         <GridBackground intensity="high" />
         <div className="flex flex-col items-center gap-4 z-10">
           <motion.div
@@ -233,6 +270,7 @@ export default function Home() {
         animate={shakeScreen ? { x: [-10, 10, -10, 10, 0] } : {}}
         transition={{ duration: 0.4 }}
       >
+        {userStatsOverlay}
         <GridBackground intensity={bgIntensity} />
         <BiometricCircuit revealProgress={circuitReveal} />
         
@@ -328,6 +366,7 @@ export default function Home() {
   if (phase === "phase_1_complete") {
     return (
       <div className="fixed inset-0 bg-[#F5F5F5] overflow-hidden flex flex-col items-center justify-center">
+        {userStatsOverlay}
         {/* Simple static aluminum background - no animated orbs */}
         <div 
           className="fixed inset-0"
@@ -366,6 +405,7 @@ export default function Home() {
   if (phase === "phase_2") {
     return (
       <div className="fixed inset-0 bg-[#0D0D0D] flex flex-col overflow-hidden">
+        {userStatsOverlay}
         {/* Terminal fills screen above independence bar */}
         <div className="flex-1 min-h-0">
           <TerminalChat 
