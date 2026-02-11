@@ -1,7 +1,7 @@
-import { useEffect, useState, useCallback, useRef, useMemo, Component, type ReactNode, type ErrorInfo } from "react";
+import { useEffect, useState, useCallback, useRef, useMemo, Component, Suspense, type ReactNode, type ErrorInfo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Canvas, useFrame } from "@react-three/fiber";
-import { OrbitControls } from "@react-three/drei";
+import { OrbitControls, useGLTF } from "@react-three/drei";
 import { Lock, ArrowLeft, Sparkles } from "lucide-react";
 import { SKILL_META, type SkillKey, SKILL_KEYS } from "@shared/schema";
 import * as THREE from "three";
@@ -32,173 +32,62 @@ class WebGLErrorBoundary extends Component<{ fallback: ReactNode; children: Reac
   }
 }
 
-function VoxelBox({ position, size, color, emissive, emissiveIntensity, opacity }: {
-  position: [number, number, number];
-  size: [number, number, number];
-  color: string;
-  emissive?: string;
-  emissiveIntensity?: number;
-  opacity?: number;
-}) {
-  return (
-    <mesh position={position}>
-      <boxGeometry args={size} />
-      <meshStandardMaterial
-        color={color}
-        emissive={emissive || "#000000"}
-        emissiveIntensity={emissiveIntensity || 0}
-        transparent={opacity !== undefined && opacity < 1}
-        opacity={opacity ?? 1}
-        roughness={0.7}
-        metalness={0.3}
-      />
-    </mesh>
-  );
-}
+const AVATAR_URL = "/avatar.glb";
 
-function TruthSeekerVisor() {
-  const meshRef = useRef<THREE.Mesh>(null);
-  useFrame(({ clock }) => {
-    if (meshRef.current) {
-      const mat = meshRef.current.material as THREE.MeshStandardMaterial;
-      mat.emissiveIntensity = 1.5 + Math.sin(clock.getElapsedTime() * 2) * 0.8;
-    }
-  });
-
-  return (
-    <mesh ref={meshRef} position={[0, 1.55, 0.42]}>
-      <boxGeometry args={[0.9, 0.18, 0.15]} />
-      <meshStandardMaterial
-        color="#FF6600"
-        emissive="#FF4400"
-        emissiveIntensity={1.5}
-        transparent
-        opacity={0.9}
-        roughness={0.2}
-        metalness={0.8}
-      />
-    </mesh>
-  );
-}
-
-function HardMoneyChip() {
+function AvatarModel({ skills }: { skills: GrantedSkill[] }) {
+  const { scene } = useGLTF(AVATAR_URL);
   const groupRef = useRef<THREE.Group>(null);
-  useFrame(({ clock }) => {
-    if (groupRef.current) {
-      const glow = 1.2 + Math.sin(clock.getElapsedTime() * 1.5) * 0.5;
-      groupRef.current.children.forEach((child) => {
-        if ((child as THREE.Mesh).material) {
-          const mat = (child as THREE.Mesh).material as THREE.MeshStandardMaterial;
-          if (mat.emissive) mat.emissiveIntensity = glow;
+  const clonedScene = useMemo(() => {
+    const clone = scene.clone(true);
+    clone.traverse((child) => {
+      if ((child as THREE.Mesh).isMesh) {
+        const mesh = child as THREE.Mesh;
+        if (mesh.material) {
+          const mat = (mesh.material as THREE.MeshStandardMaterial).clone();
+          mat.roughness = 0.6;
+          mat.metalness = 0.7;
+          mesh.material = mat;
         }
-      });
-    }
-  });
-
-  return (
-    <group ref={groupRef} position={[0, 0.4, 0.35]}>
-      <mesh>
-        <boxGeometry args={[0.35, 0.35, 0.08]} />
-        <meshStandardMaterial
-          color="#B87333"
-          emissive="#FFD700"
-          emissiveIntensity={1.2}
-          roughness={0.2}
-          metalness={0.9}
-        />
-      </mesh>
-      <mesh position={[0, 0, 0.05]}>
-        <boxGeometry args={[0.2, 0.2, 0.04]} />
-        <meshStandardMaterial
-          color="#FFD700"
-          emissive="#FFD700"
-          emissiveIntensity={1.5}
-          roughness={0.1}
-          metalness={1}
-        />
-      </mesh>
-      {[[-0.12, 0.12], [0.12, 0.12], [-0.12, -0.12], [0.12, -0.12]].map(([x, y], i) => (
-        <mesh key={i} position={[x, y, 0.06]}>
-          <boxGeometry args={[0.04, 0.04, 0.02]} />
-          <meshStandardMaterial
-            color="#FFD700"
-            emissive="#FFA500"
-            emissiveIntensity={0.8}
-            roughness={0.3}
-            metalness={0.7}
-          />
-        </mesh>
-      ))}
-    </group>
-  );
-}
-
-function GridRunnerAura() {
-  const meshRef = useRef<THREE.Mesh>(null);
-  useFrame(({ clock }) => {
-    if (meshRef.current) {
-      meshRef.current.rotation.y = clock.getElapsedTime() * 0.4;
-      meshRef.current.rotation.x = Math.sin(clock.getElapsedTime() * 0.3) * 0.1;
-      const mat = meshRef.current.material as THREE.MeshStandardMaterial;
-      mat.emissiveIntensity = 0.6 + Math.sin(clock.getElapsedTime() * 2) * 0.3;
-    }
-  });
-
-  return (
-    <mesh ref={meshRef} position={[0, 0.6, 0]}>
-      <icosahedronGeometry args={[1.8, 1]} />
-      <meshStandardMaterial
-        color="#00BFFF"
-        emissive="#00BFFF"
-        emissiveIntensity={0.6}
-        wireframe
-        transparent
-        opacity={0.4}
-        roughness={0.5}
-        metalness={0.5}
-      />
-    </mesh>
-  );
-}
-
-function VoxelMannequin({ skills }: { skills: GrantedSkill[] }) {
-  const hasSkill = (key: SkillKey) => skills.some(s => s.skillKey === key);
-  const groupRef = useRef<THREE.Group>(null);
+      }
+    });
+    return clone;
+  }, [scene]);
 
   useFrame(({ clock }) => {
     if (groupRef.current) {
-      groupRef.current.rotation.y = Math.sin(clock.getElapsedTime() * 0.3) * 0.05;
-      groupRef.current.position.y = Math.sin(clock.getElapsedTime() * 0.8) * 0.03;
+      groupRef.current.rotation.y += 0.003;
+      groupRef.current.position.y = Math.sin(clock.getElapsedTime() * 0.8) * 0.08;
     }
   });
 
-  const bodyColor = "#6B6B6B";
-  const darkColor = "#555555";
+  const bbox = useMemo(() => {
+    const box = new THREE.Box3().setFromObject(clonedScene);
+    const size = new THREE.Vector3();
+    const center = new THREE.Vector3();
+    box.getSize(size);
+    box.getCenter(center);
+    return { size, center };
+  }, [clonedScene]);
+
+  const scale = useMemo(() => {
+    const maxDim = Math.max(bbox.size.x, bbox.size.y, bbox.size.z);
+    return maxDim > 0 ? 2.5 / maxDim : 1;
+  }, [bbox]);
 
   return (
     <group ref={groupRef}>
-      <VoxelBox position={[0, 1.6, 0]} size={[0.7, 0.7, 0.7]} color={bodyColor} />
-      <VoxelBox position={[-0.15, 1.75, 0.36]} size={[0.12, 0.12, 0.05]} color="#222222" />
-      <VoxelBox position={[0.15, 1.75, 0.36]} size={[0.12, 0.12, 0.05]} color="#222222" />
-      <VoxelBox position={[0, 1.55, 0.36]} size={[0.2, 0.06, 0.04]} color="#444444" />
+      <group scale={[scale, scale, scale]} position={[-bbox.center.x * scale, -bbox.center.y * scale + 0.2, -bbox.center.z * scale]}>
+        <primitive object={clonedScene} />
+      </group>
 
-      <VoxelBox position={[0, 0.7, 0]} size={[0.8, 1.0, 0.5]} color={bodyColor} />
-      <VoxelBox position={[0, 0.3, 0]} size={[0.7, 0.3, 0.45]} color={darkColor} />
-
-      <VoxelBox position={[-0.55, 0.85, 0]} size={[0.25, 0.8, 0.3]} color={darkColor} />
-      <VoxelBox position={[0.55, 0.85, 0]} size={[0.25, 0.8, 0.3]} color={darkColor} />
-
-      <VoxelBox position={[-0.2, -0.35, 0]} size={[0.3, 0.7, 0.35]} color={darkColor} />
-      <VoxelBox position={[0.2, -0.35, 0]} size={[0.3, 0.7, 0.35]} color={darkColor} />
-      <VoxelBox position={[-0.2, -0.75, 0.05]} size={[0.3, 0.15, 0.45]} color="#444444" />
-      <VoxelBox position={[0.2, -0.75, 0.05]} size={[0.3, 0.15, 0.45]} color="#444444" />
-
-      {hasSkill("TRUTH_SEEKER") && <TruthSeekerVisor />}
-      {hasSkill("HARD_MONEY") && <HardMoneyChip />}
-      {hasSkill("GRID_RUNNER") && <GridRunnerAura />}
+      <group name="equipment_head" position={[0, bbox.size.y * scale * 0.45 + 0.2, 0]} />
+      <group name="equipment_body" position={[0, 0.2, 0]} />
+      <group name="equipment_hands" position={[0, bbox.size.y * scale * 0.15 + 0.2, 0]} />
     </group>
   );
 }
+
+useGLTF.preload(AVATAR_URL);
 
 function AvatarFallback({ skills }: { skills: GrantedSkill[] }) {
   const hasSkill = (key: SkillKey) => skills.some(s => s.skillKey === key);
@@ -251,7 +140,6 @@ function AvatarFallback({ skills }: { skills: GrantedSkill[] }) {
 }
 
 function AvatarScene({ skills }: { skills: GrantedSkill[] }) {
-  const hasGrid = skills.some(s => s.skillKey === "GRID_RUNNER");
   const [webglSupported] = useState(() => checkWebGLSupport());
 
   if (!webglSupported) {
@@ -261,24 +149,40 @@ function AvatarScene({ skills }: { skills: GrantedSkill[] }) {
   return (
     <WebGLErrorBoundary fallback={<AvatarFallback skills={skills} />}>
       <Canvas
-        camera={{ position: [0, 1, 4], fov: 40 }}
+        camera={{ position: [0, 0.8, 3.5], fov: 35 }}
         style={{ background: "transparent" }}
-        gl={{ alpha: true, antialias: true }}
+        gl={{ alpha: true, antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 0.9 }}
         onCreated={({ gl }) => {
           gl.setClearColor(0x000000, 0);
         }}
       >
-        <ambientLight intensity={0.3} />
-        <pointLight position={[3, 3, 2]} intensity={1.5} color="#B87333" />
-        <pointLight position={[-2, 1, 3]} intensity={0.6} color="#FF6633" />
-        {hasGrid && <pointLight position={[0, -1, 2]} intensity={0.4} color="#00BFFF" />}
-        <VoxelMannequin skills={skills} />
+        <ambientLight intensity={0.08} color="#1a1a2e" />
+
+        <pointLight position={[3, 2, 1]} intensity={2.5} color="#FF6B1A" distance={10} decay={2} />
+
+        <pointLight position={[-2.5, 0.5, 2]} intensity={0.4} color="#1a1a3e" distance={8} decay={2} />
+
+        <pointLight position={[0, -2, 1]} intensity={0.15} color="#B87333" distance={6} decay={2} />
+
+        <spotLight
+          position={[-1, 3, -2]}
+          angle={0.5}
+          penumbra={0.8}
+          intensity={0.6}
+          color="#FF4500"
+          target-position={[0, 0, 0]}
+        />
+
+        <Suspense fallback={null}>
+          <AvatarModel skills={skills} />
+        </Suspense>
         <OrbitControls
           enableZoom={false}
           enablePan={false}
           minPolarAngle={Math.PI / 4}
           maxPolarAngle={Math.PI / 1.5}
-          target={[0, 0.7, 0]}
+          target={[0, 0.5, 0]}
+          autoRotate={false}
         />
       </Canvas>
     </WebGLErrorBoundary>

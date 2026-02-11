@@ -203,10 +203,13 @@ Large prominent navigation button:
 - Removed Lvl/XP overlay from all screens (stealth UI)
 - Stealth profile avatar: pixel person icon in TerminalChat header (40% opacity), opens Dossier Mode overlay
 - Profile overlay (inside TerminalChat, NOT separate route): Dossier Mode fullscreen overlay preserving chat state
-  - 3D Avatar: @react-three/fiber + @react-three/drei, procedural voxel mannequin from cube meshes
-  - OrbitControls for finger/mouse rotation, copper/orange point lighting
+  - 3D Avatar: @react-three/fiber + @react-three/drei, GLB model (/avatar.glb) loaded via useGLTF with Suspense
+  - OrbitControls for finger/mouse rotation, auto-rotation (0.003 rad/frame), sine-wave levitation (0.08 amplitude)
+  - Cyberpunk lighting: orange rim-light (#FF6B1A), cold fill (#1a1a3e), copper under-light, ACES filmic tone mapping
+  - Materials overridden: roughness 0.6, metalness 0.7 for dark metal look
   - WebGL fallback: SVG avatar if WebGL unavailable (headless browsers)
-  - Dynamic equipment: TRUTH_SEEKER visor (orange neon emissive), HARD_MONEY chest chip (gold/copper), GRID_RUNNER wireframe icosahedron (cyan neon)
+  - Equipment containers: equipment_head, equipment_body, equipment_hands (empty groups for future gear)
+  - Dynamic equipment (currently disabled, containers ready): TRUTH_SEEKER visor, HARD_MONEY chest chip, GRID_RUNNER wireframe
   - Cyberpunk skill cards: neon glow borders (red locked / gold unlocked), scanline background, monospace font, "[ LOCKED ]" text
   - Skills: TRUTH_SEEKER (block 2), HARD_MONEY (block 3), GRID_RUNNER (block 6)
 - Skill system: user_skills table (id, user_id, skill_key, granted_at)
