@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback, useRef, useMemo, Component, Suspense, type ReactNode, type ErrorInfo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls, useGLTF } from "@react-three/drei";
+import { OrbitControls, useGLTF, Environment } from "@react-three/drei";
 import { Lock, ArrowLeft, Sparkles } from "lucide-react";
 import { SKILL_META, type SkillKey, SKILL_KEYS } from "@shared/schema";
 import * as THREE from "three";
@@ -88,25 +88,17 @@ function AvatarModel({ skills }: { skills: GrantedSkill[] }) {
     clone.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
-        if (mesh.material) {
-          const mat = (mesh.material as THREE.MeshStandardMaterial).clone();
-          mat.color = new THREE.Color(0x444444);
-          mat.roughness = 0.5;
-          mat.metalness = 0.8;
-          mat.needsUpdate = true;
-          mesh.material = mat;
-        }
+        mesh.material = new THREE.MeshStandardMaterial({
+          color: new THREE.Color("#444444"),
+          roughness: 0.4,
+          metalness: 0.8,
+        });
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
       }
     });
     return clone;
   }, [scene]);
-
-  useFrame(({ clock }) => {
-    if (groupRef.current) {
-      groupRef.current.rotation.y += 0.003;
-      groupRef.current.position.y = Math.sin(clock.getElapsedTime() * 0.8) * 0.08;
-    }
-  });
 
   const bbox = useMemo(() => {
     const box = new THREE.Box3().setFromObject(clonedScene);
@@ -125,7 +117,7 @@ function AvatarModel({ skills }: { skills: GrantedSkill[] }) {
   const offsetY = -bbox.center.y * scale;
 
   return (
-    <group ref={groupRef} position={[0, -0.5, 0]}>
+    <group ref={groupRef} position={[0, -1, 0]}>
       <group scale={[scale, scale, scale]} position={[-bbox.center.x * scale, offsetY, -bbox.center.z * scale]}>
         <primitive object={clonedScene} />
       </group>
@@ -224,6 +216,7 @@ function AvatarScene({ skills }: { skills: GrantedSkill[] }) {
 
         <Suspense fallback={null}>
           <AvatarModel skills={skills} />
+          <Environment preset="city" />
         </Suspense>
         <BloomEffect />
         <OrbitControls
