@@ -195,3 +195,8 @@ Large prominent navigation button:
 - Sounds: mechanical/spaceship-like for Phase 1 (sine-based click, sawtooth error)
 - Typing sound: warm sine wave (340→180Hz) with lowpass filter instead of noise burst
 - SATS always reset to 200 on terminal entry (absolute value, no accumulation)
+- PWA: manifest.json (Liberta Terminal, standalone, black theme), service-worker.js (NetworkFirst strategy)
+- PWA icons: generated copper circuit chip on black background (192x192, 512x512)
+- iOS install prompt: Gnosis Pay style dark overlay, shows on iOS Safari only, lucide-react icons
+- Native feel CSS: overscroll-behavior-y:none, tap-highlight:transparent, user-select:none on interactive elements only
+- Typewriter speed: 12ms per character (was 20ms)
