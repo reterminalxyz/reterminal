@@ -700,8 +700,16 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
   }, [typeMessage]);
 
   const restoredWalletRef = useRef(savedState.current);
+  const initializedRef = useRef(false);
+  const onSatsUpdateRef = useRef(onSatsUpdate);
+  const onProgressUpdateRef = useRef(onProgressUpdate);
+  onSatsUpdateRef.current = onSatsUpdate;
+  onProgressUpdateRef.current = onProgressUpdate;
 
   useEffect(() => {
+    if (initializedRef.current) return;
+    initializedRef.current = true;
+
     const shouldSkip = skipFirstTypewriter && !skippedFirstRef.current;
     skippedFirstRef.current = true;
     if (restoredWalletRef.current?.walletMode) return;
@@ -710,13 +718,13 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     if (saved && !saved.walletMode && saved.blockIndex > 0) {
       savedProgress.current = null;
       internalSatsRef.current = saved.sats;
-      onSatsUpdate(saved.sats);
-      onProgressUpdate(saved.progress);
+      onSatsUpdateRef.current(saved.sats);
+      onProgressUpdateRef.current(saved.progress);
       startBlock(saved.blockIndex, true);
     } else {
       startBlock(0, shouldSkip);
     }
-  }, [startBlock, skipFirstTypewriter, onSatsUpdate, onProgressUpdate]);
+  }, [startBlock, skipFirstTypewriter]);
 
   const internalSatsRef = useRef(totalSats);
 

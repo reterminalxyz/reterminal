@@ -75,6 +75,8 @@ export default function Home() {
   const [answeredQuestions, setAnsweredQuestions] = useState<Set<QuestionId>>(new Set());
   const [userStats, setUserStats] = useState<{ level: number; xp: number } | null>(null);
   const { grantSkill, pendingSkill, dismissPopup } = useGrantSkill();
+  const handleSatsUpdate = useCallback((sats: number) => setTotalSats(Math.min(sats, 1000)), []);
+  const handleProgressUpdate = useCallback((p: number) => setProgress(Math.min(p, 27)), []);
   const isAnsweringRef = useRef(false);
   const mountedRef = useRef(true);
   const pendingTimeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -440,8 +442,8 @@ export default function Home() {
           <TerminalChat 
             key={terminalKey} 
             onBack={handleTerminalBack}
-            onProgressUpdate={(p) => setProgress(Math.min(p, 27))}
-            onSatsUpdate={(sats) => setTotalSats(Math.min(sats, 1000))}
+            onProgressUpdate={handleProgressUpdate}
+            onSatsUpdate={handleSatsUpdate}
             totalSats={totalSats}
             skipFirstTypewriter={skipTypewriter}
             userStats={userStats}
