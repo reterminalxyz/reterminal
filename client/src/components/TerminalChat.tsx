@@ -466,13 +466,13 @@ function SkillNotificationBanner({ onClose, iconRect }: { skillKey: SkillKey; on
       >
         <EyeOff className="w-[18px] h-[18px] flex-shrink-0" style={{ color: "#00e5ff", filter: "drop-shadow(0 0 6px rgba(0,229,255,0.6))" }} />
         <span
-          className="text-[15px] tracking-[4px] font-mono font-bold uppercase"
+          className="text-[13px] tracking-[3px] font-mono font-bold uppercase"
           style={{
             color: '#FFD700',
             textShadow: '0 0 8px #FFD700, 0 0 16px #B87333',
           }}
         >
-          +СКИЛЛ
+          +СКИЛЛ ПОЛУЧЕН
         </span>
       </motion.div>
     </motion.div>
@@ -731,7 +731,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
 
     if (block.grantSkillKey && onGrantSkill) {
       const skillKey = block.grantSkillKey;
-      onGrantSkill(skillKey);
+      safeTimeout(() => onGrantSkill(skillKey), 1000);
     }
 
     saveTerminalProgress({
@@ -739,7 +739,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
       sats: internalSatsRef.current,
       progress: newProgress,
     });
-  }, [onSatsUpdate, onProgressUpdate, showNotification, onGrantSkill]);
+  }, [onSatsUpdate, onProgressUpdate, showNotification, onGrantSkill, safeTimeout]);
 
   const startWalletStep = useCallback((stepId: string) => {
     const step = WALLET_STEPS.find(s => s.id === stepId);
