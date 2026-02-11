@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Fingerprint } from "lucide-react";
+import { X, EyeOff } from "lucide-react";
 import { playClick, playTypeTick, playSatsChime, playTransition } from "@/lib/sounds";
 import { SKILL_META, type SkillKey } from "@shared/schema";
 import ProfileOverlay from "./ProfileOverlay";
@@ -422,41 +422,59 @@ function clearWalletState() {
   try { localStorage.removeItem("liberta_wallet_state"); } catch (_) {}
 }
 
-function SkillNotificationBanner({ skillKey, onClose }: { skillKey: SkillKey; onClose: () => void }) {
-  const meta = SKILL_META[skillKey];
+function SkillNotificationBanner({ onClose, iconRect }: { skillKey: SkillKey; onClose: () => void; iconRect?: { x: number; y: number } | null }) {
+  const [phase, setPhase] = useState<"show" | "fly">("show");
 
   useEffect(() => {
-    const timer = setTimeout(onClose, 2800);
-    return () => clearTimeout(timer);
-  }, [onClose]);
+    const showTimer = setTimeout(() => setPhase("fly"), 1500);
+    return () => clearTimeout(showTimer);
+  }, []);
+
+  const flyToX = iconRect ? iconRect.x - window.innerWidth / 2 : 0;
+  const flyToY = iconRect ? iconRect.y - 60 : -40;
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: -40 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -30 }}
-      transition={{ duration: 0.35, ease: "easeOut" }}
+      initial={{ opacity: 0, y: 0, scale: 0.7 }}
+      animate={phase === "show"
+        ? { opacity: [0, 1, 1, 1], y: [0, 60, 60, 60], scale: [0.7, 1.15, 1, 1] }
+        : { opacity: 0, y: flyToY, x: flyToX, scale: 0.2 }
+      }
+      transition={phase === "show"
+        ? { duration: 1.2, times: [0, 0.15, 0.5, 1], ease: "easeInOut" }
+        : { duration: 0.35, ease: "easeIn" }
+      }
+      onAnimationComplete={() => { if (phase === "fly") onClose(); }}
       className="fixed top-12 left-0 right-0 z-[100] pointer-events-none flex justify-center"
       data-testid="popup-level-up"
     >
-      <div
-        className="flex items-center gap-3 px-4 py-2.5 border-2"
+      <motion.div
+        className="flex items-center gap-3 px-5 py-2 border-2 border-[#B87333]"
         style={{
-          background: "#0A0A0A",
-          borderColor: "#00e5ff",
-          boxShadow: "0 0 20px rgba(0,229,255,0.4), 0 0 40px rgba(0,229,255,0.15)",
+          imageRendering: 'pixelated',
+          background: '#0A0A0A',
+          boxShadow: '0 0 20px rgba(184,115,51,0.5), 0 0 40px rgba(255,215,0,0.2)',
         }}
+        animate={{
+          boxShadow: [
+            "0 0 10px rgba(184,115,51,0.3), 0 0 20px rgba(255,215,0,0.1)",
+            "0 0 30px rgba(184,115,51,0.7), 0 0 50px rgba(255,215,0,0.4)",
+            "0 0 10px rgba(184,115,51,0.3), 0 0 20px rgba(255,215,0,0.1)"
+          ]
+        }}
+        transition={{ duration: 0.6, repeat: 2 }}
       >
-        <Fingerprint className="w-[18px] h-[18px] flex-shrink-0" style={{ color: "#00e5ff", filter: "drop-shadow(0 0 6px rgba(0,229,255,0.6))" }} />
-        <div className="flex flex-col">
-          <span className="text-[8px] tracking-[3px] font-mono font-bold uppercase" style={{ color: "#00e5ff" }}>
-            НОВЫЙ СКИЛЛ
-          </span>
-          <span className="text-[12px] tracking-[2px] font-mono font-bold uppercase" style={{ color: "#e0e0e0", textShadow: "0 0 6px rgba(0,229,255,0.3)" }}>
-            {meta.name}
-          </span>
-        </div>
-      </div>
+        <EyeOff className="w-[18px] h-[18px] flex-shrink-0" style={{ color: "#00e5ff", filter: "drop-shadow(0 0 6px rgba(0,229,255,0.6))" }} />
+        <span
+          className="text-[15px] tracking-[4px] font-mono font-bold uppercase"
+          style={{
+            color: '#FFD700',
+            textShadow: '0 0 8px #FFD700, 0 0 16px #B87333',
+          }}
+        >
+          +СКИЛЛ
+        </span>
+      </motion.div>
     </motion.div>
   );
 }
@@ -713,7 +731,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
 
     if (block.grantSkillKey && onGrantSkill) {
       const skillKey = block.grantSkillKey;
-      safeTimeout(() => onGrantSkill(skillKey), 2000);
+      onGrantSkill(skillKey);
     }
 
     saveTerminalProgress({
@@ -721,7 +739,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
       sats: internalSatsRef.current,
       progress: newProgress,
     });
-  }, [onSatsUpdate, onProgressUpdate, showNotification, onGrantSkill, safeTimeout]);
+  }, [onSatsUpdate, onProgressUpdate, showNotification, onGrantSkill]);
 
   const startWalletStep = useCallback((stepId: string) => {
     const step = WALLET_STEPS.find(s => s.id === stepId);
@@ -1077,7 +1095,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
               transition={iconBlinking ? { duration: 2.4, ease: "easeInOut" } : {}}
               data-testid="button-profile-avatar"
             >
-              <Fingerprint
+              <EyeOff
                 className="w-[22px] h-[22px]"
                 style={{
                   color: iconBlinking ? "#00e5ff" : "#B87333",
@@ -1300,6 +1318,10 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
         {levelUpSkill && onDismissLevelUp && (
           <SkillNotificationBanner
             skillKey={levelUpSkill}
+            iconRect={dosierIconRef.current ? (() => {
+              const r = dosierIconRef.current!.getBoundingClientRect();
+              return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+            })() : null}
             onClose={() => {
               onDismissLevelUp();
               setIconBlinking(true);

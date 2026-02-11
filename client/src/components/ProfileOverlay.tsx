@@ -386,22 +386,32 @@ export default function ProfileOverlay({ onClose, token, originRect }: ProfileOv
                 <div className="flex-1 h-[1px]" style={{ background: "#1a1a1a" }} />
               </div>
 
-              {SEGMENT_SKILLS.map((seg, i) => {
-                const segActive = [seg1Active, seg2Active, seg3Active][i];
-                return (
-                  <div key={seg.label}>
-                    <SegmentLabel label={seg.label} active={segActive} color={seg.color} />
-                    {seg.keys.map(key => (
-                      <SkillRow
-                        key={key}
-                        skillKey={key}
-                        granted={grantedKeys.has(key)}
-                        isNew={newSkillKeys.has(key)}
-                      />
-                    ))}
-                  </div>
-                );
-              })}
+              {unlockedCount === 0 ? (
+                <div className="flex items-center justify-center py-8">
+                  <span className="text-[9px] tracking-[3px] font-mono uppercase" style={{ color: "#333" }}>
+                    НАВЫКИ НЕ ОБНАРУЖЕНЫ
+                  </span>
+                </div>
+              ) : (
+                SEGMENT_SKILLS.map((seg, i) => {
+                  const segActive = [seg1Active, seg2Active, seg3Active][i];
+                  const grantedInSeg = seg.keys.filter(k => grantedKeys.has(k));
+                  if (grantedInSeg.length === 0) return null;
+                  return (
+                    <div key={seg.label}>
+                      <SegmentLabel label={seg.label} active={segActive} color={seg.color} />
+                      {grantedInSeg.map(key => (
+                        <SkillRow
+                          key={key}
+                          skillKey={key}
+                          granted={true}
+                          isNew={newSkillKeys.has(key)}
+                        />
+                      ))}
+                    </div>
+                  );
+                })
+              )}
             </div>
 
             <div className="flex items-center justify-between px-1 mt-4" style={{ borderTop: "1px solid #151515", paddingTop: "8px" }}>
