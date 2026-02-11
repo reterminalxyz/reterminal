@@ -202,18 +202,16 @@ Large prominent navigation button:
 - Typewriter speed: 12ms per character (was 20ms)
 - Removed Lvl/XP overlay from all screens (stealth UI)
 - Stealth profile avatar: pixel person icon in TerminalChat header (40% opacity), opens Dossier Mode overlay
-- Profile overlay (inside TerminalChat, NOT separate route): Dossier Mode fullscreen overlay preserving chat state
-  - 3D Avatar: @react-three/fiber + @react-three/drei, GLB model (/avatar.glb) loaded via useGLTF with Suspense
-  - OrbitControls for finger/mouse rotation, auto-rotation (0.003 rad/frame), sine-wave levitation (0.08 amplitude)
-  - Lighting: ambientLight 0.5, white spotLight [3,6,4] intensity 5, blue pointLight [0,1,-4] intensity 4 (rim light), Stage environment="city"
-  - Camera: FOV 45, position [0, 0, 5], Stage handles centering
-  - Materials: MeshStandardMaterial color #333333, metalness 0.8, roughness 0.2
-  - NeonVisor: separate mesh at eye level, emissive #ffaa00, emissiveIntensity 10, toneMapped=false
-  - Bloom: UnrealBloomPass (strength 1.5, radius 0.4, threshold 0.1) via Three.js EffectComposer + OutputPass
-  - WebGL fallback: SVG avatar if WebGL unavailable (headless browsers)
-  - Equipment containers: equipment_head, equipment_body, equipment_hands (empty groups for future gear)
-  - Dynamic equipment (currently disabled, containers ready): TRUTH_SEEKER visor, HARD_MONEY chest chip, GRID_RUNNER wireframe
-  - Cyberpunk skill cards: neon glow borders (red locked / gold unlocked), scanline background, monospace font, "[ LOCKED ]" text
+- Profile overlay (inside TerminalChat, NOT separate route): Cyberpunk HUD "MODULE CONTROL" overlay, pure 2D CSS/SVG
+  - No 3D, no Canvas, no Three.js, no GLB models
+  - Dark background (#0a0a0a) with CSS grid overlay and scan-line animation
+  - Core Module: central SVG technical schematic showing sync percentage
+  - 3 Module Slots (EQUIPMENT BAY): MOD_01 Visual Uplink (TRUTH_SEEKER, cyan), MOD_02 Neural Input (HARD_MONEY, orange), MOD_03 Logic Engine (GRID_RUNNER, copper)
+  - Locked state: grey wireframe, "SYSTEM_OFFLINE" text, dim placeholder bars
+  - Unlocked state: neon glow border + flicker animation, specifications grid, runtime pseudo-code with line numbers, loading bar, activation date
+  - Greebles: SYS.ID, date/time, SYNCED/STANDBY status, mini bar graphs, protocol version footer
+  - Scan line: slow cyan bar sweeping top-to-bottom every 6 seconds
+  - Animations: framer-motion opacity flicker on active modules, no rotation
   - Skills: TRUTH_SEEKER (block 2), HARD_MONEY (block 3), GRID_RUNNER (block 6)
 - Skill system: user_skills table (id, user_id, skill_key, granted_at)
 - API: GET /api/skills/:token, POST /api/skills/grant (validates against SKILL_KEYS)
