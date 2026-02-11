@@ -62,22 +62,37 @@ export function BootScreen({ onDismiss }: BootScreenProps) {
       </div>
 
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {Array.from({ length: 8 }).map((_, i) => (
+        <motion.div
+          className="absolute left-0 right-0 h-[60px] bg-gradient-to-b from-[#B87333]/15 to-transparent"
+          animate={{ top: ['-60px', '110%'] }}
+          transition={{ duration: 3, repeat: Infinity, repeatDelay: 2, ease: 'linear' }}
+        />
+        <motion.div
+          className="absolute left-0 right-0 h-[30px] bg-gradient-to-b from-[#B87333]/10 to-transparent"
+          animate={{ top: ['-30px', '110%'] }}
+          transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 4, ease: 'linear', delay: 1.5 }}
+        />
+      </div>
+
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {Array.from({ length: 12 }).map((_, i) => (
           <motion.div
             key={i}
             className="absolute w-full bg-[#B87333]"
-            style={{ 
-              top: `${5 + i * 12}%`,
-              height: i % 3 === 0 ? '2px' : '1px',
-              boxShadow: '0 0 10px rgba(184, 115, 51, 0.3)',
+            style={{
+              top: `${3 + i * 8}%`,
+              height: i % 4 === 0 ? '3px' : i % 2 === 0 ? '2px' : '1px',
+              boxShadow: i % 4 === 0
+                ? '0 0 15px rgba(184, 115, 51, 0.6), 0 0 30px rgba(184, 115, 51, 0.2)'
+                : '0 0 8px rgba(184, 115, 51, 0.3)',
             }}
             initial={{ x: "-100%", opacity: 0 }}
-            animate={{ x: "100%", opacity: [0, 0.5, 0.3, 0] }}
+            animate={{ x: "100%", opacity: [0, 0.7, 0.5, 0] }}
             transition={{
-              duration: 0.2,
-              delay: 1.5 + i * 2.8,
+              duration: 0.15 + (i % 3) * 0.05,
+              delay: 0.5 + i * 1.8,
               repeat: Infinity,
-              repeatDelay: 6 + i * 1.5,
+              repeatDelay: 4 + (i % 3) * 2,
               ease: "linear",
             }}
           />
@@ -86,30 +101,45 @@ export function BootScreen({ onDismiss }: BootScreenProps) {
 
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         <motion.div
-          className="absolute w-[200px] h-[200px] rounded-full"
+          className="absolute w-[300px] h-[300px] rounded-full"
           style={{
-            background: 'radial-gradient(circle, rgba(184, 115, 51, 0.08) 0%, transparent 70%)',
-            top: '15%',
-            left: '-10%',
+            background: 'radial-gradient(circle, rgba(184, 115, 51, 0.12) 0%, rgba(184, 115, 51, 0.04) 40%, transparent 70%)',
+            top: '10%',
+            left: '-15%',
           }}
           animate={{
-            x: ['0%', '150%', '0%'],
-            y: ['0%', '30%', '0%'],
+            x: ['0%', '180%', '0%'],
+            y: ['0%', '50%', '0%'],
+            scale: [1, 1.3, 1],
           }}
-          transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
         />
         <motion.div
-          className="absolute w-[150px] h-[150px] rounded-full"
+          className="absolute w-[250px] h-[250px] rounded-full"
           style={{
-            background: 'radial-gradient(circle, rgba(184, 115, 51, 0.06) 0%, transparent 70%)',
-            bottom: '20%',
-            right: '-5%',
+            background: 'radial-gradient(circle, rgba(184, 115, 51, 0.1) 0%, rgba(184, 115, 51, 0.03) 40%, transparent 70%)',
+            bottom: '15%',
+            right: '-10%',
           }}
           animate={{
-            x: ['0%', '-120%', '0%'],
-            y: ['0%', '-40%', '0%'],
+            x: ['0%', '-150%', '0%'],
+            y: ['0%', '-60%', '0%'],
+            scale: [1.2, 0.8, 1.2],
           }}
-          transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
+          transition={{ duration: 13, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <motion.div
+          className="absolute w-[180px] h-[180px] rounded-full"
+          style={{
+            background: 'radial-gradient(circle, rgba(184, 115, 51, 0.08) 0%, transparent 60%)',
+            top: '50%',
+            left: '30%',
+          }}
+          animate={{
+            x: ['0%', '80%', '-60%', '0%'],
+            y: ['-50%', '20%', '-30%', '-50%'],
+          }}
+          transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
         />
       </div>
 
@@ -123,13 +153,10 @@ export function BootScreen({ onDismiss }: BootScreenProps) {
           className="mb-8 text-center"
         >
           <div className="text-[#B87333] font-mono text-[11px] tracking-[4px] mb-4 opacity-60">
-            LIBERTA TERMINAL v1.0
+            LIBERTA TERMINAL v0.1
           </div>
-          <h1 className="text-[#E8E8E8] font-mono text-[18px] font-bold leading-tight tracking-wide mb-2">
-            Ты активировал
-          </h1>
           <h1 className="text-[#B87333] font-mono text-[18px] font-bold leading-tight tracking-wide">
-            карту свободы
+            Ты активировал карту свободы
           </h1>
         </motion.div>
 
