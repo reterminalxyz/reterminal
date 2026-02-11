@@ -202,22 +202,26 @@ Large prominent navigation button:
 - Typewriter speed: 12ms per character (was 20ms)
 - Removed Lvl/XP overlay from all screens (stealth UI)
 - Stealth profile avatar: pixel person icon in TerminalChat header (40% opacity), opens Dossier Mode overlay
-- Profile overlay (inside TerminalChat, NOT separate route): Cyberpunk HUD "MODULE CONTROL" overlay, pure 2D CSS/SVG
+- Stealth dosier icon: Lucide Cpu icon in TerminalChat header (40% opacity), opens Profile overlay
+- Profile overlay (inside TerminalChat, NOT separate route): "ТАКТИЧЕСКОЕ СКАНИРОВАНИЕ" overlay, pure 2D CSS/SVG
   - No 3D, no Canvas, no Three.js, no GLB models
   - Dark background (#0a0a0a) with CSS grid overlay and scan-line animation
-  - Core Module: central SVG technical schematic showing sync percentage
-  - 3 Module Slots (EQUIPMENT BAY): MOD_01 Visual Uplink (TRUTH_SEEKER, cyan), MOD_02 Neural Input (HARD_MONEY, orange), MOD_03 Logic Engine (GRID_RUNNER, copper)
-  - Locked state: grey wireframe, "SYSTEM_OFFLINE" text, dim placeholder bars
-  - Unlocked state: neon glow border + flicker animation, specifications grid, runtime pseudo-code with line numbers, loading bar, activation date
-  - Greebles: SYS.ID, date/time, SYNCED/STANDBY status, mini bar graphs, protocol version footer
+  - Pixel schematic device: SVG device inspired by sci-fi organizer, divided into 3 segments
+  - Segment 1 (ПРОТОКОЛ ВОЛИ): WILL_TO_FREEDOM, cyan (#00e5ff) — top section with radar circle
+  - Segment 2 (МОДУЛЬ ЗНАНИЯ): TRUTH_SEEKER + HARD_MONEY, orange (#ffaa00) — middle section with keypad grid + dials
+  - Segment 3 (СЕТЕВОЙ ПРИВОД): GRID_RUNNER, copper (#b87333) — bottom section with twin dials + status bar
+  - Locked segments: grey/dim outlines. Unlocked: color fills + pulse animations
+  - Skill rows below device: name + description, animated checkmark on unlock + beep sound
+  - Greebles: SYS.ID, date/time, SYNCED/STANDBY status, protocol version footer
   - Scan line: slow cyan bar sweeping top-to-bottom every 6 seconds
-  - Animations: framer-motion opacity flicker on active modules, no rotation
-  - Skills: TRUTH_SEEKER (block 2), HARD_MONEY (block 3), GRID_RUNNER (block 6)
+  - Skills: WILL_TO_FREEDOM (block 1), TRUTH_SEEKER (block 2), HARD_MONEY (block 3), GRID_RUNNER (block 6)
 - Skill system: user_skills table (id, user_id, skill_key, granted_at)
+- SKILL_KEYS: WILL_TO_FREEDOM, TRUTH_SEEKER, HARD_MONEY, GRID_RUNNER (4 skills total)
 - API: GET /api/skills/:token, POST /api/skills/grant (validates against SKILL_KEYS)
 - useGrantSkill hook: calls API, shows LevelUpPopup overlay on terminal
-- LevelUpPopup: animated overlay with "НАВЫК ОТКРЫТ" + skill name + "АВАТАР ОБНОВЛЁН"
+- LevelUpPopup: "НОВЫЙ СКИЛЛ ПОЛУЧЕН" + skill name, fly-to-icon animation (shrinks + moves to dosier Cpu icon)
 - Skills granted automatically when completing learning blocks with grantSkillKey field
+- playBeep(): short high-pitched tone (1800→2200Hz sine + 2800Hz harmonic) for skill checkmark
 - Progress persistence: auto-saves block index, SATS, independence to localStorage + PostgreSQL on every block/wallet transition
 - API: POST /api/save-progress (token, currentModuleId, currentStepIndex, totalSats, independenceProgress)
 - API: POST /api/sync-user now returns all progress fields for restore

@@ -47,10 +47,11 @@ export type UpdateSessionRequest = {
 
 export type SessionResponse = Session;
 
-export const SKILL_KEYS = ["TRUTH_SEEKER", "HARD_MONEY", "GRID_RUNNER"] as const;
+export const SKILL_KEYS = ["WILL_TO_FREEDOM", "TRUTH_SEEKER", "HARD_MONEY", "GRID_RUNNER"] as const;
 export type SkillKey = typeof SKILL_KEYS[number];
 
 export const SKILL_META: Record<SkillKey, { name: string; description: string; layer: string }> = {
+  WILL_TO_FREEDOM: { name: "Воля к Свободе", description: "Ты сделал первый шаг. Протокол активирован.", layer: "core" },
   TRUTH_SEEKER: { name: "Искатель Истины", description: "Ты видишь сквозь ложь системы. Визор активирован.", layer: "visor" },
   HARD_MONEY: { name: "Твёрдые Деньги", description: "Ты понял суть звонкой монеты. Ключ в твоих руках.", layer: "hand_item" },
   GRID_RUNNER: { name: "Бегущий по Сетке", description: "Ты освоил сеть Lightning. Аура цифрового сопротивления.", layer: "aura" },

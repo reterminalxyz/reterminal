@@ -1,33 +1,16 @@
 import { useEffect, useState, useCallback } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { SKILL_META, type SkillKey, SKILL_KEYS } from "@shared/schema";
+import { playBeep } from "@/lib/sounds";
 
 type GrantedSkill = { skillKey: string; grantedAt: string | null };
 
-const MODULE_CONFIG: Record<SkillKey, { serial: string; label: string; neonColor: string; specs: string[]; code: string[] }> = {
-  TRUTH_SEEKER: {
-    serial: "MOD_01",
-    label: "VISUAL UPLINK",
-    neonColor: "#00e5ff",
-    specs: ["FREQ: 2.4GHz", "RANGE: 500m", "LATENCY: <2ms"],
-    code: ["decrypt(stream.in)", "filter(noise > 0.3)", "render(truth.map)"],
-  },
-  HARD_MONEY: {
-    serial: "MOD_02",
-    label: "NEURAL INPUT",
-    neonColor: "#ffaa00",
-    specs: ["HASH: SHA-256", "DEPTH: 21M", "VERIFY: PROOF"],
-    code: ["validate(block.hash)", "sign(tx, privKey)", "broadcast(mempool)"],
-  },
-  GRID_RUNNER: {
-    serial: "MOD_03",
-    label: "LOGIC ENGINE",
-    neonColor: "#b87333",
-    specs: ["SPEED: 1M tx/s", "ROUTE: ONION", "CHANNEL: ACTIVE"],
-    code: ["route(payment.path)", "encrypt(layer, 3)", "settle(invoice.id)"],
-  },
-};
+const SEGMENT_SKILLS: { keys: SkillKey[]; label: string; color: string; colorDim: string }[] = [
+  { keys: ["WILL_TO_FREEDOM"], label: "ПРОТОКОЛ ВОЛИ", color: "#00e5ff", colorDim: "#00e5ff" },
+  { keys: ["TRUTH_SEEKER", "HARD_MONEY"], label: "МОДУЛЬ ЗНАНИЯ", color: "#ffaa00", colorDim: "#ffaa00" },
+  { keys: ["GRID_RUNNER"], label: "СЕТЕВОЙ ПРИВОД", color: "#b87333", colorDim: "#b87333" },
+];
 
 function ScanLine() {
   return (
@@ -58,207 +41,212 @@ function GridBackground() {
   );
 }
 
-function CoreModule({ unlockedCount }: { unlockedCount: number }) {
-  const pct = Math.round((unlockedCount / SKILL_KEYS.length) * 100);
+function PixelDevice({ segments }: { segments: [boolean, boolean, boolean] }) {
+  return (
+    <svg viewBox="0 0 200 340" width="200" height="340" className="mx-auto" data-testid="pixel-device">
+      <rect x="40" y="10" width="120" height="320" rx="4" fill="#1a1a1a" stroke="#333" strokeWidth="1.5" />
+      <rect x="44" y="14" width="112" height="312" rx="2" fill="#111" />
+
+      <rect x="60" y="4" width="8" height="10" fill="#222" stroke="#333" strokeWidth="0.5" />
+      <rect x="75" y="2" width="12" height="12" fill="#222" stroke="#333" strokeWidth="0.5" />
+      <rect x="92" y="0" width="16" height="16" fill="#222" stroke="#444" strokeWidth="0.5" />
+      <rect x="96" y="4" width="8" height="8" fill={segments[0] ? "#00e5ff22" : "#111"} stroke={segments[0] ? "#00e5ff" : "#333"} strokeWidth="0.5" />
+      <rect x="113" y="2" width="12" height="12" fill="#222" stroke="#333" strokeWidth="0.5" />
+      <rect x="130" y="4" width="8" height="10" fill="#222" stroke="#333" strokeWidth="0.5" />
+
+      <line x1="70" y1="14" x2="70" y2="8" stroke="#333" strokeWidth="0.5" />
+      <line x1="130" y1="14" x2="130" y2="8" stroke="#333" strokeWidth="0.5" />
+
+      <line x1="44" y1="118" x2="156" y2="118" stroke="#333" strokeWidth="0.5" strokeDasharray="2 2" />
+      <line x1="44" y1="222" x2="156" y2="222" stroke="#333" strokeWidth="0.5" strokeDasharray="2 2" />
+
+      {/* SEGMENT 1: Top - Protocol Core (WILL_TO_FREEDOM) */}
+      <g opacity={segments[0] ? 1 : 0.2}>
+        <circle cx="100" cy="66" r="28" fill="none" stroke={segments[0] ? "#00e5ff" : "#333"} strokeWidth="1.5">
+          {segments[0] && <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite" />}
+        </circle>
+        <circle cx="100" cy="66" r="20" fill="none" stroke={segments[0] ? "#00e5ff" : "#333"} strokeWidth="0.5" opacity="0.5" />
+        <circle cx="100" cy="66" r="12" fill={segments[0] ? "#00e5ff15" : "none"} stroke={segments[0] ? "#00e5ff" : "#333"} strokeWidth="1">
+          {segments[0] && <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite" />}
+        </circle>
+        <circle cx="100" cy="66" r="4" fill={segments[0] ? "#00e5ff" : "#333"} />
+
+        <line x1="60" y1="44" x2="72" y2="44" stroke={segments[0] ? "#00e5ff" : "#333"} strokeWidth="0.5" />
+        <rect x="56" y="42" width="4" height="4" fill={segments[0] ? "#00e5ff" : "#333"} opacity="0.6" />
+        <line x1="128" y1="44" x2="140" y2="44" stroke={segments[0] ? "#00e5ff" : "#333"} strokeWidth="0.5" />
+        <rect x="140" y="42" width="4" height="4" fill={segments[0] ? "#00e5ff" : "#333"} opacity="0.6" />
+
+        <line x1="60" y1="88" x2="72" y2="88" stroke={segments[0] ? "#00e5ff" : "#333"} strokeWidth="0.5" />
+        <line x1="128" y1="88" x2="140" y2="88" stroke={segments[0] ? "#00e5ff" : "#333"} strokeWidth="0.5" />
+
+        <rect x="56" y="50" width="12" height="3" fill={segments[0] ? "#00e5ff" : "#222"} opacity="0.4" />
+        <rect x="56" y="56" width="8" height="3" fill={segments[0] ? "#00e5ff" : "#222"} opacity="0.3" />
+        <rect x="132" y="50" width="12" height="3" fill={segments[0] ? "#00e5ff" : "#222"} opacity="0.4" />
+        <rect x="134" y="56" width="8" height="3" fill={segments[0] ? "#00e5ff" : "#222"} opacity="0.3" />
+
+        <text x="100" y="106" textAnchor="middle" fill={segments[0] ? "#00e5ff" : "#333"} fontSize="5" fontFamily="monospace" letterSpacing="2">
+          {segments[0] ? "ACTIVATED" : "OFFLINE"}
+        </text>
+      </g>
+
+      {/* SEGMENT 2: Middle - Knowledge Module (TRUTH_SEEKER + HARD_MONEY) */}
+      <g opacity={segments[1] ? 1 : 0.2}>
+        {[0,1,2,3,4,5].map(row => (
+          <g key={`keys-${row}`}>
+            {[0,1,2,3,4,5,6].map(col => (
+              <rect
+                key={`key-${row}-${col}`}
+                x={58 + col * 12}
+                y={128 + row * 12}
+                width="10"
+                height="10"
+                rx="1"
+                fill={segments[1] ? (row < 2 ? "#ffaa0020" : "#ffaa0010") : "#151515"}
+                stroke={segments[1] ? "#ffaa0050" : "#222"}
+                strokeWidth="0.5"
+              />
+            ))}
+          </g>
+        ))}
+
+        <circle cx="58" cy="206" r="12" fill="none" stroke={segments[1] ? "#ffaa00" : "#333"} strokeWidth="1">
+          {segments[1] && <animate attributeName="opacity" values="0.5;1;0.5" dur="2.5s" repeatCount="indefinite" />}
+        </circle>
+        <circle cx="58" cy="206" r="6" fill={segments[1] ? "#ffaa0030" : "none"} stroke={segments[1] ? "#ffaa00" : "#333"} strokeWidth="0.5" />
+
+        <circle cx="142" cy="206" r="12" fill="none" stroke={segments[1] ? "#ffaa00" : "#333"} strokeWidth="1">
+          {segments[1] && <animate attributeName="opacity" values="0.5;1;0.5" dur="3s" repeatCount="indefinite" />}
+        </circle>
+        <circle cx="142" cy="206" r="6" fill={segments[1] ? "#ffaa0030" : "none"} stroke={segments[1] ? "#ffaa00" : "#333"} strokeWidth="0.5" />
+
+        <rect x="76" y="198" width="48" height="16" fill={segments[1] ? "#ffaa0010" : "#111"} stroke={segments[1] ? "#ffaa0040" : "#222"} strokeWidth="0.5" />
+        <rect x="80" y="202" width="10" height="3" fill={segments[1] ? "#ffaa00" : "#222"} opacity="0.6" />
+        <rect x="94" y="202" width="10" height="3" fill={segments[1] ? "#ffaa00" : "#222"} opacity="0.6" />
+        <rect x="108" y="202" width="10" height="3" fill={segments[1] ? "#ffaa00" : "#222"} opacity="0.6" />
+        <rect x="80" y="208" width="6" height="2" fill={segments[1] ? "#ffaa00" : "#222"} opacity="0.4" />
+      </g>
+
+      {/* SEGMENT 3: Bottom - Network Drive (GRID_RUNNER) */}
+      <g opacity={segments[2] ? 1 : 0.2}>
+        <circle cx="76" cy="268" r="18" fill="none" stroke={segments[2] ? "#b87333" : "#333"} strokeWidth="1">
+          {segments[2] && <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite" />}
+        </circle>
+        <circle cx="76" cy="268" r="10" fill={segments[2] ? "#b8733320" : "none"} stroke={segments[2] ? "#b87333" : "#333"} strokeWidth="0.5" />
+        <line x1="76" y1="256" x2="76" y2="250" stroke={segments[2] ? "#b87333" : "#333"} strokeWidth="0.5" />
+        <line x1="86" y1="258" x2="92" y2="252" stroke={segments[2] ? "#b87333" : "#333"} strokeWidth="0.5" />
+        <line x1="66" y1="258" x2="60" y2="252" stroke={segments[2] ? "#b87333" : "#333"} strokeWidth="0.5" />
+
+        <circle cx="124" cy="268" r="18" fill="none" stroke={segments[2] ? "#b87333" : "#333"} strokeWidth="1">
+          {segments[2] && <animate attributeName="opacity" values="0.6;1;0.6" dur="2.5s" repeatCount="indefinite" />}
+        </circle>
+        <circle cx="124" cy="268" r="10" fill={segments[2] ? "#b8733320" : "none"} stroke={segments[2] ? "#b87333" : "#333"} strokeWidth="0.5" />
+
+        <rect x="56" y="294" width="88" height="18" fill={segments[2] ? "#b8733310" : "#111"} stroke={segments[2] ? "#b8733350" : "#222"} strokeWidth="0.5" />
+        <rect x="60" y="298" width="20" height="6" fill={segments[2] ? "#b87333" : "#222"} opacity="0.5" />
+        <rect x="84" y="298" width="20" height="6" fill={segments[2] ? "#b87333" : "#222"} opacity="0.4" />
+        <rect x="108" y="298" width="20" height="6" fill={segments[2] ? "#b87333" : "#222"} opacity="0.3" />
+        <rect x="60" y="306" width="12" height="2" fill={segments[2] ? "#b87333" : "#222"} opacity="0.3" />
+      </g>
+
+      {/* Connectors on sides */}
+      <rect x="32" y="60" width="8" height="16" rx="1" fill="#1a1a1a" stroke="#333" strokeWidth="0.5" />
+      <rect x="32" y="160" width="8" height="16" rx="1" fill="#1a1a1a" stroke="#333" strokeWidth="0.5" />
+      <rect x="32" y="260" width="8" height="16" rx="1" fill="#1a1a1a" stroke="#333" strokeWidth="0.5" />
+      <rect x="160" y="60" width="8" height="16" rx="1" fill="#1a1a1a" stroke="#333" strokeWidth="0.5" />
+      <rect x="160" y="160" width="8" height="16" rx="1" fill="#1a1a1a" stroke="#333" strokeWidth="0.5" />
+      <rect x="160" y="260" width="8" height="16" rx="1" fill="#1a1a1a" stroke="#333" strokeWidth="0.5" />
+
+      {/* Bottom connectors / cables */}
+      <rect x="70" y="326" width="12" height="14" rx="1" fill="#1a1a1a" stroke="#333" strokeWidth="0.5" />
+      <rect x="94" y="326" width="12" height="14" rx="1" fill="#1a1a1a" stroke="#333" strokeWidth="0.5" />
+      <rect x="118" y="326" width="12" height="14" rx="1" fill="#1a1a1a" stroke="#333" strokeWidth="0.5" />
+    </svg>
+  );
+}
+
+function SkillRow({ skillKey, granted, isNew }: { skillKey: SkillKey; granted: boolean; isNew: boolean }) {
+  const meta = SKILL_META[skillKey];
+  const [showCheck, setShowCheck] = useState(false);
+
+  useEffect(() => {
+    if (granted && isNew) {
+      const t = setTimeout(() => {
+        setShowCheck(true);
+        try { playBeep(); } catch (_) {}
+      }, 600);
+      return () => clearTimeout(t);
+    }
+    if (granted) setShowCheck(true);
+  }, [granted, isNew]);
+
+  const segConfig = SEGMENT_SKILLS.find(s => s.keys.includes(skillKey));
+  const color = segConfig?.color || "#555";
 
   return (
-    <div className="relative mx-auto" style={{ width: 160, height: 160 }} data-testid="core-module">
-      <svg viewBox="0 0 160 160" width="160" height="160" className="mx-auto">
-        <rect x="30" y="30" width="100" height="100" fill="none" stroke="#333" strokeWidth="1" />
-        <rect x="40" y="40" width="80" height="80" fill="none" stroke="#444" strokeWidth="0.5" strokeDasharray="4 2" />
-
-        <line x1="80" y1="0" x2="80" y2="30" stroke="#333" strokeWidth="0.5" />
-        <line x1="80" y1="130" x2="80" y2="160" stroke="#333" strokeWidth="0.5" />
-        <line x1="0" y1="80" x2="30" y2="80" stroke="#333" strokeWidth="0.5" />
-        <line x1="130" y1="80" x2="160" y2="80" stroke="#333" strokeWidth="0.5" />
-
-        <circle cx="80" cy="80" r="25" fill="none" stroke={unlockedCount > 0 ? "#00e5ff" : "#333"} strokeWidth="1" opacity={unlockedCount > 0 ? 0.6 : 0.3}>
-          {unlockedCount > 0 && (
-            <animate attributeName="opacity" values="0.4;0.8;0.4" dur="3s" repeatCount="indefinite" />
-          )}
-        </circle>
-        <circle cx="80" cy="80" r="18" fill="none" stroke={unlockedCount > 0 ? "#00e5ff" : "#333"} strokeWidth="0.5" opacity="0.3" />
-
-        <circle cx="30" cy="30" r="2" fill="#444" />
-        <circle cx="130" cy="30" r="2" fill="#444" />
-        <circle cx="30" cy="130" r="2" fill="#444" />
-        <circle cx="130" cy="130" r="2" fill="#444" />
-
-        <rect x="55" y="55" width="50" height="50" fill="none" stroke="#555" strokeWidth="0.5" />
-        <line x1="60" y1="60" x2="100" y2="100" stroke="#333" strokeWidth="0.3" />
-        <line x1="100" y1="60" x2="60" y2="100" stroke="#333" strokeWidth="0.3" />
-      </svg>
-
-      <div className="absolute inset-0 flex flex-col items-center justify-center">
+    <div
+      className="flex items-center gap-3 py-2 px-3"
+      style={{
+        borderBottom: "1px solid #151515",
+        opacity: granted ? 1 : 0.3,
+      }}
+      data-testid={`skill-row-${skillKey}`}
+    >
+      <div
+        className="w-[8px] h-[8px] flex-shrink-0"
+        style={{
+          background: granted ? color : "#222",
+          boxShadow: granted ? `0 0 8px ${color}60` : "none",
+        }}
+      />
+      <div className="flex-1 min-w-0">
         <div
-          className="text-[18px] font-bold font-mono tracking-wider"
+          className="text-[10px] tracking-[2px] font-bold font-mono uppercase truncate"
           style={{
-            color: unlockedCount > 0 ? "#00e5ff" : "#444",
-            textShadow: unlockedCount > 0 ? "0 0 10px rgba(0,229,255,0.5)" : "none",
+            color: granted ? "#e0e0e0" : "#333",
+            textShadow: granted ? `0 0 4px ${color}30` : "none",
           }}
         >
-          {pct}%
+          {meta.name}
         </div>
-        <div className="text-[7px] tracking-[3px] font-mono text-[#555] uppercase mt-0.5">
-          SYNCED
+        <div
+          className="text-[8px] font-mono mt-0.5 truncate"
+          style={{ color: granted ? "#666" : "#222" }}
+        >
+          {meta.description}
         </div>
+      </div>
+      <div className="flex-shrink-0 w-5 h-5 flex items-center justify-center">
+        <AnimatePresence>
+          {granted && showCheck && (
+            <motion.div
+              initial={{ scale: 0, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0 }}
+              transition={{ type: "spring", damping: 10 }}
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14">
+                <rect x="2" y="6" width="3" height="6" fill={color} transform="rotate(-45 3.5 9)" />
+                <rect x="5" y="8" width="3" height="8" fill={color} transform="rotate(45 6.5 12)" />
+              </svg>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
 }
 
-function ModuleSlot({ skillKey, granted }: { skillKey: SkillKey; granted: GrantedSkill | undefined }) {
-  const config = MODULE_CONFIG[skillKey];
-  const meta = SKILL_META[skillKey];
-  const isUnlocked = !!granted;
-
+function SegmentLabel({ label, active, color }: { label: string; active: boolean; color: string }) {
   return (
-    <div
-      className="relative"
-      style={{
-        border: `1px solid ${isUnlocked ? config.neonColor + "66" : "#222"}`,
-        background: isUnlocked
-          ? `linear-gradient(180deg, ${config.neonColor}08 0%, #0a0a0a 100%)`
-          : "#0d0d0d",
-        boxShadow: isUnlocked
-          ? `0 0 20px ${config.neonColor}20, inset 0 0 30px ${config.neonColor}05`
-          : "none",
-      }}
-      data-testid={`module-slot-${skillKey}`}
-    >
-      {isUnlocked && (
-        <motion.div
-          className="absolute inset-0 pointer-events-none"
-          style={{ border: `1px solid ${config.neonColor}` }}
-          animate={{ opacity: [0.3, 0.7, 0.3] }}
-          transition={{ duration: 2.5, repeat: Infinity }}
-        />
-      )}
-
-      <div className="p-3">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-2">
-            <div
-              className="w-[6px] h-[6px]"
-              style={{
-                background: isUnlocked ? config.neonColor : "#333",
-                boxShadow: isUnlocked ? `0 0 6px ${config.neonColor}` : "none",
-              }}
-            />
-            <span
-              className="text-[9px] tracking-[3px] font-bold font-mono uppercase"
-              style={{
-                color: isUnlocked ? config.neonColor : "#333",
-                textShadow: isUnlocked ? `0 0 6px ${config.neonColor}60` : "none",
-              }}
-            >
-              {config.serial}
-            </span>
-          </div>
-          <span
-            className="text-[8px] tracking-[2px] font-mono uppercase"
-            style={{ color: isUnlocked ? "#666" : "#222" }}
-          >
-            {isUnlocked ? "ONLINE" : "OFFLINE"}
-          </span>
-        </div>
-
-        <div
-          className="text-[11px] tracking-[2px] font-bold font-mono uppercase mb-1"
-          style={{
-            color: isUnlocked ? "#e0e0e0" : "#2a2a2a",
-            textShadow: isUnlocked ? `0 0 4px ${config.neonColor}30` : "none",
-          }}
-        >
-          {config.label}
-        </div>
-
-        <div
-          className="text-[9px] font-mono mb-2"
-          style={{ color: isUnlocked ? "#777" : "#1a1a1a" }}
-        >
-          {meta.name}
-        </div>
-
-        {isUnlocked ? (
-          <div>
-            <div className="mb-2">
-              <div className="text-[7px] tracking-[2px] font-mono text-[#444] uppercase mb-1">
-                SPECIFICATIONS
-              </div>
-              <div className="grid grid-cols-3 gap-1">
-                {config.specs.map((spec, i) => (
-                  <div
-                    key={i}
-                    className="text-[7px] font-mono px-1 py-0.5"
-                    style={{
-                      color: config.neonColor,
-                      background: `${config.neonColor}08`,
-                      border: `1px solid ${config.neonColor}15`,
-                    }}
-                  >
-                    {spec}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <div className="text-[7px] tracking-[2px] font-mono text-[#444] uppercase mb-1">
-                RUNTIME
-              </div>
-              {config.code.map((line, i) => (
-                <div key={i} className="flex items-center gap-1">
-                  <span className="text-[7px] font-mono" style={{ color: `${config.neonColor}60` }}>
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <motion.span
-                    className="text-[8px] font-mono"
-                    style={{ color: config.neonColor }}
-                    animate={{ opacity: [0.5, 1, 0.5] }}
-                    transition={{ duration: 2, repeat: Infinity, delay: i * 0.3 }}
-                  >
-                    {line}
-                  </motion.span>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-2 h-[3px] w-full overflow-hidden" style={{ background: "#111" }}>
-              <motion.div
-                className="h-full"
-                style={{ background: config.neonColor, width: "100%" }}
-                animate={{ opacity: [0.4, 1, 0.4] }}
-                transition={{ duration: 1.5, repeat: Infinity }}
-              />
-            </div>
-
-            {granted?.grantedAt && (
-              <div className="text-[7px] font-mono mt-1" style={{ color: "#444" }}>
-                ACTIVATED: {new Date(granted.grantedAt).toLocaleDateString("ru-RU")}
-              </div>
-            )}
-          </div>
-        ) : (
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <div className="flex-1 h-[1px]" style={{ background: "#1a1a1a" }} />
-              <span className="text-[8px] tracking-[3px] font-mono" style={{ color: "#2a2a2a" }}>
-                SYSTEM_OFFLINE
-              </span>
-              <div className="flex-1 h-[1px]" style={{ background: "#1a1a1a" }} />
-            </div>
-
-            <div className="space-y-1">
-              {[1, 2, 3].map(i => (
-                <div key={i} className="h-[6px] w-full" style={{ background: "#111", border: "1px solid #1a1a1a" }} />
-              ))}
-            </div>
-
-            <div className="mt-2 h-[3px] w-full" style={{ background: "#111", border: "1px solid #151515" }} />
-          </div>
-        )}
-      </div>
+    <div className="flex items-center gap-2 py-1.5 px-3">
+      <div className="flex-1 h-[1px]" style={{ background: active ? `${color}30` : "#151515" }} />
+      <span
+        className="text-[7px] tracking-[3px] font-mono uppercase flex-shrink-0"
+        style={{ color: active ? color : "#222" }}
+      >
+        {label}
+      </span>
+      <div className="flex-1 h-[1px]" style={{ background: active ? `${color}30` : "#151515" }} />
     </div>
   );
 }
@@ -269,52 +257,26 @@ function Greebles({ token, unlockedCount }: { token: string | null; unlockedCoun
   const timeStr = now.toLocaleTimeString("ru-RU", { hour: "2-digit", minute: "2-digit" });
 
   return (
-    <>
-      <div className="flex items-center justify-between px-3 py-1.5" style={{ borderBottom: "1px solid #151515" }}>
-        <div className="flex items-center gap-3">
-          <span className="text-[7px] font-mono tracking-[2px] text-[#333]">
-            SYS.ID: {token ? token.slice(0, 8).toUpperCase() : "--------"}
-          </span>
-          <span className="text-[7px] font-mono text-[#333]">
-            {dateStr} {timeStr}
-          </span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1">
-            <div className="w-[4px] h-[4px]" style={{ background: unlockedCount > 0 ? "#00e5ff" : "#333" }}>
-              {unlockedCount > 0 && (
-                <motion.div
-                  className="w-full h-full"
-                  style={{ background: "#00e5ff" }}
-                  animate={{ opacity: [0.5, 1, 0.5] }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                />
-              )}
-            </div>
-            <span className="text-[7px] font-mono" style={{ color: unlockedCount > 0 ? "#00e5ff" : "#333" }}>
-              {unlockedCount > 0 ? "SYNCED" : "STANDBY"}
-            </span>
-          </div>
-        </div>
+    <div className="flex items-center justify-between px-3 py-1.5" style={{ borderBottom: "1px solid #151515" }}>
+      <div className="flex items-center gap-3">
+        <span className="text-[7px] font-mono tracking-[2px] text-[#333]">
+          SYS.ID: {token ? token.slice(0, 8).toUpperCase() : "--------"}
+        </span>
+        <span className="text-[7px] font-mono text-[#333]">
+          {dateStr} {timeStr}
+        </span>
       </div>
-    </>
-  );
-}
-
-function MiniGraph() {
-  const bars = [3, 5, 4, 7, 6, 8, 5, 7, 9, 6, 4, 7];
-  return (
-    <div className="flex items-end gap-[1px] h-[12px]">
-      {bars.map((h, i) => (
-        <div
-          key={i}
-          className="w-[2px]"
-          style={{
-            height: `${h}px`,
-            background: "#333",
-          }}
+      <div className="flex items-center gap-1">
+        <motion.div
+          className="w-[4px] h-[4px]"
+          style={{ background: unlockedCount > 0 ? "#00e5ff" : "#333" }}
+          animate={unlockedCount > 0 ? { opacity: [0.5, 1, 0.5] } : {}}
+          transition={{ duration: 2, repeat: Infinity }}
         />
-      ))}
+        <span className="text-[7px] font-mono" style={{ color: unlockedCount > 0 ? "#00e5ff" : "#333" }}>
+          {unlockedCount > 0 ? "SYNCED" : "STANDBY"}
+        </span>
+      </div>
     </div>
   );
 }
@@ -327,13 +289,29 @@ interface ProfileOverlayProps {
 export default function ProfileOverlay({ onClose, token }: ProfileOverlayProps) {
   const [skills, setSkills] = useState<GrantedSkill[]>([]);
   const [loading, setLoading] = useState(true);
+  const [newSkillKeys, setNewSkillKeys] = useState<Set<string>>(new Set());
 
   const fetchSkills = useCallback(() => {
     if (!token) { setLoading(false); return; }
     fetch(`/api/skills/${token}`)
       .then(r => r.json())
       .then(data => {
-        if (Array.isArray(data)) setSkills(data);
+        if (Array.isArray(data)) {
+          setSkills(data);
+          try {
+            const seenKey = `liberta_seen_skills_${token}`;
+            const seen = JSON.parse(localStorage.getItem(seenKey) || "[]") as string[];
+            const seenSet = new Set(seen);
+            const newKeys = new Set<string>();
+            const currentKeys: string[] = [];
+            data.forEach((s: GrantedSkill) => {
+              currentKeys.push(s.skillKey);
+              if (!seenSet.has(s.skillKey)) newKeys.add(s.skillKey);
+            });
+            setNewSkillKeys(newKeys);
+            localStorage.setItem(seenKey, JSON.stringify(currentKeys));
+          } catch (_) {}
+        }
       })
       .catch(() => {})
       .finally(() => setLoading(false));
@@ -341,7 +319,12 @@ export default function ProfileOverlay({ onClose, token }: ProfileOverlayProps) 
 
   useEffect(() => { fetchSkills(); }, [fetchSkills]);
 
+  const grantedKeys = new Set(skills.map(s => s.skillKey));
   const unlockedCount = skills.length;
+
+  const seg1Active = SEGMENT_SKILLS[0].keys.some(k => grantedKeys.has(k));
+  const seg2Active = SEGMENT_SKILLS[1].keys.some(k => grantedKeys.has(k));
+  const seg3Active = SEGMENT_SKILLS[2].keys.some(k => grantedKeys.has(k));
 
   return (
     <motion.div
@@ -369,7 +352,7 @@ export default function ProfileOverlay({ onClose, token }: ProfileOverlayProps) 
             <span className="text-[9px] tracking-[2px] font-bold uppercase font-mono">ТЕРМИНАЛ</span>
           </button>
           <span className="text-[10px] tracking-[4px] font-bold uppercase font-mono" style={{ color: "#00e5ff", textShadow: "0 0 8px rgba(0,229,255,0.3)" }}>
-            MODULE CONTROL
+            ТАКТИЧЕСКОЕ СКАНИРОВАНИЕ
           </span>
           <div className="w-16" />
         </div>
@@ -388,38 +371,43 @@ export default function ProfileOverlay({ onClose, token }: ProfileOverlayProps) 
           </div>
         ) : (
           <div className="px-3 pt-4 pb-8 max-w-[400px] mx-auto">
-            <div className="text-center mb-4">
+            <div className="text-center mb-2">
               <div className="text-[7px] tracking-[4px] font-mono uppercase mb-3" style={{ color: "#333" }}>
-                CORE SYSTEM DIAGNOSTICS
+                DIAGNOSTIC DEVICE v0.1
               </div>
-              <CoreModule unlockedCount={unlockedCount} />
-              <div className="flex items-center justify-center gap-3 mt-3">
-                <MiniGraph />
+              <PixelDevice segments={[seg1Active, seg2Active, seg3Active]} />
+              <div className="flex items-center justify-center gap-2 mt-2">
                 <span className="text-[7px] tracking-[2px] font-mono" style={{ color: "#333" }}>
-                  {unlockedCount}/{SKILL_KEYS.length} MODULES
+                  {unlockedCount}/{SKILL_KEYS.length} НАВЫКОВ
                 </span>
-                <MiniGraph />
               </div>
             </div>
 
-            <div className="mb-3">
-              <div className="flex items-center gap-2 mb-3">
+            <div className="mt-4">
+              <div className="flex items-center gap-2 mb-2">
                 <div className="flex-1 h-[1px]" style={{ background: "#1a1a1a" }} />
-                <span className="text-[8px] tracking-[3px] font-mono uppercase" style={{ color: "#333" }}>
-                  EQUIPMENT BAY
+                <span className="text-[8px] tracking-[3px] font-mono uppercase" style={{ color: "#444" }}>
+                  СКАН МОДУЛЕЙ
                 </span>
                 <div className="flex-1 h-[1px]" style={{ background: "#1a1a1a" }} />
               </div>
 
-              <div className="grid gap-3">
-                {SKILL_KEYS.map(key => (
-                  <ModuleSlot
-                    key={key}
-                    skillKey={key}
-                    granted={skills.find(s => s.skillKey === key)}
-                  />
-                ))}
-              </div>
+              {SEGMENT_SKILLS.map((seg, i) => {
+                const segActive = [seg1Active, seg2Active, seg3Active][i];
+                return (
+                  <div key={seg.label}>
+                    <SegmentLabel label={seg.label} active={segActive} color={seg.color} />
+                    {seg.keys.map(key => (
+                      <SkillRow
+                        key={key}
+                        skillKey={key}
+                        granted={grantedKeys.has(key)}
+                        isNew={newSkillKeys.has(key)}
+                      />
+                    ))}
+                  </div>
+                );
+              })}
             </div>
 
             <div className="flex items-center justify-between px-1 mt-4" style={{ borderTop: "1px solid #151515", paddingTop: "8px" }}>
