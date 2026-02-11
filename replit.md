@@ -57,3 +57,27 @@ The application features a distinct two-phase visual design:
 - **External Services/APIs:**
     - NFC card integration (implied by product description)
     - Lightning Network wallet deep links and external URLs for wallet creation.
+
+## Implementation Details
+- Stealth dosier icon: Lucide Fingerprint icon in TerminalChat header (50% opacity, 22x22), opens Profile overlay
+- Profile overlay (inside TerminalChat, NOT separate route): "НАБОР НАВЫКОВ" overlay, pure 2D CSS/SVG
+  - Opens with scale-from-point animation (from icon center → fullscreen)
+  - No ScanLine animation (removed)
+  - Dark background (#0a0a0a) with CSS grid overlay
+  - Pixel schematic device: SVG device divided into 3 segments
+  - Segment 1 (ПРОТОКОЛ ВОЛИ): WILL_TO_FREEDOM, cyan (#00e5ff)
+  - Segment 2 (МОДУЛЬ ЗНАНИЯ): TRUTH_SEEKER + HARD_MONEY, orange (#ffaa00)
+  - Segment 3 (СЕТЕВОЙ ПРИВОД): GRID_RUNNER, copper (#b87333)
+  - Pixel checkmark next to granted skills
+  - Skills: WILL_TO_FREEDOM (block 1), TRUTH_SEEKER (block 2), HARD_MONEY (block 3), GRID_RUNNER (block 6)
+- Skill system: user_skills table (id, user_id, skill_key, granted_at)
+- SKILL_KEYS: WILL_TO_FREEDOM, TRUTH_SEEKER, HARD_MONEY, GRID_RUNNER (4 skills total)
+- API: GET /api/skills/:token, POST /api/skills/grant (validates against SKILL_KEYS)
+- SkillNotificationBanner: top notification bar with cyan Fingerprint icon + skill name, auto-closes after 2.8s
+- After notification closes: organizer icon blinks cyan 4 times (2.4s animation)
+- Skill grant delayed 2s after SATS toast to sequence: SATS → skill notification → icon blink
+- Skills granted automatically when completing learning blocks with grantSkillKey field
+- Progress persistence: auto-saves block index, SATS, independence to localStorage + PostgreSQL
+- API: POST /api/save-progress, POST /api/sync-user
+- localStorage keys: "liberta_token", "liberta_terminal_progress", "liberta_boot_dismissed"
+- Users table columns: id, token, xp, level, current_module_id, current_step_index, total_sats, independence_progress

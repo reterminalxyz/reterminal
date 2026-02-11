@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Cpu } from "lucide-react";
+import { X, Fingerprint } from "lucide-react";
 import { playClick, playTypeTick, playSatsChime, playTransition } from "@/lib/sounds";
 import { SKILL_META, type SkillKey } from "@shared/schema";
 import ProfileOverlay from "./ProfileOverlay";
@@ -447,7 +447,7 @@ function SkillNotificationBanner({ skillKey, onClose }: { skillKey: SkillKey; on
           boxShadow: "0 0 20px rgba(0,229,255,0.4), 0 0 40px rgba(0,229,255,0.15)",
         }}
       >
-        <Cpu className="w-[18px] h-[18px] flex-shrink-0" style={{ color: "#00e5ff", filter: "drop-shadow(0 0 6px rgba(0,229,255,0.6))" }} />
+        <Fingerprint className="w-[18px] h-[18px] flex-shrink-0" style={{ color: "#00e5ff", filter: "drop-shadow(0 0 6px rgba(0,229,255,0.6))" }} />
         <div className="flex flex-col">
           <span className="text-[8px] tracking-[3px] font-mono font-bold uppercase" style={{ color: "#00e5ff" }}>
             НОВЫЙ СКИЛЛ
@@ -1077,7 +1077,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
               transition={iconBlinking ? { duration: 2.4, ease: "easeInOut" } : {}}
               data-testid="button-profile-avatar"
             >
-              <Cpu
+              <Fingerprint
                 className="w-[22px] h-[22px]"
                 style={{
                   color: iconBlinking ? "#00e5ff" : "#B87333",
@@ -1314,6 +1314,10 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
           <ProfileOverlay
             onClose={() => setShowProfile(false)}
             token={userToken || localStorage.getItem("liberta_token")}
+            originRect={dosierIconRef.current ? (() => {
+              const r = dosierIconRef.current!.getBoundingClientRect();
+              return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
+            })() : null}
           />
         )}
       </AnimatePresence>

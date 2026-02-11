@@ -12,20 +12,6 @@ const SEGMENT_SKILLS: { keys: SkillKey[]; label: string; color: string; colorDim
   { keys: ["GRID_RUNNER"], label: "СЕТЕВОЙ ПРИВОД", color: "#b87333", colorDim: "#b87333" },
 ];
 
-function ScanLine() {
-  return (
-    <motion.div
-      className="absolute left-0 w-full h-[2px] z-30 pointer-events-none"
-      style={{
-        background: "linear-gradient(90deg, transparent, rgba(0,229,255,0.15), rgba(0,229,255,0.3), rgba(0,229,255,0.15), transparent)",
-        boxShadow: "0 0 8px rgba(0,229,255,0.2)",
-      }}
-      animate={{ top: ["-2%", "102%"] }}
-      transition={{ duration: 6, repeat: Infinity, ease: "linear" }}
-    />
-  );
-}
-
 function GridBackground() {
   return (
     <div
@@ -289,9 +275,10 @@ function Greebles({ token, unlockedCount }: { token: string | null; unlockedCoun
 interface ProfileOverlayProps {
   onClose: () => void;
   token: string | null;
+  originRect?: { x: number; y: number } | null;
 }
 
-export default function ProfileOverlay({ onClose, token }: ProfileOverlayProps) {
+export default function ProfileOverlay({ onClose, token, originRect }: ProfileOverlayProps) {
   const [skills, setSkills] = useState<GrantedSkill[]>([]);
   const [loading, setLoading] = useState(true);
   const [newSkillKeys, setNewSkillKeys] = useState<Set<string>>(new Set());
@@ -331,18 +318,20 @@ export default function ProfileOverlay({ onClose, token }: ProfileOverlayProps) 
   const seg2Active = SEGMENT_SKILLS[1].keys.some(k => grantedKeys.has(k));
   const seg3Active = SEGMENT_SKILLS[2].keys.some(k => grantedKeys.has(k));
 
+  const ox = originRect ? `${originRect.x}px` : "50%";
+  const oy = originRect ? `${originRect.y}px` : "0%";
+
   return (
     <motion.div
       className="fixed inset-0 z-[9999] flex flex-col"
-      style={{ background: "#0a0a0a" }}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.3 }}
+      style={{ background: "#0a0a0a", transformOrigin: `${ox} ${oy}` }}
+      initial={{ opacity: 0, scale: 0.05, borderRadius: "50%" }}
+      animate={{ opacity: 1, scale: 1, borderRadius: "0%" }}
+      exit={{ opacity: 0, scale: 0.05, borderRadius: "50%" }}
+      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
       data-testid="overlay-profile"
     >
       <GridBackground />
-      <ScanLine />
 
       <div className="flex-shrink-0 z-50 relative" style={{ background: "#0d0d0d", borderBottom: "1px solid #222" }}>
         <div className="flex items-center justify-between px-4 py-3">
