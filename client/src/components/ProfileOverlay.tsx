@@ -1,10 +1,14 @@
 import { useEffect, useState, useCallback, useRef, useMemo, Component, Suspense, type ReactNode, type ErrorInfo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
 import { Lock, ArrowLeft, Sparkles } from "lucide-react";
 import { SKILL_META, type SkillKey, SKILL_KEYS } from "@shared/schema";
 import * as THREE from "three";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
+import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
 
 type GrantedSkill = { skillKey: string; grantedAt: string | null };
 
@@ -32,6 +36,48 @@ class WebGLErrorBoundary extends Component<{ fallback: ReactNode; children: Reac
   }
 }
 
+function BloomEffect() {
+  const { gl, scene, camera, size } = useThree();
+  const composerRef = useRef<EffectComposer | null>(null);
+
+  useEffect(() => {
+    const composer = new EffectComposer(gl);
+    composer.setSize(size.width, size.height);
+    composer.setPixelRatio(gl.getPixelRatio());
+
+    const renderPass = new RenderPass(scene, camera);
+    renderPass.clear = true;
+    composer.addPass(renderPass);
+
+    const bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(size.width, size.height),
+      0.8,
+      0.4,
+      0.85
+    );
+    composer.addPass(bloomPass);
+
+    const outputPass = new OutputPass();
+    composer.addPass(outputPass);
+
+    composerRef.current = composer;
+
+    return () => {
+      composer.dispose();
+    };
+  }, [gl, scene, camera, size]);
+
+  useFrame((state) => {
+    if (composerRef.current) {
+      state.gl.autoClear = false;
+      state.gl.clear();
+      composerRef.current.render();
+    }
+  }, 100);
+
+  return null;
+}
+
 const AVATAR_URL = "/avatar.glb";
 
 function AvatarModel({ skills }: { skills: GrantedSkill[] }) {
@@ -44,11 +90,10 @@ function AvatarModel({ skills }: { skills: GrantedSkill[] }) {
         const mesh = child as THREE.Mesh;
         if (mesh.material) {
           const mat = (mesh.material as THREE.MeshStandardMaterial).clone();
-          mat.roughness = 0.4;
-          mat.metalness = 0.3;
-          if (!mat.map) {
-            mat.color = new THREE.Color("#ffffff");
-          }
+          mat.color = new THREE.Color(0x444444);
+          mat.roughness = 0.5;
+          mat.metalness = 0.8;
+          mat.needsUpdate = true;
           mesh.material = mat;
         }
       }
@@ -74,13 +119,13 @@ function AvatarModel({ skills }: { skills: GrantedSkill[] }) {
 
   const scale = useMemo(() => {
     const maxDim = Math.max(bbox.size.x, bbox.size.y, bbox.size.z);
-    return maxDim > 0 ? 2.0 / maxDim : 1;
+    return maxDim > 0 ? 3.0 / maxDim : 1;
   }, [bbox]);
 
   const offsetY = -bbox.center.y * scale;
 
   return (
-    <group ref={groupRef}>
+    <group ref={groupRef} position={[0, -0.5, 0]}>
       <group scale={[scale, scale, scale]} position={[-bbox.center.x * scale, offsetY, -bbox.center.z * scale]}>
         <primitive object={clonedScene} />
       </group>
@@ -156,14 +201,17 @@ function AvatarScene({ skills }: { skills: GrantedSkill[] }) {
       <Canvas
         camera={{ position: [0, 0.5, 4.5], fov: 45 }}
         style={{ background: "transparent" }}
+        frameloop="always"
         gl={{ alpha: true, antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.2 }}
         onCreated={({ gl }) => {
           gl.setClearColor(0x000000, 0);
         }}
       >
-        <ambientLight intensity={0.5} color="#ffffff" />
+        <ambientLight intensity={1.5} />
 
-        <pointLight position={[5, 5, 5]} intensity={2.0} color="#FF8C42" distance={20} decay={1.5} />
+        <directionalLight position={[10, 10, 5]} intensity={3} color="#ffffff" />
+
+        <pointLight position={[-10, -10, -10]} intensity={2} color="#ff8c00" />
 
         <spotLight
           position={[-5, 2, -5]}
@@ -174,11 +222,10 @@ function AvatarScene({ skills }: { skills: GrantedSkill[] }) {
           target-position={[0, 0, 0]}
         />
 
-        <pointLight position={[0, -2, 3]} intensity={0.3} color="#B87333" distance={10} decay={1.5} />
-
         <Suspense fallback={null}>
           <AvatarModel skills={skills} />
         </Suspense>
+        <BloomEffect />
         <OrbitControls
           enableZoom={false}
           enablePan={false}
