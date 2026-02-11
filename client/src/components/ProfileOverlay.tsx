@@ -1,14 +1,10 @@
-import { useEffect, useState, useCallback, useRef, useMemo, Component, Suspense, type ReactNode, type ErrorInfo } from "react";
+import { useEffect, useState, useCallback, useMemo, Component, Suspense, type ReactNode, type ErrorInfo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls, useGLTF, Environment } from "@react-three/drei";
+import { Canvas } from "@react-three/fiber";
+import { OrbitControls, useGLTF, Stage } from "@react-three/drei";
 import { Lock, ArrowLeft, Sparkles } from "lucide-react";
 import { SKILL_META, type SkillKey, SKILL_KEYS } from "@shared/schema";
 import * as THREE from "three";
-import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
-import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
-import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
-import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
 
 type GrantedSkill = { skillKey: string; grantedAt: string | null };
 
@@ -36,62 +32,17 @@ class WebGLErrorBoundary extends Component<{ fallback: ReactNode; children: Reac
   }
 }
 
-function BloomEffect() {
-  const { gl, scene, camera, size } = useThree();
-  const composerRef = useRef<EffectComposer | null>(null);
-
-  useEffect(() => {
-    const composer = new EffectComposer(gl);
-    composer.setSize(size.width, size.height);
-    composer.setPixelRatio(gl.getPixelRatio());
-
-    const renderPass = new RenderPass(scene, camera);
-    renderPass.clear = true;
-    composer.addPass(renderPass);
-
-    const bloomPass = new UnrealBloomPass(
-      new THREE.Vector2(size.width, size.height),
-      0.8,
-      0.4,
-      0.85
-    );
-    composer.addPass(bloomPass);
-
-    const outputPass = new OutputPass();
-    composer.addPass(outputPass);
-
-    composerRef.current = composer;
-
-    return () => {
-      composer.dispose();
-    };
-  }, [gl, scene, camera, size]);
-
-  useFrame((state) => {
-    if (composerRef.current) {
-      state.gl.autoClear = false;
-      state.gl.clear();
-      composerRef.current.render();
-    }
-  }, 100);
-
-  return null;
-}
-
 const AVATAR_URL = "/avatar.glb";
 
-function AvatarModel({ skills }: { skills: GrantedSkill[] }) {
+function AvatarModel() {
   const { scene } = useGLTF(AVATAR_URL);
-  const groupRef = useRef<THREE.Group>(null);
   const clonedScene = useMemo(() => {
     const clone = scene.clone(true);
     clone.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
-        mesh.material = new THREE.MeshStandardMaterial({
-          color: new THREE.Color("#444444"),
-          roughness: 0.4,
-          metalness: 0.8,
+        mesh.material = new THREE.MeshLambertMaterial({
+          color: "#555555",
         });
         mesh.castShadow = true;
         mesh.receiveShadow = true;
@@ -100,33 +51,7 @@ function AvatarModel({ skills }: { skills: GrantedSkill[] }) {
     return clone;
   }, [scene]);
 
-  const bbox = useMemo(() => {
-    const box = new THREE.Box3().setFromObject(clonedScene);
-    const size = new THREE.Vector3();
-    const center = new THREE.Vector3();
-    box.getSize(size);
-    box.getCenter(center);
-    return { size, center };
-  }, [clonedScene]);
-
-  const scale = useMemo(() => {
-    const maxDim = Math.max(bbox.size.x, bbox.size.y, bbox.size.z);
-    return maxDim > 0 ? 3.0 / maxDim : 1;
-  }, [bbox]);
-
-  const offsetY = -bbox.center.y * scale;
-
-  return (
-    <group ref={groupRef} position={[0, -1, 0]}>
-      <group scale={[scale, scale, scale]} position={[-bbox.center.x * scale, offsetY, -bbox.center.z * scale]}>
-        <primitive object={clonedScene} />
-      </group>
-
-      <group name="equipment_head" position={[0, bbox.size.y * scale * 0.45 + offsetY, 0]} />
-      <group name="equipment_body" position={[0, offsetY, 0]} />
-      <group name="equipment_hands" position={[0, bbox.size.y * scale * 0.15 + offsetY, 0]} />
-    </group>
-  );
+  return <primitive object={clonedScene} />;
 }
 
 useGLTF.preload(AVATAR_URL);
@@ -191,41 +116,29 @@ function AvatarScene({ skills }: { skills: GrantedSkill[] }) {
   return (
     <WebGLErrorBoundary fallback={<AvatarFallback skills={skills} />}>
       <Canvas
-        camera={{ position: [0, 0.5, 4.5], fov: 45 }}
+        camera={{ position: [0, 0, 5], fov: 45 }}
         style={{ background: "transparent" }}
-        frameloop="always"
-        gl={{ alpha: true, antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.2 }}
+        gl={{ alpha: true, antialias: true }}
         onCreated={({ gl }) => {
           gl.setClearColor(0x000000, 0);
         }}
       >
-        <ambientLight intensity={1.5} />
-
-        <directionalLight position={[10, 10, 5]} intensity={3} color="#ffffff" />
-
-        <pointLight position={[-10, -10, -10]} intensity={2} color="#ff8c00" />
-
-        <spotLight
-          position={[-5, 2, -5]}
-          angle={0.6}
-          penumbra={1}
-          intensity={1.5}
-          color="#4488CC"
-          target-position={[0, 0, 0]}
-        />
+        <ambientLight intensity={2.0} />
+        <directionalLight position={[5, 5, 5]} intensity={3.0} />
 
         <Suspense fallback={null}>
-          <AvatarModel skills={skills} />
-          <Environment preset="city" />
+          <Stage intensity={0.5} environment="city" shadows={false} adjustCamera={false}>
+            <AvatarModel />
+          </Stage>
         </Suspense>
-        <BloomEffect />
+
         <OrbitControls
           enableZoom={false}
           enablePan={false}
+          autoRotate={false}
           minPolarAngle={Math.PI / 4}
           maxPolarAngle={Math.PI / 1.5}
           target={[0, 0, 0]}
-          autoRotate={false}
         />
       </Canvas>
     </WebGLErrorBoundary>
