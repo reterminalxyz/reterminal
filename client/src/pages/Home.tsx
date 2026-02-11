@@ -51,6 +51,10 @@ export default function Home() {
     const bgColor = phase === "boot" ? '#000000' : phase === "phase_2" ? '#0A0A0A' : '#F5F5F5';
     document.documentElement.style.backgroundColor = bgColor;
     document.body.style.backgroundColor = bgColor;
+    const root = document.getElementById('root');
+    if (root) root.style.backgroundColor = bgColor;
+    const metaTheme = document.querySelector('meta[name="theme-color"]');
+    if (metaTheme) metaTheme.setAttribute('content', bgColor);
   }, [phase]);
 
   const safeTimeout = useCallback((fn: () => void, ms: number) => {
@@ -196,7 +200,7 @@ export default function Home() {
   // Loading state
   if (phase === "loading" || !sessionId || isSessionLoading) {
     return (
-      <div className="min-h-[100dvh] bg-[#F5F5F5] flex items-center justify-center">
+      <div className="fixed inset-0 bg-[#F5F5F5] flex items-center justify-center">
         <GridBackground intensity="high" />
         <div className="flex flex-col items-center gap-4 z-10">
           <motion.div
@@ -225,7 +229,7 @@ export default function Home() {
     
     return (
       <motion.div 
-        className="min-h-[100dvh] bg-[#F5F5F5] relative overflow-hidden"
+        className="fixed inset-0 bg-[#F5F5F5] overflow-hidden"
         animate={shakeScreen ? { x: [-10, 10, -10, 10, 0] } : {}}
         transition={{ duration: 0.4 }}
       >
@@ -272,7 +276,7 @@ export default function Home() {
         </div>
 
         {/* Question - centered, only TITLE moved slightly higher */}
-        <div className="min-h-[100dvh] flex flex-col items-center justify-center relative z-10 px-4">
+        <div className="h-full flex flex-col items-center justify-center relative z-10 px-4">
           <AnimatePresence mode="wait">
             <motion.div
               key={question.id}
@@ -323,7 +327,7 @@ export default function Home() {
   // Phase 1 Complete - NO animated background on chip screen
   if (phase === "phase_1_complete") {
     return (
-      <div className="min-h-[100dvh] bg-[#F5F5F5] relative overflow-hidden flex flex-col items-center justify-center">
+      <div className="fixed inset-0 bg-[#F5F5F5] overflow-hidden flex flex-col items-center justify-center">
         {/* Simple static aluminum background - no animated orbs */}
         <div 
           className="fixed inset-0"
@@ -361,7 +365,7 @@ export default function Home() {
   // Phase 2 - Terminal Chat with Satoshi (final screen)
   if (phase === "phase_2") {
     return (
-      <div className="h-[100dvh] bg-[#0D0D0D] flex flex-col overflow-hidden">
+      <div className="fixed inset-0 bg-[#0D0D0D] flex flex-col overflow-hidden">
         {/* Terminal fills screen above independence bar */}
         <div className="flex-1 min-h-0">
           <TerminalChat 
