@@ -396,17 +396,33 @@ type BlockPhase =
   | "waiting_conditional_options"
   | "completed";
 
+function saveWalletState(data: { walletMode: boolean; stepId: string | null; blockIndex: number; sats: number; progress: number }) {
+  try { localStorage.setItem("liberta_wallet_state", JSON.stringify(data)); } catch (_) {}
+}
+function loadWalletState(): { walletMode: boolean; stepId: string | null; blockIndex: number; sats: number; progress: number } | null {
+  try {
+    const raw = localStorage.getItem("liberta_wallet_state");
+    if (raw) return JSON.parse(raw);
+  } catch (_) {}
+  return null;
+}
+function clearWalletState() {
+  try { localStorage.removeItem("liberta_wallet_state"); } catch (_) {}
+}
+
 export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats, skipFirstTypewriter }: TerminalChatProps) {
+  const savedState = useRef(loadWalletState());
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [displayedText, setDisplayedText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [currentBlockIndex, setCurrentBlockIndex] = useState(0);
+  const [currentBlockIndex, setCurrentBlockIndex] = useState(() => savedState.current?.blockIndex ?? 0);
   const [blockPhase, setBlockPhase] = useState<BlockPhase>("typing_speech");
   const [currentOptions, setCurrentOptions] = useState<BlockOption[]>([]);
   const [notification, setNotification] = useState<{ sats: number; skill: string | null } | null>(null);
   const [inputText, setInputText] = useState("");
-  const [walletMode, setWalletMode] = useState(false);
-  const [currentWalletStepId, setCurrentWalletStepId] = useState<string | null>(null);
+  const [walletMode, setWalletMode] = useState(() => savedState.current?.walletMode ?? false);
+  const [currentWalletStepId, setCurrentWalletStepId] = useState<string | null>(() => savedState.current?.stepId ?? null);
   const [walletButtons, setWalletButtons] = useState<WalletStepButton[]>([]);
   const [showTroubleshooting, setShowTroubleshooting] = useState(false);
   const [flowCompleted, setFlowCompleted] = useState(false);
@@ -563,10 +579,14 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     });
   }, [typeMessage]);
 
+  const restoredWalletRef = useRef(savedState.current);
+
   useEffect(() => {
     const shouldSkip = skipFirstTypewriter && !skippedFirstRef.current;
     skippedFirstRef.current = true;
-    startBlock(0, shouldSkip);
+    if (!restoredWalletRef.current?.walletMode) {
+      startBlock(0, shouldSkip);
+    }
   }, [startBlock, skipFirstTypewriter]);
 
   const internalSatsRef = useRef(totalSats);
@@ -584,7 +604,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
       internalSatsRef.current = Math.min(internalSatsRef.current + block.reward, 1000);
       onSatsUpdate(internalSatsRef.current);
       showNotification(block.reward);
-      playSatsChime();
+      try { playSatsChime(); } catch (_) {}
     }
     onProgressUpdate(Math.min(block.progress_target, 27));
   }, [onSatsUpdate, onProgressUpdate, showNotification]);
@@ -593,17 +613,21 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     const step = WALLET_STEPS.find(s => s.id === stepId);
     if (!step) return;
 
+    setWalletMode(true);
     userScrolledRef.current = false;
     setCurrentWalletStepId(stepId);
     setWalletButtons([]);
     setCurrentOptions([]);
     isLockedRef.current = true;
 
-    playTransition();
+    saveWalletState({ walletMode: true, stepId, blockIndex: 7, sats: internalSatsRef.current, progress: 27 });
+
+    try { playTransition(); } catch (_) {}
 
     if (stepId === "step_5") {
       setShowCelebration(true);
       safeTimeout(() => setShowCelebration(false), 4000);
+      clearWalletState();
     }
 
     typeMessage(step.instruction, "satoshi", () => {
@@ -615,25 +639,31 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     });
   }, [typeMessage, safeTimeout]);
 
+  useEffect(() => {
+    const restored = restoredWalletRef.current;
+    if (restored && restored.walletMode && restored.stepId) {
+      restoredWalletRef.current = null;
+      if (restored.sats) onSatsUpdate(restored.sats);
+      if (restored.progress) onProgressUpdate(restored.progress);
+      startWalletStep(restored.stepId);
+    }
+  }, [startWalletStep, onSatsUpdate, onProgressUpdate]);
+
   const handleWalletButtonClick = useCallback((button: WalletStepButton) => {
     if (isLockedRef.current || isTyping) return;
     playClick();
 
     if (button.type === "external" && button.url) {
-      const isPWA = window.matchMedia('(display-mode: standalone)').matches
-        || (navigator as any).standalone === true;
-      if (isPWA) {
+      try {
         const a = document.createElement("a");
         a.href = button.url;
         a.target = "_blank";
         a.rel = "noopener noreferrer";
-        a.style.display = "none";
+        a.style.cssText = "position:fixed;top:-9999px;left:-9999px;opacity:0;pointer-events:none;";
         document.body.appendChild(a);
         a.click();
-        setTimeout(() => { try { document.body.removeChild(a); } catch (_) {} }, 200);
-      } else {
-        window.open(button.url, "_blank", "noopener,noreferrer");
-      }
+        setTimeout(() => { try { document.body.removeChild(a); } catch (_) {} }, 500);
+      } catch (_) {}
       return;
     }
 
@@ -643,30 +673,23 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
       setMessages(prev => [...prev, { id: Date.now(), text: button.text, sender: "user" }]);
 
       try {
-        const isPWA = window.matchMedia('(display-mode: standalone)').matches
-          || (navigator as any).standalone === true;
-
-        if (isPWA) {
-          const iframe = document.createElement("iframe");
-          iframe.style.display = "none";
-          iframe.style.width = "0";
-          iframe.style.height = "0";
-          iframe.style.border = "none";
-          iframe.style.position = "absolute";
-          document.body.appendChild(iframe);
-          iframe.src = button.url;
-          setTimeout(() => { try { document.body.removeChild(iframe); } catch (_) {} }, 3000);
-        } else {
+        const iframe = document.createElement("iframe");
+        iframe.style.cssText = "position:fixed;top:-9999px;left:-9999px;width:0;height:0;border:none;opacity:0;pointer-events:none;";
+        document.body.appendChild(iframe);
+        try { iframe.contentWindow?.location.replace(button.url); } catch (_) { iframe.src = button.url; }
+        setTimeout(() => { try { document.body.removeChild(iframe); } catch (_) {} }, 3000);
+      } catch (_) {
+        try {
           const a = document.createElement("a");
           a.href = button.url;
           a.target = "_blank";
           a.rel = "noopener noreferrer";
-          a.style.display = "none";
+          a.style.cssText = "position:fixed;top:-9999px;left:-9999px;opacity:0;";
           document.body.appendChild(a);
           a.click();
-          setTimeout(() => { try { document.body.removeChild(a); } catch (_) {} }, 200);
-        }
-      } catch (_) {}
+          setTimeout(() => { try { document.body.removeChild(a); } catch (_) {} }, 500);
+        } catch (_) {}
+      }
 
       if (button.target) {
         const targetStep = button.target;

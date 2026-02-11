@@ -40,13 +40,28 @@ const QUESTIONS = [
 ];
 
 
+function hasSavedWalletState(): boolean {
+  try {
+    const raw = localStorage.getItem("liberta_wallet_state");
+    if (raw) {
+      const data = JSON.parse(raw);
+      return data?.walletMode === true;
+    }
+  } catch (_) {}
+  return false;
+}
+
 export default function Home() {
+  const hasWalletRestore = useRef(hasSavedWalletState());
   const [sessionId, setSessionId] = useState<number | null>(null);
-  const [phase, setPhase] = useState<Phase>(() => isInStandaloneMode() ? "loading" : "boot");
+  const [phase, setPhase] = useState<Phase>(() => {
+    if (hasWalletRestore.current) return "loading";
+    return isInStandaloneMode() ? "loading" : "boot";
+  });
   const [currentQuestion, setCurrentQuestion] = useState<QuestionId>(1);
-  const [circuitReveal, setCircuitReveal] = useState(0); // 0, 25, 50, 75, 100
-  const [totalSats, setTotalSats] = useState(0);
-  const [progress, setProgress] = useState(0); // Independence % (5→10→15→20 for 4 questions)
+  const [circuitReveal, setCircuitReveal] = useState(() => hasWalletRestore.current ? 100 : 0);
+  const [totalSats, setTotalSats] = useState(() => hasWalletRestore.current ? 1000 : 0);
+  const [progress, setProgress] = useState(() => hasWalletRestore.current ? 27 : 0);
   const [shakeScreen, setShakeScreen] = useState(false);
   const [showError, setShowError] = useState(false);
   const [terminalKey, setTerminalKey] = useState(0);
@@ -108,7 +123,12 @@ export default function Home() {
       createSession.mutate({ nodeId: "#RE_CHAIN_" + Math.floor(Math.random() * 9999) }, {
         onSuccess: (data) => {
           setSessionId(data.id);
-          setPhase("phase_1");
+          if (hasWalletRestore.current) {
+            hasWalletRestore.current = false;
+            setPhase("phase_2");
+          } else {
+            setPhase("phase_1");
+          }
         }
       });
     }
@@ -205,6 +225,7 @@ export default function Home() {
   };
 
   const handleTerminalBack = () => {
+    try { localStorage.removeItem("liberta_wallet_state"); } catch (_) {}
     setSkipTypewriter(true);
     setTotalSats(200);
     setProgress(20);
