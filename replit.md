@@ -201,10 +201,13 @@ Large prominent navigation button:
 - Native feel CSS: overscroll-behavior-y:none, tap-highlight:transparent, user-select:none on interactive elements only
 - Typewriter speed: 12ms per character (was 20ms)
 - Removed Lvl/XP overlay from all screens (stealth UI)
-- Stealth profile avatar: pixel person icon in TerminalChat header (40% opacity), navigates to /profile (Dossier Mode)
-- Profile page (/profile): Dossier Mode with AvatarDisplay (CSS layer system), SkillCards grid
-  - AvatarDisplay: base voxel image + 3 conditional layers (visor/TRUTH_SEEKER, hand item/HARD_MONEY, aura/GRID_RUNNER)
-  - SkillCards: locked (grey, lock icon, blur "???") / unlocked (copper glow, description, date)
+- Stealth profile avatar: pixel person icon in TerminalChat header (40% opacity), opens Dossier Mode overlay
+- Profile overlay (inside TerminalChat, NOT separate route): Dossier Mode fullscreen overlay preserving chat state
+  - 3D Avatar: @react-three/fiber + @react-three/drei, procedural voxel mannequin from cube meshes
+  - OrbitControls for finger/mouse rotation, copper/orange point lighting
+  - WebGL fallback: SVG avatar if WebGL unavailable (headless browsers)
+  - Dynamic equipment: TRUTH_SEEKER visor (orange neon emissive), HARD_MONEY chest chip (gold/copper), GRID_RUNNER wireframe icosahedron (cyan neon)
+  - Cyberpunk skill cards: neon glow borders (red locked / gold unlocked), scanline background, monospace font, "[ LOCKED ]" text
   - Skills: TRUTH_SEEKER (block 2), HARD_MONEY (block 3), GRID_RUNNER (block 6)
 - Skill system: user_skills table (id, user_id, skill_key, granted_at)
 - API: GET /api/skills/:token, POST /api/skills/grant (validates against SKILL_KEYS)

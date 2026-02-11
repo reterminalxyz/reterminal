@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Sparkles } from "lucide-react";
-import { useLocation } from "wouter";
 import { playClick, playTypeTick, playSatsChime, playTransition } from "@/lib/sounds";
 import { SKILL_META, type SkillKey } from "@shared/schema";
+import ProfileOverlay from "./ProfileOverlay";
 
 interface BlockOption {
   text: string;
@@ -540,7 +540,7 @@ function loadTerminalProgress(): { blockIndex: number; sats: number; progress: n
 }
 
 export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats, skipFirstTypewriter, userStats, userToken, onGrantSkill, levelUpSkill, onDismissLevelUp }: TerminalChatProps) {
-  const [, setLocation] = useLocation();
+  const [showProfile, setShowProfile] = useState(false);
   const savedState = useRef(loadWalletState());
   const savedProgress = useRef(loadTerminalProgress());
 
@@ -1093,7 +1093,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
           <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={() => setLocation("/profile")}
+              onClick={() => setShowProfile(true)}
               className="w-7 h-7 flex items-center justify-center opacity-40 hover:opacity-80 transition-opacity"
               data-testid="button-profile-avatar"
             >
@@ -1321,6 +1321,15 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
           <LevelUpPopupInline skillKey={levelUpSkill} onClose={onDismissLevelUp} />
         </AnimatePresence>
       )}
+
+      <AnimatePresence>
+        {showProfile && (
+          <ProfileOverlay
+            onClose={() => setShowProfile(false)}
+            token={userToken || localStorage.getItem("liberta_token")}
+          />
+        )}
+      </AnimatePresence>
 
     </div>
   );
