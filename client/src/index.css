@@ -484,10 +484,10 @@ button, a, label, nav, header, [role="button"] {
     to bottom,
     transparent 0px,
     transparent 2px,
-    rgba(184, 115, 51, 0.015) 2px,
-    rgba(184, 115, 51, 0.015) 4px
+    rgba(184, 115, 51, 0.06) 2px,
+    rgba(184, 115, 51, 0.06) 4px
   );
-  animation: scanline-drift 8s linear infinite;
+  animation: scanline-drift 4s linear infinite;
 }
 
 @keyframes scanline-drift {
@@ -496,32 +496,59 @@ button, a, label, nav, header, [role="button"] {
 }
 
 .boot-noise {
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  opacity: 0.03;
-  animation: noise-flicker 0.15s steps(3) infinite;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  opacity: 0.06;
+  animation: noise-flicker 0.08s steps(5) infinite;
 }
 
 @keyframes noise-flicker {
-  0% { opacity: 0.03; transform: translate(0, 0); }
-  33% { opacity: 0.05; transform: translate(-1px, 1px); }
-  66% { opacity: 0.02; transform: translate(1px, -1px); }
-  100% { opacity: 0.04; transform: translate(0, 0); }
+  0% { opacity: 0.05; transform: translate(0, 0) scale(1.02); }
+  20% { opacity: 0.08; transform: translate(-2px, 1px) scale(1); }
+  40% { opacity: 0.04; transform: translate(1px, -2px) scale(1.01); }
+  60% { opacity: 0.09; transform: translate(2px, 1px) scale(1); }
+  80% { opacity: 0.03; transform: translate(-1px, -1px) scale(1.02); }
+  100% { opacity: 0.06; transform: translate(0, 0) scale(1); }
 }
 
 .boot-flicker {
   background: transparent;
-  animation: screen-flicker 6s ease-in-out infinite;
+  animation: screen-flicker 4s ease-in-out infinite;
 }
 
 @keyframes screen-flicker {
-  0%, 94%, 96%, 98%, 100% { opacity: 0; }
-  95% { opacity: 1; background: rgba(184, 115, 51, 0.02); }
-  97% { opacity: 1; background: rgba(184, 115, 51, 0.04); }
-  99% { opacity: 1; background: rgba(255, 255, 255, 0.01); }
+  0%, 88%, 100% { opacity: 0; }
+  89% { opacity: 1; background: rgba(184, 115, 51, 0.06); }
+  90% { opacity: 0; }
+  91% { opacity: 1; background: rgba(184, 115, 51, 0.1); }
+  92% { opacity: 0; }
+  93% { opacity: 1; background: rgba(255, 255, 255, 0.03); }
+  94% { opacity: 0; }
 }
 
 .boot-vignette {
-  background: radial-gradient(ellipse at center, transparent 40%, rgba(0, 0, 0, 0.6) 100%);
+  background: radial-gradient(ellipse at center, transparent 30%, rgba(0, 0, 0, 0.7) 100%);
+}
+
+.boot-glitch-bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: rgba(184, 115, 51, 0.3);
+  box-shadow: 0 0 8px rgba(184, 115, 51, 0.4), 0 0 20px rgba(184, 115, 51, 0.15);
+  animation: glitch-bar-sweep 5s linear infinite;
+  opacity: 0;
+}
+
+.boot-glitch-bar:nth-child(2) { animation-delay: 2.5s; }
+.boot-glitch-bar:nth-child(3) { animation-delay: 1.2s; height: 1px; }
+
+@keyframes glitch-bar-sweep {
+  0% { top: -2px; opacity: 0; }
+  2% { opacity: 0.8; }
+  15% { opacity: 0.6; }
+  30% { top: 100%; opacity: 0; }
+  100% { top: 100%; opacity: 0; }
 }
 
 .install-btn-glitch {

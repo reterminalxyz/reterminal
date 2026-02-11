@@ -56,22 +56,61 @@ export function BootScreen({ onDismiss }: BootScreenProps) {
       <div className="boot-flicker absolute inset-0 pointer-events-none" />
 
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {Array.from({ length: 6 }).map((_, i) => (
+        <div className="boot-glitch-bar" />
+        <div className="boot-glitch-bar" />
+        <div className="boot-glitch-bar" />
+      </div>
+
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {Array.from({ length: 8 }).map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-full h-[1px] bg-[#B87333]/20"
-            initial={{ x: "-100%" }}
-            animate={{ x: "100%" }}
+            className="absolute w-full bg-[#B87333]"
+            style={{ 
+              top: `${5 + i * 12}%`,
+              height: i % 3 === 0 ? '2px' : '1px',
+              boxShadow: '0 0 10px rgba(184, 115, 51, 0.3)',
+            }}
+            initial={{ x: "-100%", opacity: 0 }}
+            animate={{ x: "100%", opacity: [0, 0.5, 0.3, 0] }}
             transition={{
-              duration: 0.15,
-              delay: 2 + i * 4.5 + Math.random() * 2,
+              duration: 0.2,
+              delay: 1.5 + i * 2.8,
               repeat: Infinity,
-              repeatDelay: 8 + Math.random() * 12,
+              repeatDelay: 6 + i * 1.5,
               ease: "linear",
             }}
-            style={{ top: `${10 + Math.random() * 80}%` }}
           />
         ))}
+      </div>
+
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <motion.div
+          className="absolute w-[200px] h-[200px] rounded-full"
+          style={{
+            background: 'radial-gradient(circle, rgba(184, 115, 51, 0.08) 0%, transparent 70%)',
+            top: '15%',
+            left: '-10%',
+          }}
+          animate={{
+            x: ['0%', '150%', '0%'],
+            y: ['0%', '30%', '0%'],
+          }}
+          transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <motion.div
+          className="absolute w-[150px] h-[150px] rounded-full"
+          style={{
+            background: 'radial-gradient(circle, rgba(184, 115, 51, 0.06) 0%, transparent 70%)',
+            bottom: '20%',
+            right: '-5%',
+          }}
+          animate={{
+            x: ['0%', '-120%', '0%'],
+            y: ['0%', '-40%', '0%'],
+          }}
+          transition={{ duration: 15, repeat: Infinity, ease: 'easeInOut' }}
+        />
       </div>
 
       <div className="boot-vignette absolute inset-0 pointer-events-none" />
@@ -111,6 +150,15 @@ export function BootScreen({ onDismiss }: BootScreenProps) {
         >
           <button
             type="button"
+            onClick={onDismiss}
+            className="relative w-full py-4 border-2 border-[#555] bg-[#555]/10 text-[#999] font-mono text-[13px] font-bold tracking-[3px] uppercase transition-all duration-200 active:scale-[0.97] hover:border-[#777] hover:text-[#bbb]"
+            data-testid="button-stay-browser"
+          >
+            Остаться в браузере
+          </button>
+
+          <button
+            type="button"
             onClick={handleInstall}
             className="install-btn-glitch relative w-full py-4 border-2 border-[#B87333] bg-[#B87333]/10 text-[#B87333] font-mono text-[13px] font-bold tracking-[3px] uppercase transition-all duration-200 active:scale-[0.97]"
             data-testid="button-install-terminal"
@@ -118,15 +166,6 @@ export function BootScreen({ onDismiss }: BootScreenProps) {
           >
             <span className="relative z-10">Установить терминал</span>
             <div className="absolute inset-0 bg-[#B87333]/5 animate-pulse" />
-          </button>
-
-          <button
-            type="button"
-            onClick={onDismiss}
-            className="relative w-full py-4 border-2 border-[#555] bg-[#555]/10 text-[#999] font-mono text-[13px] font-bold tracking-[3px] uppercase transition-all duration-200 active:scale-[0.97] hover:border-[#777] hover:text-[#bbb]"
-            data-testid="button-stay-browser"
-          >
-            Остаться в браузере
           </button>
         </motion.div>
 
