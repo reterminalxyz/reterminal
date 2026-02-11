@@ -24,7 +24,7 @@ export function IndependenceBar({ progress, phase, showBackground = false }: Ind
   
   return (
     <div 
-      className={`${isDark ? 'relative' : 'fixed bottom-0 left-0 right-0'} z-40 px-4 pt-3 ${isDark ? 'bg-[#0A0A0A] border-t-2 border-[#B87333]/40' : 'bg-[#F5F5F5]'}`}
+      className={`${isDark ? 'relative' : 'fixed bottom-0 left-0 right-0'} z-40 px-4 pt-3 ${isDark ? 'bg-[#0A0A0A] border-t-2 border-[#B87333]/40' : ''}`}
       style={{ paddingBottom: `max(16px, env(safe-area-inset-bottom))` }}
     >
       <motion.div 

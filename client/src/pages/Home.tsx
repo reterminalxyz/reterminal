@@ -47,6 +47,12 @@ export default function Home() {
   const mountedRef = useRef(true);
   const pendingTimeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   
+  useEffect(() => {
+    const bgColor = phase === "boot" ? '#000000' : phase === "phase_2" ? '#0A0A0A' : '#F5F5F5';
+    document.documentElement.style.backgroundColor = bgColor;
+    document.body.style.backgroundColor = bgColor;
+  }, [phase]);
+
   const safeTimeout = useCallback((fn: () => void, ms: number) => {
     const id = setTimeout(() => {
       if (!mountedRef.current) return;
