@@ -620,7 +620,20 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     playClick();
 
     if (button.type === "external" && button.url) {
-      window.open(button.url, "_blank", "noopener,noreferrer");
+      const isPWA = window.matchMedia('(display-mode: standalone)').matches
+        || (navigator as any).standalone === true;
+      if (isPWA) {
+        const a = document.createElement("a");
+        a.href = button.url;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.style.display = "none";
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => { try { document.body.removeChild(a); } catch (_) {} }, 200);
+      } else {
+        window.open(button.url, "_blank", "noopener,noreferrer");
+      }
       return;
     }
 
@@ -628,16 +641,33 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
       isLockedRef.current = true;
       setWalletButtons([]);
       setMessages(prev => [...prev, { id: Date.now(), text: button.text, sender: "user" }]);
+
       try {
-        const a = document.createElement("a");
-        a.href = button.url;
-        a.style.display = "none";
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(() => {
-          try { document.body.removeChild(a); } catch (_) {}
-        }, 100);
+        const isPWA = window.matchMedia('(display-mode: standalone)').matches
+          || (navigator as any).standalone === true;
+
+        if (isPWA) {
+          const iframe = document.createElement("iframe");
+          iframe.style.display = "none";
+          iframe.style.width = "0";
+          iframe.style.height = "0";
+          iframe.style.border = "none";
+          iframe.style.position = "absolute";
+          document.body.appendChild(iframe);
+          iframe.src = button.url;
+          setTimeout(() => { try { document.body.removeChild(iframe); } catch (_) {} }, 3000);
+        } else {
+          const a = document.createElement("a");
+          a.href = button.url;
+          a.target = "_blank";
+          a.rel = "noopener noreferrer";
+          a.style.display = "none";
+          document.body.appendChild(a);
+          a.click();
+          setTimeout(() => { try { document.body.removeChild(a); } catch (_) {} }, 200);
+        }
       } catch (_) {}
+
       if (button.target) {
         const targetStep = button.target;
         let alreadyFired = false;
