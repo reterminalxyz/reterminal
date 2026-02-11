@@ -8,21 +8,18 @@ export function useGrantSkill() {
     const token = localStorage.getItem("liberta_token");
     if (!token) return false;
 
+    setPendingSkill(skillKey);
+
     try {
-      const res = await fetch("/api/skills/grant", {
+      await fetch("/api/skills/grant", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, skillKey }),
       });
-      const data = await res.json();
-      if (data.granted) {
-        setPendingSkill(skillKey);
-        return true;
-      }
-      return false;
     } catch {
-      return false;
     }
+
+    return true;
   }, []);
 
   const dismissPopup = useCallback(() => {
