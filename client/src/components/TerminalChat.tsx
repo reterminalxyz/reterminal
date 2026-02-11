@@ -422,7 +422,7 @@ function clearWalletState() {
   try { localStorage.removeItem("liberta_wallet_state"); } catch (_) {}
 }
 
-function SkillNotificationBanner({ onClose, iconRect }: { skillKey: SkillKey; onClose: () => void; iconRect?: { x: number; y: number } | null }) {
+function SkillNotificationBanner({ onClose, iconRect }: { onClose: () => void; iconRect?: { x: number; y: number } | null }) {
   const [phase, setPhase] = useState<"show" | "fly">("show");
 
   useEffect(() => {
@@ -517,6 +517,9 @@ function loadTerminalProgress(): { blockIndex: number; sats: number; progress: n
   }
 }
 
+let msgIdCounter = 0;
+function nextMsgId() { return ++msgIdCounter; }
+
 export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats, skipFirstTypewriter, userStats, userToken, onGrantSkill, levelUpSkill, onDismissLevelUp }: TerminalChatProps) {
   const [showProfile, setShowProfile] = useState(false);
   const [iconBlinking, setIconBlinking] = useState(false);
@@ -551,6 +554,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
   const scrollTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const lastScrollTopRef = useRef(0);
   const pendingTimeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+  const deeplinkCleanupRef = useRef<(() => void) | null>(null);
 
   const scrollToBottom = useCallback(() => {
     if (!userScrolledRef.current) {
@@ -608,6 +612,10 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
       if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
       pendingTimeoutsRef.current.forEach(t => clearTimeout(t));
       pendingTimeoutsRef.current = [];
+      if (deeplinkCleanupRef.current) {
+        deeplinkCleanupRef.current();
+        deeplinkCleanupRef.current = null;
+      }
     };
   }, []);
 
@@ -647,7 +655,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
           if (!mountedRef.current) return;
           setIsTyping(false);
           setDisplayedText("");
-          setMessages(prev => [...prev, { id: Date.now(), text, sender }]);
+          setMessages(prev => [...prev, { id: nextMsgId(), text, sender }]);
           onComplete?.();
         });
       }
@@ -665,7 +673,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     isLockedRef.current = true;
 
     if (skipTyping) {
-      setMessages(prev => [...prev, { id: Date.now(), text: block.speech, sender: "satoshi" }]);
+      setMessages(prev => [...prev, { id: nextMsgId(), text: block.speech, sender: "satoshi" }]);
       isLockedRef.current = false;
       if (block.intermediate_question) {
         setBlockPhase("waiting_intermediate");
@@ -738,7 +746,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     }
 
     saveTerminalProgress({
-      blockIndex,
+      blockIndex: blockIndex + 1,
       sats: internalSatsRef.current,
       progress: newProgress,
     });
@@ -806,7 +814,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     if (button.type === "deeplink" && button.url) {
       isLockedRef.current = true;
       setWalletButtons([]);
-      setMessages(prev => [...prev, { id: Date.now(), text: button.text, sender: "user" }]);
+      setMessages(prev => [...prev, { id: nextMsgId(), text: button.text, sender: "user" }]);
 
       try {
         const iframe = document.createElement("iframe");
@@ -835,6 +843,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
           alreadyFired = true;
           document.removeEventListener("visibilitychange", onReturn);
           window.removeEventListener("focus", onReturn);
+          deeplinkCleanupRef.current = null;
           startWalletStep(targetStep);
         };
         const onReturn = () => {
@@ -844,6 +853,10 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
         };
         document.addEventListener("visibilitychange", onReturn);
         window.addEventListener("focus", onReturn);
+        deeplinkCleanupRef.current = () => {
+          document.removeEventListener("visibilitychange", onReturn);
+          window.removeEventListener("focus", onReturn);
+        };
         setTimeout(fireOnce, 3000);
       } else {
         isLockedRef.current = false;
@@ -854,7 +867,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     if (button.type === "next" && button.target) {
       isLockedRef.current = true;
       setWalletButtons([]);
-      setMessages(prev => [...prev, { id: Date.now(), text: button.text, sender: "user" }]);
+      setMessages(prev => [...prev, { id: nextMsgId(), text: button.text, sender: "user" }]);
       safeTimeout(() => {
         startWalletStep(button.target!);
       }, 800);
@@ -868,7 +881,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     if (!inputText.trim()) return;
     const userText = inputText.trim();
     setInputText("");
-    setMessages(prev => [...prev, { id: Date.now(), text: userText, sender: "user" }]);
+    setMessages(prev => [...prev, { id: nextMsgId(), text: userText, sender: "user" }]);
     playClick();
 
     if (flowCompleted) {
@@ -883,7 +896,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
       }, 500);
     } else {
       safeTimeout(() => {
-        setMessages(prev => [...prev, { id: Date.now() + 1, text: "сначала пройди первый блок, все вопросы потом", sender: "satoshi" }]);
+        setMessages(prev => [...prev, { id: nextMsgId(), text: "сначала пройди первый блок, все вопросы потом", sender: "satoshi" }]);
       }, 500);
     }
   }, [inputText, flowCompleted, typeMessage, safeTimeout]);
@@ -893,7 +906,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     isLockedRef.current = true;
     playClick();
 
-    setMessages(prev => [...prev, { id: Date.now(), text: option.text, sender: "user" }]);
+    setMessages(prev => [...prev, { id: nextMsgId(), text: option.text, sender: "user" }]);
     setCurrentOptions([]);
 
     const currentBlock = LEARNING_BLOCKS[currentBlockIndex];
@@ -1320,7 +1333,6 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
       <AnimatePresence>
         {levelUpSkill && onDismissLevelUp && (
           <SkillNotificationBanner
-            skillKey={levelUpSkill}
             iconRect={dosierIconRef.current ? (() => {
               const r = dosierIconRef.current!.getBoundingClientRect();
               return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
@@ -1328,7 +1340,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
             onClose={() => {
               onDismissLevelUp();
               setIconBlinking(true);
-              setTimeout(() => setIconBlinking(false), 2600);
+              safeTimeout(() => setIconBlinking(false), 2600);
             }}
           />
         )}
