@@ -69,7 +69,35 @@ export async function registerRoutes(
         return res.status(400).json({ message: "Token is required" });
       }
       const user = await storage.syncUser(token);
-      res.json({ level: user.level, xp: user.xp });
+      res.json({
+        level: user.level,
+        xp: user.xp,
+        currentModuleId: user.currentModuleId,
+        currentStepIndex: user.currentStepIndex,
+        totalSats: user.totalSats,
+        independenceProgress: user.independenceProgress,
+      });
+    } catch (err) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post('/api/save-progress', async (req, res) => {
+    try {
+      const { token, currentModuleId, currentStepIndex, totalSats, independenceProgress } = req.body;
+      if (!token || typeof token !== 'string') {
+        return res.status(400).json({ message: "Token is required" });
+      }
+      const user = await storage.saveProgress(token, {
+        currentModuleId: currentModuleId ?? null,
+        currentStepIndex: typeof currentStepIndex === 'number' ? currentStepIndex : 0,
+        totalSats: typeof totalSats === 'number' ? totalSats : 0,
+        independenceProgress: typeof independenceProgress === 'number' ? independenceProgress : 0,
+      });
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      res.json({ ok: true });
     } catch (err) {
       res.status(500).json({ message: "Internal server error" });
     }

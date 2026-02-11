@@ -40,6 +40,8 @@ interface TerminalChatProps {
   onSatsUpdate: (sats: number) => void;
   totalSats: number;
   skipFirstTypewriter?: boolean;
+  userStats?: { level: number; xp: number } | null;
+  userToken?: string;
 }
 
 const LEARNING_BLOCKS: LearningBlock[] = [
@@ -410,12 +412,52 @@ function clearWalletState() {
   try { localStorage.removeItem("liberta_wallet_state"); } catch (_) {}
 }
 
-export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats, skipFirstTypewriter }: TerminalChatProps) {
+function saveTerminalProgress(data: { blockIndex: number; sats: number; progress: number; walletMode?: boolean; walletStepId?: string | null }) {
+  try {
+    localStorage.setItem("liberta_terminal_progress", JSON.stringify({
+      blockIndex: data.blockIndex,
+      sats: data.sats,
+      progress: data.progress,
+      walletMode: data.walletMode || false,
+      walletStepId: data.walletStepId || null,
+      timestamp: Date.now(),
+    }));
+  } catch (_) {}
+
+  const token = localStorage.getItem("liberta_token");
+  if (token) {
+    fetch("/api/save-progress", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        token,
+        currentModuleId: data.walletMode ? `wallet_${data.walletStepId}` : `block_${data.blockIndex}`,
+        currentStepIndex: data.blockIndex,
+        totalSats: data.sats,
+        independenceProgress: data.progress,
+      }),
+    }).catch(() => {});
+  }
+}
+
+function loadTerminalProgress(): { blockIndex: number; sats: number; progress: number; walletMode: boolean; walletStepId: string | null } | null {
+  try {
+    const raw = localStorage.getItem("liberta_terminal_progress");
+    if (!raw) return null;
+    return JSON.parse(raw);
+  } catch (_) {
+    return null;
+  }
+}
+
+export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats, skipFirstTypewriter, userStats, userToken }: TerminalChatProps) {
   const savedState = useRef(loadWalletState());
+  const savedProgress = useRef(loadTerminalProgress());
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [displayedText, setDisplayedText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [showProfile, setShowProfile] = useState(false);
   const [currentBlockIndex, setCurrentBlockIndex] = useState(() => savedState.current?.blockIndex ?? 0);
   const [blockPhase, setBlockPhase] = useState<BlockPhase>("typing_speech");
   const [currentOptions, setCurrentOptions] = useState<BlockOption[]>([]);
@@ -584,10 +626,19 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
   useEffect(() => {
     const shouldSkip = skipFirstTypewriter && !skippedFirstRef.current;
     skippedFirstRef.current = true;
-    if (!restoredWalletRef.current?.walletMode) {
+    if (restoredWalletRef.current?.walletMode) return;
+
+    const saved = savedProgress.current;
+    if (saved && !saved.walletMode && saved.blockIndex > 0) {
+      savedProgress.current = null;
+      internalSatsRef.current = saved.sats;
+      onSatsUpdate(saved.sats);
+      onProgressUpdate(saved.progress);
+      startBlock(saved.blockIndex, true);
+    } else {
       startBlock(0, shouldSkip);
     }
-  }, [startBlock, skipFirstTypewriter]);
+  }, [startBlock, skipFirstTypewriter, onSatsUpdate, onProgressUpdate]);
 
   const internalSatsRef = useRef(totalSats);
 
@@ -606,7 +657,14 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
       showNotification(block.reward);
       try { playSatsChime(); } catch (_) {}
     }
-    onProgressUpdate(Math.min(block.progress_target, 27));
+    const newProgress = Math.min(block.progress_target, 27);
+    onProgressUpdate(newProgress);
+
+    saveTerminalProgress({
+      blockIndex,
+      sats: internalSatsRef.current,
+      progress: newProgress,
+    });
   }, [onSatsUpdate, onProgressUpdate, showNotification]);
 
   const startWalletStep = useCallback((stepId: string) => {
@@ -621,6 +679,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     isLockedRef.current = true;
 
     saveWalletState({ walletMode: true, stepId, blockIndex: 7, sats: internalSatsRef.current, progress: 27 });
+    saveTerminalProgress({ blockIndex: 7, sats: internalSatsRef.current, progress: 27, walletMode: true, walletStepId: stepId });
 
     try { playTransition(); } catch (_) {}
 
@@ -930,6 +989,72 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
         {showCelebration && <CelebrationOverlay />}
       </AnimatePresence>
 
+      <AnimatePresence>
+        {showProfile && (
+          <motion.div
+            className="fixed inset-0 z-[9999] flex items-center justify-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            onClick={() => setShowProfile(false)}
+            data-testid="modal-profile"
+          >
+            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+            <motion.div
+              className="relative w-[320px] border-2 border-[#B87333]/60 bg-[#0D0D0D] p-6"
+              initial={{ scale: 0.9, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.9, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              style={{ boxShadow: '0 0 30px rgba(184,115,51,0.15)' }}
+            >
+              <div className="flex items-center gap-4 mb-5">
+                <div className="w-12 h-12 border-2 border-[#B87333]/60 bg-[#B87333]/10 flex items-center justify-center">
+                  <svg width="24" height="24" viewBox="0 0 16 16" fill="none">
+                    <rect x="6" y="2" width="4" height="4" fill="#B87333" />
+                    <rect x="5" y="6" width="6" height="2" fill="#B87333" />
+                    <rect x="4" y="8" width="8" height="4" fill="#B87333" opacity="0.8" />
+                    <rect x="5" y="12" width="2" height="2" fill="#B87333" opacity="0.6" />
+                    <rect x="9" y="12" width="2" height="2" fill="#B87333" opacity="0.6" />
+                  </svg>
+                </div>
+                <div>
+                  <div className="text-[11px] tracking-[3px] text-[#B87333]/60 font-bold uppercase">АГЕНТ</div>
+                  <div className="text-[10px] tracking-[1px] text-[#B87333]/40 font-mono mt-0.5">
+                    {userToken ? `#${userToken.slice(0, 8)}` : '#UNKNOWN'}
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-3 border-t border-[#B87333]/20 pt-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] tracking-[2px] text-[#B87333]/50 font-bold">УРОВЕНЬ</span>
+                  <span className="text-[14px] tracking-[2px] text-[#B87333] font-bold">{userStats?.level ?? 1}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] tracking-[2px] text-[#B87333]/50 font-bold">ОПЫТ</span>
+                  <span className="text-[14px] tracking-[2px] text-[#B87333] font-bold">{userStats?.xp ?? 0} XP</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] tracking-[2px] text-[#B87333]/50 font-bold">SATS</span>
+                  <span className="text-[14px] tracking-[2px] text-[#FFD700] font-bold">{totalSats}</span>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowProfile(false)}
+                className="w-full mt-5 py-2 border border-[#B87333]/30 text-[10px] tracking-[3px] text-[#B87333]/60 font-bold uppercase"
+                data-testid="button-close-profile"
+              >
+                ЗАКРЫТЬ
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="flex-shrink-0 bg-[#111111] border-b-2 border-[#B87333]/60 z-50">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
@@ -939,6 +1064,20 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
             </span>
           </div>
           <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setShowProfile(true)}
+              className="w-7 h-7 flex items-center justify-center opacity-40 hover:opacity-80 transition-opacity"
+              data-testid="button-profile-avatar"
+            >
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+                <rect x="6" y="2" width="4" height="4" fill="#B87333" />
+                <rect x="5" y="6" width="6" height="2" fill="#B87333" />
+                <rect x="4" y="8" width="8" height="4" fill="#B87333" opacity="0.8" />
+                <rect x="5" y="12" width="2" height="2" fill="#B87333" opacity="0.6" />
+                <rect x="9" y="12" width="2" height="2" fill="#B87333" opacity="0.6" />
+              </svg>
+            </button>
             <div className="flex items-center gap-2.5 px-3 py-1.5 border-2 border-[#B87333]/60 bg-[#B87333]/10">
               <PixelCoin animating={satsAnimating} />
               <motion.span

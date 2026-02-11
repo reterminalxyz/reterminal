@@ -7,6 +7,7 @@ export interface IStorage {
   getSession(id: number): Promise<Session | undefined>;
   updateSession(id: number, actionId: string, scoreDelta: number, nextStepId: string): Promise<Session>;
   syncUser(token: string): Promise<User>;
+  saveProgress(token: string, progress: { currentModuleId: string | null; currentStepIndex: number; totalSats: number; independenceProgress: number }): Promise<User | undefined>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -50,6 +51,20 @@ export class DatabaseStorage implements IStorage {
       .values({ token, xp: 0, level: 1 })
       .returning();
     return newUser;
+  }
+
+  async saveProgress(token: string, progress: { currentModuleId: string | null; currentStepIndex: number; totalSats: number; independenceProgress: number }): Promise<User | undefined> {
+    const [updated] = await db
+      .update(users)
+      .set({
+        currentModuleId: progress.currentModuleId,
+        currentStepIndex: progress.currentStepIndex,
+        totalSats: progress.totalSats,
+        independenceProgress: progress.independenceProgress,
+      })
+      .where(eq(users.token, token))
+      .returning();
+    return updated;
   }
 }
 

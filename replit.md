@@ -200,3 +200,12 @@ Large prominent navigation button:
 - iOS install prompt: Gnosis Pay style dark overlay, shows on iOS Safari only, lucide-react icons
 - Native feel CSS: overscroll-behavior-y:none, tap-highlight:transparent, user-select:none on interactive elements only
 - Typewriter speed: 12ms per character (was 20ms)
+- Removed Lvl/XP overlay from all screens (stealth UI)
+- Stealth profile avatar: pixel person icon in TerminalChat header (40% opacity), opens modal with АГЕНТ, user ID (#token), УРОВЕНЬ, ОПЫТ, SATS
+- Progress persistence: auto-saves block index, SATS, independence to localStorage + PostgreSQL on every block/wallet transition
+- API: POST /api/save-progress (token, currentModuleId, currentStepIndex, totalSats, independenceProgress)
+- API: POST /api/sync-user now returns all progress fields for restore
+- Restore logic: localStorage first (instant), API fallback if localStorage empty (e.g. new device)
+- localStorage key for token: "liberta_token" (unified across all components)
+- localStorage key for terminal progress: "liberta_terminal_progress"
+- Users table columns: id, token, xp, level, current_module_id, current_step_index, total_sats, independence_progress

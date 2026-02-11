@@ -7,6 +7,10 @@ export const users = pgTable("users", {
   token: text("token").notNull().unique(),
   xp: integer("xp").default(0).notNull(),
   level: integer("level").default(1).notNull(),
+  currentModuleId: text("current_module_id"),
+  currentStepIndex: integer("current_step_index").default(0).notNull(),
+  totalSats: integer("total_sats").default(0).notNull(),
+  independenceProgress: integer("independence_progress").default(0).notNull(),
 });
 
 export const insertUserSchema = createInsertSchema(users).omit({ id: true });
