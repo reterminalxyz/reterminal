@@ -272,13 +272,21 @@ function Greebles({ token, unlockedCount }: { token: string | null; unlockedCoun
   );
 }
 
+const SKILL_BLOCK_INDEX: Record<string, number> = {
+  WILL_TO_FREEDOM: 0,
+  TRUTH_SEEKER: 1,
+  HARD_MONEY: 2,
+  GRID_RUNNER: 5,
+};
+
 interface ProfileOverlayProps {
   onClose: () => void;
   token: string | null;
   originRect?: { x: number; y: number } | null;
+  completedBlockIndex: number;
 }
 
-export default function ProfileOverlay({ onClose, token, originRect }: ProfileOverlayProps) {
+export default function ProfileOverlay({ onClose, token, originRect, completedBlockIndex }: ProfileOverlayProps) {
   const [skills, setSkills] = useState<GrantedSkill[]>([]);
   const [loading, setLoading] = useState(true);
   const [newSkillKeys, setNewSkillKeys] = useState<Set<string>>(new Set());
@@ -289,14 +297,18 @@ export default function ProfileOverlay({ onClose, token, originRect }: ProfileOv
       .then(r => r.json())
       .then(data => {
         if (Array.isArray(data)) {
-          setSkills(data);
+          const filtered = data.filter((s: GrantedSkill) => {
+            const blockIdx = SKILL_BLOCK_INDEX[s.skillKey];
+            return blockIdx !== undefined && blockIdx < completedBlockIndex;
+          });
+          setSkills(filtered);
           try {
             const seenKey = `liberta_seen_skills_${token}`;
             const seen = JSON.parse(localStorage.getItem(seenKey) || "[]") as string[];
             const seenSet = new Set(seen);
             const newKeys = new Set<string>();
             const currentKeys: string[] = [];
-            data.forEach((s: GrantedSkill) => {
+            filtered.forEach((s: GrantedSkill) => {
               currentKeys.push(s.skillKey);
               if (!seenSet.has(s.skillKey)) newKeys.add(s.skillKey);
             });
@@ -307,7 +319,7 @@ export default function ProfileOverlay({ onClose, token, originRect }: ProfileOv
       })
       .catch(() => {})
       .finally(() => setLoading(false));
-  }, [token]);
+  }, [token, completedBlockIndex]);
 
   useEffect(() => { fetchSkills(); }, [fetchSkills]);
 

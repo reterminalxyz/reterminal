@@ -472,7 +472,7 @@ function SkillNotificationBanner({ onClose, iconRect }: { skillKey: SkillKey; on
             textShadow: '0 0 8px #FFD700, 0 0 16px #B87333',
           }}
         >
-          +СКИЛЛ ПОЛУЧЕН
+          Новый скилл
         </span>
       </motion.div>
     </motion.div>
@@ -528,6 +528,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
   const [displayedText, setDisplayedText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [currentBlockIndex, setCurrentBlockIndex] = useState(() => savedState.current?.blockIndex ?? 0);
+  const [completedBlockCount, setCompletedBlockCount] = useState(() => savedState.current?.blockIndex ?? savedProgress.current?.blockIndex ?? 0);
   const [blockPhase, setBlockPhase] = useState<BlockPhase>("typing_speech");
   const [currentOptions, setCurrentOptions] = useState<BlockOption[]>([]);
   const [notification, setNotification] = useState<{ sats: number; skill: string | null } | null>(null);
@@ -719,6 +720,8 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
   const completeBlock = useCallback((blockIndex: number) => {
     const block = LEARNING_BLOCKS[blockIndex];
     if (!block) return;
+
+    setCompletedBlockCount(prev => Math.max(prev, blockIndex + 1));
 
     if (block.reward > 0) {
       internalSatsRef.current = Math.min(internalSatsRef.current + block.reward, 1000);
@@ -1336,6 +1339,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
           <ProfileOverlay
             onClose={() => setShowProfile(false)}
             token={userToken || localStorage.getItem("liberta_token")}
+            completedBlockIndex={completedBlockCount}
             originRect={dosierIconRef.current ? (() => {
               const r = dosierIconRef.current!.getBoundingClientRect();
               return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
