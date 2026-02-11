@@ -9,6 +9,7 @@ html, body {
   height: 100%;
   margin: 0;
   padding: 0;
+  background-color: #F5F5F5;
   overscroll-behavior-y: none;
   -webkit-tap-highlight-color: transparent;
 }
@@ -131,9 +132,8 @@ button, a, label, nav, header, [role="button"] {
   }
   
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply text-foreground antialiased;
     font-family: 'IBM Plex Mono', monospace;
-    background: #F5F5F7;
     overflow: hidden;
   }
 
