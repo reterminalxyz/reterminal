@@ -458,3 +458,60 @@ button, a, label, nav, header, [role="button"] {
     inset: -1px;
   }
 }
+
+@keyframes glitch-1 {
+  0%, 100% { clip-path: inset(0 0 95% 0); transform: translate(0); }
+  20% { clip-path: inset(20% 0 60% 0); transform: translate(-2px, 1px); }
+  40% { clip-path: inset(50% 0 30% 0); transform: translate(2px, -1px); }
+  60% { clip-path: inset(70% 0 10% 0); transform: translate(-1px, 2px); }
+  80% { clip-path: inset(10% 0 80% 0); transform: translate(1px, -2px); }
+}
+
+@keyframes glitch-2 {
+  0%, 100% { clip-path: inset(95% 0 0 0); transform: translate(0); }
+  25% { clip-path: inset(60% 0 20% 0); transform: translate(2px, 1px); }
+  50% { clip-path: inset(30% 0 50% 0); transform: translate(-2px, -1px); }
+  75% { clip-path: inset(10% 0 70% 0); transform: translate(1px, 2px); }
+}
+
+@keyframes scanline-move {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+
+.install-btn-glitch {
+  position: relative;
+  overflow: hidden;
+}
+
+.install-btn-glitch::before,
+.install-btn-glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font: inherit;
+  letter-spacing: inherit;
+  text-transform: inherit;
+}
+
+.install-btn-glitch::before {
+  color: #B87333;
+  animation: glitch-1 3s infinite linear;
+  opacity: 0.4;
+  text-shadow: -1px 0 rgba(184, 115, 51, 0.3);
+}
+
+.install-btn-glitch::after {
+  color: #B87333;
+  animation: glitch-2 2.5s infinite linear;
+  opacity: 0.3;
+  text-shadow: 1px 0 rgba(184, 115, 51, 0.3);
+}
+
+.install-btn-glitch:hover {
+  background-color: rgba(184, 115, 51, 0.15);
+  box-shadow: 0 0 20px rgba(184, 115, 51, 0.2), inset 0 0 20px rgba(184, 115, 51, 0.05);
+}

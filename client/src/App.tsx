@@ -5,7 +5,6 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Home from "@/pages/Home";
 import NotFound from "@/pages/not-found";
-import { IOSInstallPrompt } from "@/components/IOSInstallPrompt";
 
 function Router() {
   return (
@@ -22,7 +21,6 @@ function App() {
       <TooltipProvider>
         <Toaster />
         <Router />
-        <IOSInstallPrompt />
       </TooltipProvider>
     </QueryClientProvider>
   );

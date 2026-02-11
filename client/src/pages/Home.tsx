@@ -5,11 +5,19 @@ import { GridBackground } from "@/components/GridBackground";
 import { IndependenceBar } from "@/components/IndependenceBar";
 import { BackButton } from "@/components/BackButton";
 import { TerminalChat } from "@/components/TerminalChat";
+import { BootScreen } from "@/components/BootScreen";
 import { useCreateSession, useUpdateSession, useSession } from "@/hooks/use-sessions";
 import { Loader2 } from "lucide-react";
 import { playClick, playError, playPhaseComplete, playTransition } from "@/lib/sounds";
 
-type Phase = "loading" | "phase_1" | "phase_1_complete" | "phase_2";
+function isInStandaloneMode(): boolean {
+  return (
+    ("standalone" in window.navigator && (window.navigator as any).standalone) ||
+    window.matchMedia("(display-mode: standalone)").matches
+  );
+}
+
+type Phase = "boot" | "loading" | "phase_1" | "phase_1_complete" | "phase_2";
 type QuestionId = 1 | 2 | 3 | 4;
 
 const PROGRESS_PER_QUESTION = [5, 10, 15, 20];
@@ -25,7 +33,7 @@ const QUESTIONS = [
 
 export default function Home() {
   const [sessionId, setSessionId] = useState<number | null>(null);
-  const [phase, setPhase] = useState<Phase>("loading");
+  const [phase, setPhase] = useState<Phase>(() => isInStandaloneMode() ? "loading" : "boot");
   const [currentQuestion, setCurrentQuestion] = useState<QuestionId>(1);
   const [circuitReveal, setCircuitReveal] = useState(0); // 0, 25, 50, 75, 100
   const [totalSats, setTotalSats] = useState(0);
@@ -63,6 +71,7 @@ export default function Home() {
   const updateSession = useUpdateSession();
 
   useEffect(() => {
+    if (phase === "boot") return;
     if (!sessionId) {
       createSession.mutate({ nodeId: "#RE_CHAIN_" + Math.floor(Math.random() * 9999) }, {
         onSuccess: (data) => {
@@ -71,7 +80,7 @@ export default function Home() {
         }
       });
     }
-  }, []);
+  }, [phase]);
 
   const handleQuestionAnswer = (questionId: QuestionId, isCorrect: boolean) => {
     // Synchronous ref check prevents any race conditions
@@ -170,6 +179,13 @@ export default function Home() {
     setPhase("phase_1_complete");
   };
 
+
+  // Boot screen (install gateway)
+  if (phase === "boot") {
+    return (
+      <BootScreen onDismiss={() => setPhase("loading")} />
+    );
+  }
 
   // Loading state
   if (phase === "loading" || !sessionId || isSessionLoading) {
