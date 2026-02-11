@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X } from "lucide-react";
+import { X, Sparkles } from "lucide-react";
+import { useLocation } from "wouter";
 import { playClick, playTypeTick, playSatsChime, playTransition } from "@/lib/sounds";
+import { SKILL_META, type SkillKey } from "@shared/schema";
 
 interface BlockOption {
   text: string;
@@ -23,6 +25,7 @@ interface LearningBlock {
   intermediate_question?: IntermediateQuestion;
   speech_continued?: string;
   skill: string | null;
+  grantSkillKey?: SkillKey;
   reward: number;
   progress_target: number;
   options: BlockOption[];
@@ -42,6 +45,9 @@ interface TerminalChatProps {
   skipFirstTypewriter?: boolean;
   userStats?: { level: number; xp: number } | null;
   userToken?: string;
+  onGrantSkill?: (skillKey: SkillKey) => void;
+  levelUpSkill?: SkillKey | null;
+  onDismissLevelUp?: () => void;
 }
 
 const LEARNING_BLOCKS: LearningBlock[] = [
@@ -78,6 +84,7 @@ const LEARNING_BLOCKS: LearningBlock[] = [
     },
     speech_continued: "На самом деле нет, хотя банк говорит тебе, что это твои деньги.\n\nНесмотря на то, что их приложение и показывает баланс, эти деньги не твоя собственность. Это запись в ИХ базе данных, которую тебе РАЗРЕШАЮТ использовать.\nПопробуй вот что:\nОтправь крупную сумму другу в другую страну. Банк обязательно спросит: «Откуда деньги? Зачем? Кому?» Они могут заблокировать твой счет просто потому, что их алгоритму не понравилась твоя покупка.\nРешил купить что-то, что не нравится твоему правительству? Может быть, пожертвование протестующим, запрещенную книгу или VPN? Счет заморожен. Без суда.\nДеньги в банке — это не деньги. Это обещание банка.\nИ это обещание работает, пока ты делаешь то, что от тебя ожидают.\nОни контролируют доступ к твоему времени, твоему труду, твоей жизни.\nТы работаешь всю неделю и обмениваешь это время на цифры в приложении. А цифры принадлежат не тебе.\nБанк — хозяин твоего времени.\n«Баланс в приложении» — это не владение, разрешение.",
     skill: "Понимание, что баланс в приложении — это не владение, а разрешение",
+    grantSkillKey: "TRUTH_SEEKER",
     reward: 100,
     progress_target: 22,
     options: [
@@ -98,6 +105,7 @@ const LEARNING_BLOCKS: LearningBlock[] = [
     title: "Bitcoin — выход (Математика против обещаний)",
     speech: "Хорошо. Ты готов увидеть выход.\n\nЭто Bitcoin!\n\nЗабудь всё, что ты слышал о нём: \"криптовалюта\", \"инвестиция\", \"спекуляция\".\nНа самом деле Bitcoin это математика, которую невозможно подделать.\nПредставь золото. Его нельзя напечатать. Его количество ограничено. Его ценность признают люди во всем мире.\n\nТеперь представь, что золото:\n- Помещается в зашифрованном файле в твоем телефоне\n- Его можно отправить за секунды в любую страну\n- Никто не может его конфисковать\n- Никакой банк его не контролирует\n\n21 миллион монет. Больше никогда не будет. Никакой центральный банк не может напечатать еще.\nЭто не обещание. Это неизменяемый математический закон, записанный в коде навсегда.\nБанк может обанкротиться. Правительство может обесценить деньги.\nBitcoin? Работает 17 лет без остановки. 24/7. Без выходных. Без банкротств.\nЭто первый в истории способ хранить результат твоего труда там, где его не достанет ни одно правительство.",
     skill: "Bitcoin = математика + редкость + свобода",
+    grantSkillKey: "HARD_MONEY",
     reward: 100,
     progress_target: 23,
     options: [
@@ -134,6 +142,7 @@ const LEARNING_BLOCKS: LearningBlock[] = [
     title: "Lightning (Мгновенная энергия)",
     speech: "Вот где Bitcoin становится оружием будущего.\n\nБиткоинами можно оплачивать огромное количество вещей, а количество стран и бизнесов где им можно оплачивать покупки постоянно растёт. Помимо оплаты в интернете, при необходимости есть сотни способов конвертации в наличные.\n\nПомнишь, в начале я говорил про награду? Ты получаешь сатоши (сокращенно — SATS).\nСатоши — это самая маленькая часть биткоина. В 1 биткоине 100 миллионов SATS. Они названы в честь меня — создателя Bitcoin, Сатоши Накамото.\n\nИ вот что важно: их можно отправлять друг другу за доли секунды.\nХочешь отправить деньги в Японию? 0.5 секунды.\nКомиссия? Меньше одного цента евро. Иногда доли цента.\nЭто называется Lightning Network.\n\nБезграничная сеть. Твой телефон подключается к миллионам узлов по всему миру.\nНикакого банка посередине. Никакой SWIFT. Никаких «рабочих часов».\nДеньги двигаются со скоростью мысли.",
     skill: "Мгновенные платежи без границ",
+    grantSkillKey: "GRID_RUNNER",
     reward: 100,
     progress_target: 26,
     options: [
@@ -412,6 +421,86 @@ function clearWalletState() {
   try { localStorage.removeItem("liberta_wallet_state"); } catch (_) {}
 }
 
+function LevelUpPopupInline({ skillKey, onClose }: { skillKey: SkillKey; onClose: () => void }) {
+  const meta = SKILL_META[skillKey];
+  useEffect(() => {
+    const timer = setTimeout(onClose, 4000);
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
+  return (
+    <motion.div
+      className="fixed inset-0 z-[99999] flex items-center justify-center"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+      data-testid="popup-level-up"
+    >
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-md" />
+      <motion.div
+        className="relative flex flex-col items-center gap-4 p-8"
+        initial={{ scale: 0.5, y: 30 }}
+        animate={{ scale: 1, y: 0 }}
+        exit={{ scale: 0.8, y: -20 }}
+        transition={{ type: "spring", damping: 15 }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <motion.div
+          className="w-20 h-20 flex items-center justify-center"
+          style={{
+            border: "3px solid #B87333",
+            background: "rgba(184,115,51,0.1)",
+            boxShadow: "0 0 40px rgba(184,115,51,0.3), 0 0 80px rgba(184,115,51,0.1)",
+          }}
+          animate={{
+            boxShadow: [
+              "0 0 40px rgba(184,115,51,0.3), 0 0 80px rgba(184,115,51,0.1)",
+              "0 0 60px rgba(255,215,0,0.5), 0 0 120px rgba(184,115,51,0.2)",
+              "0 0 40px rgba(184,115,51,0.3), 0 0 80px rgba(184,115,51,0.1)",
+            ]
+          }}
+          transition={{ duration: 2, repeat: Infinity }}
+        >
+          <Sparkles className="w-10 h-10 text-[#FFD700]" />
+        </motion.div>
+        <motion.div
+          className="text-[10px] tracking-[6px] text-[#B87333]/60 font-bold uppercase"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2 }}
+        >
+          НАВЫК ОТКРЫТ
+        </motion.div>
+        <motion.div
+          className="text-[18px] tracking-[4px] text-[#FFD700] font-bold uppercase text-center"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.4 }}
+        >
+          {meta.name}
+        </motion.div>
+        <motion.div
+          className="text-[12px] text-[#A0A0A0] text-center max-w-[280px] leading-relaxed"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+        >
+          {meta.description}
+        </motion.div>
+        <motion.div
+          className="mt-2 text-[9px] tracking-[3px] text-[#B87333]/40 font-bold"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1 }}
+        >
+          АВАТАР ОБНОВЛЁН
+        </motion.div>
+      </motion.div>
+    </motion.div>
+  );
+}
+
 function saveTerminalProgress(data: { blockIndex: number; sats: number; progress: number; walletMode?: boolean; walletStepId?: string | null }) {
   try {
     localStorage.setItem("liberta_terminal_progress", JSON.stringify({
@@ -450,14 +539,14 @@ function loadTerminalProgress(): { blockIndex: number; sats: number; progress: n
   }
 }
 
-export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats, skipFirstTypewriter, userStats, userToken }: TerminalChatProps) {
+export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats, skipFirstTypewriter, userStats, userToken, onGrantSkill, levelUpSkill, onDismissLevelUp }: TerminalChatProps) {
+  const [, setLocation] = useLocation();
   const savedState = useRef(loadWalletState());
   const savedProgress = useRef(loadTerminalProgress());
 
   const [messages, setMessages] = useState<Message[]>([]);
   const [displayedText, setDisplayedText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
-  const [showProfile, setShowProfile] = useState(false);
   const [currentBlockIndex, setCurrentBlockIndex] = useState(() => savedState.current?.blockIndex ?? 0);
   const [blockPhase, setBlockPhase] = useState<BlockPhase>("typing_speech");
   const [currentOptions, setCurrentOptions] = useState<BlockOption[]>([]);
@@ -660,12 +749,16 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     const newProgress = Math.min(block.progress_target, 27);
     onProgressUpdate(newProgress);
 
+    if (block.grantSkillKey && onGrantSkill) {
+      onGrantSkill(block.grantSkillKey);
+    }
+
     saveTerminalProgress({
       blockIndex,
       sats: internalSatsRef.current,
       progress: newProgress,
     });
-  }, [onSatsUpdate, onProgressUpdate, showNotification]);
+  }, [onSatsUpdate, onProgressUpdate, showNotification, onGrantSkill]);
 
   const startWalletStep = useCallback((stepId: string) => {
     const step = WALLET_STEPS.find(s => s.id === stepId);
@@ -989,72 +1082,6 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
         {showCelebration && <CelebrationOverlay />}
       </AnimatePresence>
 
-      <AnimatePresence>
-        {showProfile && (
-          <motion.div
-            className="fixed inset-0 z-[9999] flex items-center justify-center"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.2 }}
-            onClick={() => setShowProfile(false)}
-            data-testid="modal-profile"
-          >
-            <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
-            <motion.div
-              className="relative w-[320px] border-2 border-[#B87333]/60 bg-[#0D0D0D] p-6"
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              onClick={(e) => e.stopPropagation()}
-              style={{ boxShadow: '0 0 30px rgba(184,115,51,0.15)' }}
-            >
-              <div className="flex items-center gap-4 mb-5">
-                <div className="w-12 h-12 border-2 border-[#B87333]/60 bg-[#B87333]/10 flex items-center justify-center">
-                  <svg width="24" height="24" viewBox="0 0 16 16" fill="none">
-                    <rect x="6" y="2" width="4" height="4" fill="#B87333" />
-                    <rect x="5" y="6" width="6" height="2" fill="#B87333" />
-                    <rect x="4" y="8" width="8" height="4" fill="#B87333" opacity="0.8" />
-                    <rect x="5" y="12" width="2" height="2" fill="#B87333" opacity="0.6" />
-                    <rect x="9" y="12" width="2" height="2" fill="#B87333" opacity="0.6" />
-                  </svg>
-                </div>
-                <div>
-                  <div className="text-[11px] tracking-[3px] text-[#B87333]/60 font-bold uppercase">АГЕНТ</div>
-                  <div className="text-[10px] tracking-[1px] text-[#B87333]/40 font-mono mt-0.5">
-                    {userToken ? `#${userToken.slice(0, 8)}` : '#UNKNOWN'}
-                  </div>
-                </div>
-              </div>
-
-              <div className="space-y-3 border-t border-[#B87333]/20 pt-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] tracking-[2px] text-[#B87333]/50 font-bold">УРОВЕНЬ</span>
-                  <span className="text-[14px] tracking-[2px] text-[#B87333] font-bold">{userStats?.level ?? 1}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] tracking-[2px] text-[#B87333]/50 font-bold">ОПЫТ</span>
-                  <span className="text-[14px] tracking-[2px] text-[#B87333] font-bold">{userStats?.xp ?? 0} XP</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-[10px] tracking-[2px] text-[#B87333]/50 font-bold">SATS</span>
-                  <span className="text-[14px] tracking-[2px] text-[#FFD700] font-bold">{totalSats}</span>
-                </div>
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setShowProfile(false)}
-                className="w-full mt-5 py-2 border border-[#B87333]/30 text-[10px] tracking-[3px] text-[#B87333]/60 font-bold uppercase"
-                data-testid="button-close-profile"
-              >
-                ЗАКРЫТЬ
-              </button>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       <div className="flex-shrink-0 bg-[#111111] border-b-2 border-[#B87333]/60 z-50">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
@@ -1066,7 +1093,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
           <div className="flex items-center gap-3">
             <button
               type="button"
-              onClick={() => setShowProfile(true)}
+              onClick={() => setLocation("/profile")}
               className="w-7 h-7 flex items-center justify-center opacity-40 hover:opacity-80 transition-opacity"
               data-testid="button-profile-avatar"
             >
@@ -1288,6 +1315,12 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
           </motion.button>
         </div>
       </div>
+
+      {levelUpSkill && onDismissLevelUp && (
+        <AnimatePresence>
+          <LevelUpPopupInline skillKey={levelUpSkill} onClose={onDismissLevelUp} />
+        </AnimatePresence>
+      )}
 
     </div>
   );

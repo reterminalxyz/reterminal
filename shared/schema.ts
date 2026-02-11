@@ -46,3 +46,23 @@ export type UpdateSessionRequest = {
 };
 
 export type SessionResponse = Session;
+
+export const SKILL_KEYS = ["TRUTH_SEEKER", "HARD_MONEY", "GRID_RUNNER"] as const;
+export type SkillKey = typeof SKILL_KEYS[number];
+
+export const SKILL_META: Record<SkillKey, { name: string; description: string; layer: string }> = {
+  TRUTH_SEEKER: { name: "Искатель Истины", description: "Ты видишь сквозь ложь системы. Визор активирован.", layer: "visor" },
+  HARD_MONEY: { name: "Твёрдые Деньги", description: "Ты понял суть звонкой монеты. Ключ в твоих руках.", layer: "hand_item" },
+  GRID_RUNNER: { name: "Бегущий по Сетке", description: "Ты освоил сеть Lightning. Аура цифрового сопротивления.", layer: "aura" },
+};
+
+export const userSkills = pgTable("user_skills", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").notNull(),
+  skillKey: text("skill_key").notNull(),
+  grantedAt: timestamp("granted_at").defaultNow(),
+});
+
+export const insertUserSkillSchema = createInsertSchema(userSkills).omit({ id: true, grantedAt: true });
+export type UserSkill = typeof userSkills.$inferSelect;
+export type InsertUserSkill = z.infer<typeof insertUserSkillSchema>;

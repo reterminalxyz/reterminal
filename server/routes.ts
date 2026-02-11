@@ -4,6 +4,7 @@ import { storage } from "./storage";
 import { api } from "@shared/routes";
 import { z } from "zod";
 import { randomBytes } from "crypto";
+import { SKILL_KEYS } from "@shared/schema";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -77,6 +78,37 @@ export async function registerRoutes(
         totalSats: user.totalSats,
         independenceProgress: user.independenceProgress,
       });
+    } catch (err) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get('/api/skills/:token', async (req, res) => {
+    try {
+      const { token } = req.params;
+      const user = await storage.syncUser(token);
+      const skills = await storage.getUserSkills(user.id);
+      res.json(skills.map(s => ({ skillKey: s.skillKey, grantedAt: s.grantedAt })));
+    } catch (err) {
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post('/api/skills/grant', async (req, res) => {
+    try {
+      const { token, skillKey } = req.body;
+      if (!token || typeof token !== 'string') {
+        return res.status(400).json({ message: "Token is required" });
+      }
+      if (!skillKey || typeof skillKey !== 'string' || !SKILL_KEYS.includes(skillKey as any)) {
+        return res.status(400).json({ message: "Invalid skill key" });
+      }
+      const user = await storage.syncUser(token);
+      const skill = await storage.grantSkill(user.id, skillKey);
+      if (!skill) {
+        return res.json({ granted: false, message: "Skill already granted" });
+      }
+      res.json({ granted: true, skill: { skillKey: skill.skillKey, grantedAt: skill.grantedAt } });
     } catch (err) {
       res.status(500).json({ message: "Internal server error" });
     }

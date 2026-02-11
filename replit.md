@@ -201,7 +201,16 @@ Large prominent navigation button:
 - Native feel CSS: overscroll-behavior-y:none, tap-highlight:transparent, user-select:none on interactive elements only
 - Typewriter speed: 12ms per character (was 20ms)
 - Removed Lvl/XP overlay from all screens (stealth UI)
-- Stealth profile avatar: pixel person icon in TerminalChat header (40% opacity), opens modal with АГЕНТ, user ID (#token), УРОВЕНЬ, ОПЫТ, SATS
+- Stealth profile avatar: pixel person icon in TerminalChat header (40% opacity), navigates to /profile (Dossier Mode)
+- Profile page (/profile): Dossier Mode with AvatarDisplay (CSS layer system), SkillCards grid
+  - AvatarDisplay: base voxel image + 3 conditional layers (visor/TRUTH_SEEKER, hand item/HARD_MONEY, aura/GRID_RUNNER)
+  - SkillCards: locked (grey, lock icon, blur "???") / unlocked (copper glow, description, date)
+  - Skills: TRUTH_SEEKER (block 2), HARD_MONEY (block 3), GRID_RUNNER (block 6)
+- Skill system: user_skills table (id, user_id, skill_key, granted_at)
+- API: GET /api/skills/:token, POST /api/skills/grant (validates against SKILL_KEYS)
+- useGrantSkill hook: calls API, shows LevelUpPopup overlay on terminal
+- LevelUpPopup: animated overlay with "НАВЫК ОТКРЫТ" + skill name + "АВАТАР ОБНОВЛЁН"
+- Skills granted automatically when completing learning blocks with grantSkillKey field
 - Progress persistence: auto-saves block index, SATS, independence to localStorage + PostgreSQL on every block/wallet transition
 - API: POST /api/save-progress (token, currentModuleId, currentStepIndex, totalSats, independenceProgress)
 - API: POST /api/sync-user now returns all progress fields for restore

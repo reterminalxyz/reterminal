@@ -1,6 +1,6 @@
 import { db } from "./db";
-import { sessions, users, type Session, type InsertSession, type User } from "@shared/schema";
-import { eq, sql } from "drizzle-orm";
+import { sessions, users, userSkills, type Session, type InsertSession, type User, type UserSkill } from "@shared/schema";
+import { eq, sql, and } from "drizzle-orm";
 
 export interface IStorage {
   createSession(session: InsertSession): Promise<Session>;
@@ -8,6 +8,8 @@ export interface IStorage {
   updateSession(id: number, actionId: string, scoreDelta: number, nextStepId: string): Promise<Session>;
   syncUser(token: string): Promise<User>;
   saveProgress(token: string, progress: { currentModuleId: string | null; currentStepIndex: number; totalSats: number; independenceProgress: number }): Promise<User | undefined>;
+  getUserSkills(userId: number): Promise<UserSkill[]>;
+  grantSkill(userId: number, skillKey: string): Promise<UserSkill | null>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -65,6 +67,24 @@ export class DatabaseStorage implements IStorage {
       .where(eq(users.token, token))
       .returning();
     return updated;
+  }
+
+  async getUserSkills(userId: number): Promise<UserSkill[]> {
+    return db.select().from(userSkills).where(eq(userSkills.userId, userId));
+  }
+
+  async grantSkill(userId: number, skillKey: string): Promise<UserSkill | null> {
+    const [existing] = await db
+      .select()
+      .from(userSkills)
+      .where(and(eq(userSkills.userId, userId), eq(userSkills.skillKey, skillKey)));
+    if (existing) return null;
+
+    const [skill] = await db
+      .insert(userSkills)
+      .values({ userId, skillKey })
+      .returning();
+    return skill;
   }
 }
 

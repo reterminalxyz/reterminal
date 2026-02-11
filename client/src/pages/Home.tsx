@@ -7,6 +7,7 @@ import { BackButton } from "@/components/BackButton";
 import { TerminalChat } from "@/components/TerminalChat";
 import { BootScreen } from "@/components/BootScreen";
 import { useCreateSession, useUpdateSession, useSession } from "@/hooks/use-sessions";
+import { useGrantSkill } from "@/hooks/use-skills";
 import { Loader2 } from "lucide-react";
 import { playClick, playError, playPhaseComplete, playTransition } from "@/lib/sounds";
 
@@ -73,6 +74,7 @@ export default function Home() {
   const [skipTypewriter, setSkipTypewriter] = useState(false);
   const [answeredQuestions, setAnsweredQuestions] = useState<Set<QuestionId>>(new Set());
   const [userStats, setUserStats] = useState<{ level: number; xp: number } | null>(null);
+  const { grantSkill, pendingSkill, dismissPopup } = useGrantSkill();
   const isAnsweringRef = useRef(false);
   const mountedRef = useRef(true);
   const pendingTimeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -444,6 +446,9 @@ export default function Home() {
             skipFirstTypewriter={skipTypewriter}
             userStats={userStats}
             userToken={localStorage.getItem("liberta_token") || undefined}
+            onGrantSkill={grantSkill}
+            levelUpSkill={pendingSkill}
+            onDismissLevelUp={dismissPopup}
           />
         </div>
         
