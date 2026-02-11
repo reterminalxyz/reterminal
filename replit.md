@@ -205,10 +205,11 @@ Large prominent navigation button:
 - Profile overlay (inside TerminalChat, NOT separate route): Dossier Mode fullscreen overlay preserving chat state
   - 3D Avatar: @react-three/fiber + @react-three/drei, GLB model (/avatar.glb) loaded via useGLTF with Suspense
   - OrbitControls for finger/mouse rotation, auto-rotation (0.003 rad/frame), sine-wave levitation (0.08 amplitude)
-  - Lighting: ambientLight intensity 2.0 + directionalLight [5,5,5] intensity 3.0 + Stage (environment="city")
+  - Lighting: ambientLight 0.5, white spotLight [3,6,4] intensity 5, blue pointLight [0,1,-4] intensity 4 (rim light), Stage environment="city"
   - Camera: FOV 45, position [0, 0, 5], Stage handles centering
-  - Materials: MeshLambertMaterial color #555555 (simple, always reacts to light)
-  - No bloom/postprocessing (clean render pipeline)
+  - Materials: MeshStandardMaterial color #333333, metalness 0.8, roughness 0.2
+  - NeonVisor: separate mesh at eye level, emissive #ffaa00, emissiveIntensity 10, toneMapped=false
+  - Bloom: UnrealBloomPass (strength 1.5, radius 0.4, threshold 0.1) via Three.js EffectComposer + OutputPass
   - WebGL fallback: SVG avatar if WebGL unavailable (headless browsers)
   - Equipment containers: equipment_head, equipment_body, equipment_hands (empty groups for future gear)
   - Dynamic equipment (currently disabled, containers ready): TRUTH_SEEKER visor, HARD_MONEY chest chip, GRID_RUNNER wireframe

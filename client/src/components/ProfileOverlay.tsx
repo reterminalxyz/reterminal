@@ -1,10 +1,14 @@
-import { useEffect, useState, useCallback, useMemo, Component, Suspense, type ReactNode, type ErrorInfo } from "react";
+import { useEffect, useState, useCallback, useRef, useMemo, Component, Suspense, type ReactNode, type ErrorInfo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, useGLTF, Stage } from "@react-three/drei";
 import { Lock, ArrowLeft, Sparkles } from "lucide-react";
 import { SKILL_META, type SkillKey, SKILL_KEYS } from "@shared/schema";
 import * as THREE from "three";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass.js";
+import { OutputPass } from "three/examples/jsm/postprocessing/OutputPass.js";
 
 type GrantedSkill = { skillKey: string; grantedAt: string | null };
 
@@ -32,26 +36,100 @@ class WebGLErrorBoundary extends Component<{ fallback: ReactNode; children: Reac
   }
 }
 
+function SelectiveBloom() {
+  const { gl, scene, camera, size } = useThree();
+  const composerRef = useRef<EffectComposer | null>(null);
+
+  useEffect(() => {
+    const composer = new EffectComposer(gl);
+    composer.setSize(size.width, size.height);
+    composer.setPixelRatio(Math.min(gl.getPixelRatio(), 2));
+
+    const renderPass = new RenderPass(scene, camera);
+    renderPass.clear = true;
+    composer.addPass(renderPass);
+
+    const bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(size.width, size.height),
+      1.5,
+      0.4,
+      0.1
+    );
+    composer.addPass(bloomPass);
+
+    const outputPass = new OutputPass();
+    composer.addPass(outputPass);
+
+    composerRef.current = composer;
+
+    return () => {
+      composer.dispose();
+    };
+  }, [gl, scene, camera, size]);
+
+  useFrame(() => {
+    if (composerRef.current) {
+      gl.autoClear = false;
+      gl.clear();
+      composerRef.current.render();
+    }
+  }, 1);
+
+  return null;
+}
+
 const AVATAR_URL = "/avatar.glb";
+
+function NeonVisor({ bbox }: { bbox: { center: THREE.Vector3; size: THREE.Vector3 } }) {
+  const visorY = bbox.center.y + bbox.size.y * 0.32;
+  const visorWidth = bbox.size.x * 0.7;
+  const visorHeight = bbox.size.y * 0.06;
+  const visorDepth = bbox.size.z * 0.55;
+
+  return (
+    <mesh position={[bbox.center.x, visorY, bbox.center.z + visorDepth * 0.15]}>
+      <boxGeometry args={[visorWidth, visorHeight, visorDepth * 0.3]} />
+      <meshStandardMaterial
+        color="#ffaa00"
+        emissive="#ffaa00"
+        emissiveIntensity={10}
+        toneMapped={false}
+      />
+    </mesh>
+  );
+}
 
 function AvatarModel() {
   const { scene } = useGLTF(AVATAR_URL);
-  const clonedScene = useMemo(() => {
+
+  const { clonedScene, bbox } = useMemo(() => {
     const clone = scene.clone(true);
     clone.traverse((child) => {
       if ((child as THREE.Mesh).isMesh) {
         const mesh = child as THREE.Mesh;
-        mesh.material = new THREE.MeshLambertMaterial({
-          color: "#555555",
+        mesh.material = new THREE.MeshStandardMaterial({
+          color: "#333333",
+          metalness: 0.8,
+          roughness: 0.2,
         });
         mesh.castShadow = true;
         mesh.receiveShadow = true;
       }
     });
-    return clone;
+    const box = new THREE.Box3().setFromObject(clone);
+    const size = new THREE.Vector3();
+    const center = new THREE.Vector3();
+    box.getSize(size);
+    box.getCenter(center);
+    return { clonedScene: clone, bbox: { size, center } };
   }, [scene]);
 
-  return <primitive object={clonedScene} />;
+  return (
+    <group>
+      <primitive object={clonedScene} />
+      <NeonVisor bbox={bbox} />
+    </group>
+  );
 }
 
 useGLTF.preload(AVATAR_URL);
@@ -118,19 +196,31 @@ function AvatarScene({ skills }: { skills: GrantedSkill[] }) {
       <Canvas
         camera={{ position: [0, 0, 5], fov: 45 }}
         style={{ background: "transparent" }}
-        gl={{ alpha: true, antialias: true }}
+        gl={{ alpha: true, antialias: true, toneMapping: THREE.ACESFilmicToneMapping, toneMappingExposure: 1.0 }}
         onCreated={({ gl }) => {
           gl.setClearColor(0x000000, 0);
         }}
       >
-        <ambientLight intensity={2.0} />
-        <directionalLight position={[5, 5, 5]} intensity={3.0} />
+        <ambientLight intensity={0.5} />
+
+        <spotLight
+          position={[3, 6, 4]}
+          angle={0.5}
+          penumbra={0.8}
+          intensity={5}
+          color="#ffffff"
+          castShadow
+        />
+
+        <pointLight position={[0, 1, -4]} intensity={4} color="#4488ff" />
 
         <Suspense fallback={null}>
-          <Stage intensity={0.5} environment="city" shadows={false} adjustCamera={false}>
+          <Stage intensity={0.3} environment="city" shadows={false} adjustCamera={false}>
             <AvatarModel />
           </Stage>
         </Suspense>
+
+        <SelectiveBloom />
 
         <OrbitControls
           enableZoom={false}
