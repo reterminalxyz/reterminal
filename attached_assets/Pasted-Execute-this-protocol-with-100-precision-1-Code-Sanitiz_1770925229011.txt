@@ -1,0 +1,41 @@
+Execute this protocol with 100% precision:
+
+1. Code Sanitization & Production Cleanup:
+
+Wipe: Remove every console.log, debugger, unused variable, and commented-out code block across the entire project.
+
+Terminology: Update all educational modules. Use "distributed consensus" instead of "immutable/forever". Ensure the wallet section states it manages "private keys", not "stores money".
+
+Hardened Error Handling: Wrap all Nostr and NFC functions in try/catch. On failure, the terminal must output: [SYSTEM_ERROR: MODULE_UNREACHABLE]—no crashes allowed.
+
+2. Architecture Split (The "Bypass" Logic):
+
+Landing (/): Set index.html as the landing page.
+
+App (/activation): Move the fully functional terminal (wallet, Nostr, NFC, UI) to this subdirectory. Update all asset links (JS, CSS, Images) to ensure they resolve correctly under /activation.
+
+3. Landing Page: The Manifesto & Digital Fog:
+
+Manifesto Content: > "The internet has become a digital panopticon. re_terminal is the breach. Post-privacy is our current reality. Offline hardware. Stateless money. Direct signal. Reclaim your digital sovereignty."
+
+Visual Interaction: Implement the "Digital Fog" effect on /. An interactive grey noise/blur layer must cover the screen.
+
+The Reveal: Upon touch or mouse movement, use globalCompositeOperation to "scratch away" the fog, revealing the glowing copper-gradient logo underneath (#D97D45).
+
+CTA: Overlay a flickering monospace prompt: > CLEAR THE FOG TO REVEAL THE SIGNAL_
+
+4. PWA Sovereign Mode (Crucial):
+
+manifest.json: Set "start_url": "/activation".
+
+Behavior: When launched from the home screen icon, the app MUST open the Terminal directly (/activation), completely bypassing the landing page/manifesto.
+
+Offline Support: Configure the Service Worker to cache all assets needed for /activation to ensure the terminal works 100% offline.
+
+5. Mobile & Performance Polish:
+
+Set meta name="viewport" with user-scalable=no specifically for the /activation path to prevent accidental zooming.
+
+Ensure the interactive fog on the landing page is GPU-optimized and doesn't drain the battery.
+
+Once complete, confirm that: 1. The code is sanitized. 2. The PWA starts at /activation. 3. The interactive fog and manifesto are live on the root path.
