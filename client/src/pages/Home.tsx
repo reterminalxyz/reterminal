@@ -476,7 +476,7 @@ export default function Home() {
           </AnimatePresence>
         </div>
 
-        <IndependenceBar progress={progress} phase="phase_1" showBackground={currentQuestion > 1} />
+        <IndependenceBar progress={progress} phase="phase_1" showBackground={currentQuestion > 1} lang={lang} />
       </motion.div>
     );
   }
@@ -510,7 +510,7 @@ export default function Home() {
           </p>
         </motion.div>
 
-        <IndependenceBar progress={progress} phase="phase_1" showBackground={true} />
+        <IndependenceBar progress={progress} phase="phase_1" showBackground={true} lang={lang} />
       </div>
     );
   }
@@ -536,7 +536,7 @@ export default function Home() {
         </div>
         
         <div className="flex-shrink-0">
-          <IndependenceBar progress={progress} phase="phase_2" showBackground={false} />
+          <IndependenceBar progress={progress} phase="phase_2" showBackground={false} lang={lang} />
         </div>
       </div>
     );

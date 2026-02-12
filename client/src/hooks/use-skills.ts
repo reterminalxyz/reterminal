@@ -1,25 +1,33 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import type { SkillKey } from "@shared/schema";
 
 export function useGrantSkill() {
   const [pendingSkill, setPendingSkill] = useState<SkillKey | null>(null);
+  const grantedRef = useRef<Set<string>>(new Set());
 
   const grantSkill = useCallback(async (skillKey: SkillKey): Promise<boolean> => {
     const token = localStorage.getItem("liberta_token");
     if (!token) return false;
-
-    setPendingSkill(skillKey);
+    if (grantedRef.current.has(skillKey)) return false;
 
     try {
-      await fetch("/api/skills/grant", {
+      const res = await fetch("/api/skills/grant", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token, skillKey }),
       });
+      if (!res.ok) return false;
+      const data = await res.json();
+      if (data.granted) {
+        grantedRef.current.add(skillKey);
+        setPendingSkill(skillKey);
+        return true;
+      }
+      grantedRef.current.add(skillKey);
     } catch {
     }
 
-    return true;
+    return false;
   }, []);
 
   const dismissPopup = useCallback(() => {

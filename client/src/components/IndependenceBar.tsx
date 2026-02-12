@@ -1,13 +1,20 @@
 import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 
+const INDEPENDENCE_LABEL: Record<string, string> = {
+  IT: "INDIPENDENZA",
+  EN: "INDEPENDENCE",
+  RU: "НЕЗАВИСИМОСТЬ",
+};
+
 interface IndependenceBarProps {
   progress: number;
   phase: "phase_1" | "phase_2";
   showBackground?: boolean;
+  lang?: string;
 }
 
-export function IndependenceBar({ progress, phase, showBackground = false }: IndependenceBarProps) {
+export function IndependenceBar({ progress, phase, showBackground = false, lang = "IT" }: IndependenceBarProps) {
   const isDark = phase === "phase_2";
   const [isPulsing, setIsPulsing] = useState(false);
   const prevProgressRef = useRef(progress);
@@ -37,7 +44,7 @@ export function IndependenceBar({ progress, phase, showBackground = false }: Ind
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
-          НЕЗАВИСИМОСТЬ
+          {INDEPENDENCE_LABEL[lang] || INDEPENDENCE_LABEL.IT}
         </motion.span>
         
         <div className="relative w-full">
