@@ -49,10 +49,10 @@ const Q_TRANSLATIONS: Record<string, { titles: string[]; yes: string; no: string
   },
   EN: {
     titles: [
-      "Do you want to become freer?",
-      "Do you think governments and corporations want to take people's freedom?",
-      "Can something be done about it?",
-      "Ready to learn what can be done?",
+      "Do you want to be freer?",
+      "Do you believe governments and corporations want to strip people of their freedom?",
+      "Is there anything that can be done about it?",
+      "Are you ready to find out what the solution is?",
     ],
     yes: "YES",
     no: "NO",
@@ -61,12 +61,12 @@ const Q_TRANSLATIONS: Record<string, { titles: string[]; yes: string; no: string
   },
   IT: {
     titles: [
-      "Vuoi diventare più libero?",
-      "Pensi che i governi e le corporation vogliano togliere la libertà alle persone?",
-      "Si può fare qualcosa al riguardo?",
-      "Pronto a scoprire cosa si può fare?",
+      "Vuoi essere pi\u00f9 libero?",
+      "Pensi che governi e aziende vogliano togliere la libert\u00e0 alle persone?",
+      "Si pu\u00f2 fare qualcosa al riguardo?",
+      "Sei pronto a scoprire qual \u00e8 la soluzione?",
     ],
-    yes: "SÌ",
+    yes: "S\u00cc",
     no: "NO",
     notYet: "NON ANCORA",
     tryAgain: "RIPROVA",
@@ -119,7 +119,7 @@ export default function Home() {
       const stored = localStorage.getItem("liberta_lang");
       if (stored === "EN" || stored === "IT" || stored === "RU") return stored;
     } catch (_) {}
-    return "RU";
+    return "IT";
   });
   const { grantSkill, pendingSkill, dismissPopup } = useGrantSkill();
   const handleSatsUpdate = useCallback((sats: number) => setTotalSats(Math.min(sats, 1000)), []);
@@ -134,7 +134,7 @@ export default function Home() {
     try { localStorage.setItem("liberta_lang", newLang); } catch (_) {}
   };
 
-  const qt = Q_TRANSLATIONS[lang] || Q_TRANSLATIONS.RU;
+  const qt = Q_TRANSLATIONS[lang] || Q_TRANSLATIONS.IT;
   
   useEffect(() => {
     const bgColor = phase === "boot" ? '#000000' : phase === "phase_2" ? '#0A0A0A' : '#F5F5F5';
@@ -338,11 +338,11 @@ export default function Home() {
           </motion.div>
           <motion.div 
             className="text-xs tracking-[0.3em] font-mono"
-            style={{ background: "linear-gradient(135deg, #A0522D, #D4956A, #E8B89D)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", opacity: 0.8 }}
+            style={{ color: "#B87333", opacity: 0.8 }}
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           >
-            ИНИЦИАЛИЗАЦИЯ...
+            {lang === "RU" ? "ИНИЦИАЛИЗАЦИЯ..." : lang === "EN" ? "INITIALIZING..." : "INIZIALIZZAZIONE..."}
           </motion.div>
         </div>
       </div>
@@ -404,10 +404,10 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             className={`flex flex-col items-center gap-0.5 px-4 py-2 ${currentQuestion > 1 ? 'bg-[#F5F5F5]/90 border border-[#B87333]/20' : ''}`}
           >
-            <span className="text-[8px] tracking-[2px] font-mono font-bold" style={{ background: "linear-gradient(135deg, #A0522D, #D4956A, #E8B89D)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", opacity: 0.7 }}>
+            <span className="text-[8px] tracking-[2px] font-mono font-bold" style={{ color: "#B87333", opacity: 0.7 }}>
               DIGITAL RESISTANCE
             </span>
-            <span className="text-[11px] tracking-[3px] font-mono font-bold" style={{ background: "linear-gradient(135deg, #8B4513, #B87333 30%, #D4956A 60%, #E8B89D 90%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+            <span className="text-[11px] tracking-[3px] font-mono font-bold" style={{ color: "#B87333" }}>
               re_terminal
             </span>
           </motion.div>
@@ -485,8 +485,8 @@ export default function Home() {
           transition={{ delay: 1 }}
           className="absolute bottom-36 left-1/2 -translate-x-1/2 text-center z-10 bg-[#F5F5F5]/90 px-6 py-3 border border-[#B87333]/20"
         >
-          <p className="text-[22px] tracking-[3px] font-mono font-bold" style={{ background: "linear-gradient(135deg, #7A3B20, #B87333 30%, #D4956A 55%, #E8B89D 80%, #B87333)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", filter: "drop-shadow(0 0 8px rgba(184, 115, 51, 0.3))" }}>
-            Жми на чип
+          <p className="text-[22px] tracking-[3px] font-mono font-bold" style={{ color: "#B87333", filter: "drop-shadow(0 0 8px rgba(184, 115, 51, 0.3))" }}>
+            {lang === "RU" ? "Жми на чип" : lang === "EN" ? "Tap the chip" : "Tocca il chip"}
           </p>
         </motion.div>
 
@@ -511,6 +511,7 @@ export default function Home() {
             onGrantSkill={grantSkill}
             levelUpSkill={pendingSkill}
             onDismissLevelUp={dismissPopup}
+            lang={lang}
           />
         </div>
         

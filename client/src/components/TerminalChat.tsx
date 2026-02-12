@@ -4,32 +4,7 @@ import { X, EyeOff } from "lucide-react";
 import { playClick, playTypeTick, playSatsChime, playTransition } from "@/lib/sounds";
 import { SKILL_META, type SkillKey } from "@shared/schema";
 import ProfileOverlay from "./ProfileOverlay";
-
-interface BlockOption {
-  text: string;
-  action: string;
-  conditional_text?: string;
-  conditional_options?: BlockOption[];
-  continued_text?: string;
-}
-
-interface IntermediateQuestion {
-  text: string;
-  options: BlockOption[];
-}
-
-interface LearningBlock {
-  id: number;
-  title: string;
-  speech: string;
-  intermediate_question?: IntermediateQuestion;
-  speech_continued?: string;
-  skill: string | null;
-  grantSkillKey?: SkillKey;
-  reward: number;
-  progress_target: number;
-  options: BlockOption[];
-}
+import { getLearningBlocks, getWalletSteps, getSatoshiWisdom, getUITexts, type LearningBlock, type WalletStep, type WalletStepButton, type BlockOption } from "@/lib/terminal-i18n";
 
 interface Message {
   id: number;
@@ -48,216 +23,8 @@ interface TerminalChatProps {
   onGrantSkill?: (skillKey: SkillKey) => void;
   levelUpSkill?: SkillKey | null;
   onDismissLevelUp?: () => void;
+  lang?: string;
 }
-
-const LEARNING_BLOCKS: LearningBlock[] = [
-  {
-    id: 1,
-    title: "Дисклеймер (Первый удар)",
-    speech: "Слушай внимательно.\n\nТы попал сюда не случайно. Это альфа-тест проекта о цифровой свободе. Я дам тебе инструменты, которые изменят то, как ты думаешь о свободе в интернете.\n\n10-15 минут. Это всё, что тебе нужно для начала\nЭто проще, чем заказать пиццу в Glovo. Серьёзно.\nНикаких:\n- Регистраций\n- Подписок\n- Личных данных\n- Банковских карт\nТолько ты и этот чат.\n\nВот сделка: За каждый правильный ответ ты получаешь части настоящих биткоинов.\nШкала внизу показывает твой прогресс. Каждый процент — это деньги.\nВерить или нет — твой выбор.\nНо если ты здесь, значит чувствуешь, что что-то не так с системой.\nГотов сделать первый шаг?",
-    skill: "Первый шаг к свободе",
-    grantSkillKey: "WILL_TO_FREEDOM",
-    reward: 100,
-    progress_target: 21,
-    options: [
-      { text: "Да", action: "next_block" },
-      { text: "Нет", action: "go_back", conditional_text: "Понимаю. Система удобна. Если передумаешь — я буду здесь." }
-    ]
-  },
-  {
-    id: 2,
-    title: "Банковское рабство (Правда о твоих деньгах)",
-    speech: "Ты на верном пути!\nДавай начнем с простого вопроса: кому принадлежат деньги на твоем счету?",
-    intermediate_question: {
-      text: "Кому принадлежат деньги на твоем счету?",
-      options: [
-        {
-          text: "Мне",
-          action: "continue",
-          continued_text: "На самом деле нет, хотя банк говорит тебе, что это твои деньги.\n\nНесмотря на то, что их приложение и показывает баланс, эти деньги не твоя собственность. Это запись в ИХ базе данных, которую тебе РАЗРЕШАЮТ использовать.\nПопробуй вот что:\nОтправь крупную сумму другу в другую страну. Банк обязательно спросит: «Откуда деньги? Зачем? Кому?» Они могут заблокировать твой счет просто потому, что их алгоритму не понравилась твоя покупка.\nРешил купить что-то, что не нравится твоему правительству? Может быть, пожертвование протестующим, запрещенную книгу или VPN? Счет заморожен. Без суда.\nДеньги в банке — это не деньги. Это обещание банка.\nИ это обещание работает, пока ты делаешь то, что от тебя ожидают.\nОни контролируют доступ к твоему времени, твоему труду, твоей жизни.\nТы работаешь всю неделю и обмениваешь это время на цифры в приложении. А цифры принадлежат не тебе.\nБанк — хозяин твоего времени.\n«Баланс в приложении» — это не владение, разрешение."
-        },
-        {
-          text: "Банку",
-          action: "continue",
-          continued_text: "Верно, хотя банк говорит тебе, что это твои деньги.\n\nХотя их приложение и показывает баланс, эти деньги не твоя собственность. Это запись в их базе данных, которую тебе разрешают использовать.\nПопробуй вот что:\nОтправь крупную сумму другу в другую страну. Банк обязательно спросит: «Откуда деньги? Зачем? Кому?» Они могут заблокировать твой счет просто потому, что их алгоритму не понравилась твоя покупка.\nРешил купить что-то, что не нравится твоему правительству? Может быть, пожертвование протестующим, запрещенную книгу или VPN? Счет заморожен. Без суда.\nДеньги в банке — это не деньги. Это обещание банка.\nИ это обещание работает, пока ты делаешь то, что от тебя ожидают.\nОни контролируют доступ к твоему времени, твоему труду, твоей жизни.\nТы работаешь всю неделю и обмениваешь это время на цифры в приложении. А цифры принадлежат не тебе.\nБанк — хозяин твоего времени.\n«Баланс в приложении» — это не владение, разрешение."
-        }
-      ]
-    },
-    speech_continued: "На самом деле нет, хотя банк говорит тебе, что это твои деньги.\n\nНесмотря на то, что их приложение и показывает баланс, эти деньги не твоя собственность. Это запись в ИХ базе данных, которую тебе РАЗРЕШАЮТ использовать.\nПопробуй вот что:\nОтправь крупную сумму другу в другую страну. Банк обязательно спросит: «Откуда деньги? Зачем? Кому?» Они могут заблокировать твой счет просто потому, что их алгоритму не понравилась твоя покупка.\nРешил купить что-то, что не нравится твоему правительству? Может быть, пожертвование протестующим, запрещенную книгу или VPN? Счет заморожен. Без суда.\nДеньги в банке — это лишь обещания банка. И эти обещания работают, пока ты делаешь то, что от тебя ожидают.\nПолучается, что система контролирует доступ к твоему времени, твоему труду, твоей жизни.\nТы работаешь всю неделю и обмениваешь это время на цифры в приложении. А цифры принадлежат не тебе.\nБанк — хозяин твоего времени.\n«Баланс в приложении» — это не владение, а разрешение.",
-    skill: "Понимание, что баланс в приложении — это не владение, а разрешение",
-    reward: 100,
-    progress_target: 22,
-    options: [
-      { text: "Ну да, но что с этим делать?", action: "next_block" },
-      {
-        text: "Но так было всегда, это нормально",
-        action: "show_conditional_text",
-        conditional_text: "\"Нормально\" — это когда банк берет комиссию за хранение ТВОИХ денег.\n\n\"Нормально\" — это когда ты не можешь купить билет в другую страну без одобрения банка.\n\nРабство тоже когда-то было \"нормально\".\n\nГотов увидеть выход или вернешься к «нормальности»?",
-        conditional_options: [
-          { text: "Покажи выход", action: "next_block" },
-          { text: "Вернуться к началу", action: "restart" }
-        ]
-      }
-    ]
-  },
-  {
-    id: 3,
-    title: "Bitcoin — выход (Математика против обещаний)",
-    speech: "Хорошо. Ты готов увидеть выход — Bitcoin!\n\nЗабудь всё, что ты слышал о нём раньше \"криптовалюта\", \"инвестиция\", «спекуляция\". Если быть точным, технически это распределенная база данных.\nПредставь правила, которые невозможно изменить в одностороннем порядке. Чтобы подделать транзакцию или изменить алгоритм, нужно убедить миллионы независимых узлов по всему миру. Это не воля банка или обещание правительства — это математический закон, защищенный криптографией.\nБиткоин — это первая в истории человечества система, где доверие заменено доказательством. Правила здесь соблюдаются самой сетью, а не чьим-то указом.\nЕго ещё называют «цифровым золотом»\nПредставь, что золото:\n- Помещается в зашифрованном файле в твоем телефоне\n- Его можно отправить за секунды в любую страну\n- Никто не может его конфисковать\n- Никакой банк его не контролирует\n\nБанк может обанкротиться. Правительство может обесценить деньги.\nBitcoin? Работает 17 лет без остановки. 24/7. Без выходных. Без банкротств.\nЭто первый в истории способ хранить результат твоего труда там, где его не достанет ни одно правительство.",
-    skill: "Bitcoin = математика + редкость + свобода",
-    reward: 100,
-    progress_target: 23,
-    options: [
-      { text: "Понял, но как это устроено?", action: "next_block" },
-      { text: "Какие еще преимущества?", action: "next_block" }
-    ]
-  },
-  {
-    id: 4,
-    title: "Ключи (Кто владеет, тот и хозяин)",
-    speech: "Важное уточнение, исследователь. Твой кошелек (например, Phoenix) — это не банковский счет.\nБиткоинов не существует физически ни в твоем телефоне, ни в облаке, ни в банке. Они — лишь записи в глобальной распределенной базе данных (блокчейне).\nТвой телефон хранит не деньги, а ПРИВАТНЫЕ КЛЮЧИ. Это твоя цифровая подпись. Твой «ключ» — это единственное доказательство твоего права распоряжаться частью ресурсов сети.\nЗапомни: Not your keys, not your bitcoin. Если у тебя есть ключи — ты суверенен. Если ключи у третьей стороны — ты лишь пользователь их сервиса. Phoenix дает тебе полный контроль над ключами прямо здесь, в твоем терминале.",
-    skill: "Понятие личного владения без посредников",
-    reward: 100,
-    progress_target: 24,
-    options: [
-      { text: "Вау, рассказывай дальше", action: "next_block" },
-      { text: "Как этим пользоваться в реальной жизни?", action: "next_block" }
-    ]
-  },
-  {
-    id: 5,
-    title: "Приватность (Быть невидимкой)",
-    speech: "Теперь ты готов к следующему уровню.\n\nСистема хочет знать всё.\nЧто ты ел на завтрак. Куда ходил вчера. Сколько потратил на кофе. С кем встречался.\nБанки передают данные правительству. Google знает, где ты был. Твоя кредитная карта — дневник твоей жизни.\n\nВ Италии каждая транзакция больше €2000 автоматически отслеживается. Покупаешь подержанную машину у друга? Отчитайся перед государством.\n\nА если ты не хочешь? Bitcoin дает тебе выбор.\nТвой адрес — это просто набор букв и цифр. Никакого имени. Никакого паспорта.\nМожно создать новый адрес для каждой транзакции. За секунды. Бесплатно.\n\nХочешь отправить деньги другу? Никаких вопросов «Зачем?». Никаких комиссий банка. Никаких записей в твоем профиле.\n\nТвои траты — твое личное дело.\nДаже базовый уровень Bitcoin дает тебе больше свободы, чем любой банк в мире.",
-    skill: "Базовая цифровая гигиена и право на приватность",
-    reward: 100,
-    progress_target: 25,
-    options: [
-      { text: "Совсем никого между мной и получателем средств?!", action: "next_block" },
-      { text: "Можно ли это использовать для повседневных покупок или снимать наличные?", action: "next_block" }
-    ]
-  },
-  {
-    id: 6,
-    title: "Lightning (Мгновенная энергия)",
-    speech: "Вот где Bitcoin становится оружием будущего.\n\nБиткоинами можно оплачивать огромное количество вещей, а количество стран и бизнесов где им можно оплачивать покупки постоянно растёт. Помимо оплаты в интернете, при необходимости есть сотни способов конвертации в наличные.\n\nПомнишь, в начале я говорил про награду? Ты получаешь сатоши (сокращенно — SATS).\nСатоши — это самая маленькая часть биткоина. В 1 биткоине 100 миллионов SATS. Они названы в честь меня — создателя Bitcoin, Сатоши Накамото.\n\nИ вот что важно: их можно отправлять друг другу за доли секунды.\nХочешь отправить деньги в Японию? 0.5 секунды.\nКомиссия? Меньше одного цента евро. Иногда доли цента.\nЭто называется Lightning Network.\n\nБезграничная сеть. Твой телефон подключается к миллионам узлов по всему миру.\nНикакого банка посередине. Никакой SWIFT. Никаких «рабочих часов».\nДеньги двигаются со скоростью мысли.",
-    skill: "Мгновенные платежи без границ",
-    reward: 100,
-    progress_target: 26,
-    options: [
-      { text: "Кому всё это нужно?", action: "next_block" },
-      { text: "Звучит сложно, нужно уметь программировать", action: "next_block", conditional_text: "Нет. Мы сделали это проще Glovo. Идем дальше." }
-    ]
-  },
-  {
-    id: 7,
-    title: "Карта-щит (Твой пропуск в сопротивление)",
-    speech: "Ты почти прошел прототип 1 модуля и через пару минут сможешь забрать свою награду! Пора рассказать, куда ты попал.\n\nТы в клубе цифрового сопротивления авторитаризму.\n\nВсего будет 7 модулей.\nВ ближайшее время появятся:\n\n→ 2: Приватность и обход слежки\n→ 3: Защищенная коммуникация\n→ 4: Обход цензуры\n→ 5: Свободный доступ к знаниям\n→ 6: Техно-философия\n→ 7: Инструменты выживания оффлайн\n\nКаждый модуль — это навык. Каждый навык — это часть щита независимости.\n\nК концу ты будешь уметь:\nХранить деньги так, что никто их не заберет\n- Общаться так, что никто не прочитает\n- Получать информацию, которую пытаются скрыть\nВыживать в мире, где система пытается тебя контролировать\n\nА самое главное получишь десятки практических навыков для защиты своей свободы так, как нужно именно тебе. Никакой политической программы, только право человека на свободу!\n\nТа прозрачная карта — это пропуск в глобальную сеть людей, которые хотят жить в более честном мире. Передай карту тому, кто поймёт.\n\nМы строим параллельный интернет. И ты только что стал частью этого.",
-    skill: "Понимание экосистемы свободы",
-    reward: 200,
-    progress_target: 27,
-    options: [
-      { text: "Хорошо, готов забрать SATS", action: "next_block" }
-    ]
-  },
-  {
-    id: 8,
-    title: "Финальный выбор (Момент истины)",
-    speech: "1000 SATS — твои первые деньги, которые не принадлежат банку.\n\nНо есть одна проблема… У тебя еще нет кошелька. Прямо сейчас эти SATS существуют только тут.\n\nТвой финальный шаг:\n\nСоздать личный Bitcoin-кошелек. Это займёт 2 минуты.\nИ все SATS, которые ты заработал, придут на твой адрес. Автоматически.\nЭто момент, когда теория становится реальностью.",
-    skill: "Момент принятия финального решения",
-    reward: 0,
-    progress_target: 27,
-    options: [
-      { text: "Давай создадим кошелек", action: "create_wallet" },
-      {
-        text: "Нет, мне нужно подумать",
-        action: "show_conditional_text",
-        conditional_text: "Понимаю. Свобода пугает.\n\nТвои сатоши будут ждать тебя здесь 72 часа. После этого — они исчезнут.\n\nВыбор за тобой. Всегда был.",
-        conditional_options: [
-          { text: "Вернуться к созданию кошелька", action: "create_wallet" }
-        ]
-      }
-    ]
-  },
-];
-
-interface WalletStepButton {
-  text: string;
-  type: "next" | "external" | "deeplink";
-  url?: string;
-  target?: string;
-}
-
-interface WalletStep {
-  id: string;
-  title: string;
-  instruction: string;
-  buttons: WalletStepButton[];
-}
-
-const WALLET_STEPS: WalletStep[] = [
-  {
-    id: "step_1",
-    title: "Скачай свой личный сейф",
-    instruction: "Новичкам советуем используем Phoenix Wallet. Он простой, быстрый и твой.\n\nВажное уточнение, твой кошелек это не банковский счет.\nБиткоинов не существует физически ни в твоем телефоне, ни в облаке, ни в банке. Они — лишь записи в глобальной распределенной базе данных (блокчейне).\nТвой телефон хранит не деньги, а ПРИВАТНЫЕ КЛЮЧИ. Это твоя цифровая подпись. Твой «ключ» — это единственное доказательство твоего права распоряжаться частью ресурсов сети.\nЗапомни: Not your keys, not your bitcoin. Если у тебя есть ключи — ты суверенен. Если ключи у третьей стороны — ты лишь пользователь их сервиса.",
-    buttons: [
-      { text: "Скачать кошелек для iPhone", url: "https://apps.apple.com/it/app/phoenix-wallet/id1544097028", type: "external" },
-      { text: "Скачать кошелек для Android", url: "https://play.google.com/store/apps/details?id=fr.acinq.phoenix.mainnet&pli=1", type: "external" },
-      { text: "Уже скачал, что дальше?", type: "next", target: "step_2" }
-    ]
-  },
-  {
-    id: "step_2",
-    title: "Создай свой кошелек",
-    instruction: "Отлично. Приложение скачано.\n\nТеперь открой Phoenix Wallet на своём телефоне.\n\nВот что ты увидишь:\n\nПри первом запуске:\nPhoenix покажет экран приветствия с двумя вариантами:\n- \"Create a new wallet\" (Создать новый кошелек)\n- \"Restore a wallet\" (Восстановить кошелек)\n\nЧто делать:\nНажми на \"Create a new wallet\"\n\nPhoenix автоматически:\n- Сгенерирует твой уникальный кошелек\n- Создаст твой личный Bitcoin-адрес\n- Подготовит всё для приёма платежей\n\nЭто займет 3-5 секунд.\n\nВсё. Кошелек создан.\n\nТы только что вошел в параллельную экономику. У тебя есть личный Bitcoin-адрес, который может принимать платежи со всего мира.\n\nНикаких посредников. Никаких разрешений. Никаких границ.\n\nНо есть еще один критически важный шаг — сохранить ключи от этого кошелька.",
-    buttons: [
-      { text: "Кошелек создан, что дальше?", type: "next", target: "step_3" }
-    ]
-  },
-  {
-    id: "step_3",
-    title: "12 слов = абсолютная власть",
-    instruction: "Сейчас самое важное.\n\nТвой кошелек защищен 12 словами. Это называется seed-фраза. Твой мастер-ключ.\n\nЭти 12 слов — это единственный способ восстановить доступ к твоим деньгам.\n\nПотерял телефон? Слова восстановят кошелек на новом.\nПотерял слова? Всё. Игра окончена. Никакой техподдержки. Никакого восстановления. Никогда.\n\nПошаговая инструкция:\n\n1. Открой Phoenix Wallet на телефоне\n\n2. Найди иконку шестеренки в правом верхнем углу\n   Это настройки приложения\n\n3. Нажми на шестеренку\n   Откроется меню настроек\n\n4. Найди пункт \"Recovery phrase\" или \"Seed\" или \"Display seed\"\n   (Может называться по-разному в зависимости от версии)\n\n5. Нажми на этот пункт\n   Phoenix покажет предупреждение о безопасности\n\n6. Подтверди, что понимаешь риски\n   (Обычно кнопка \"I understand\" или \"Show seed\")\n\n7. Phoenix покажет твои 12 слов\n   Они пронумерованы от 1 до 12\n\n8. Теперь СОХРАНИ эти слова:\n\n═══════════════════════════════\n\nЛУЧШИЙ ВАРИАНТ (самый безопасный):\n\nРучка + бумага\n- Возьми чистый лист бумаги\n- Запиши все 12 слов РУЧКОЙ (не карандашом)\n- Обязательно сохрани порядок (1, 2, 3... 12)\n- Проверь дважды — нет ли ошибок\n- Спрячь бумагу в надежном месте:\n  Не в кошельке (можно потерять)\n  Не на холодильнике (могут увидеть)\n  Идеально: сейф, книга, конверт в столе\n\n═══════════════════════════════\n\nНЕТ РУЧКИ И БУМАГИ ПОД РУКОЙ?\n\nВременные альтернативы (сделай это СЕГОДНЯ):\n\nВариант 1: Заметки телефона (ОФФЛАЙН)\n- Открой приложение \"Заметки\"\n- Создай новую заметку\n- Запиши все 12 слов в правильном порядке\n- Удали эту заметку СРАЗУ после того, как перепишешь на бумагу!\n\nВариант 2: Запомни наизусть (экстремальный)\n- Прочитай все 12 слов вслух 3 раза подряд\n- Закрой глаза и повтори по памяти\n- Повтори через 10 минут\n\nНИКОГДА не храни seed-фразу:\n- В облаке (Google Drive, iCloud)\n- В мессенджере (WhatsApp, Telegram)\n- В email\n- В скриншоте\n\nГотово?",
-    buttons: [
-      { text: "Да, записал на бумаге", type: "next", target: "step_4" },
-      { text: "Да, сохранил временно (перепишу позже)", type: "next", target: "step_3a" }
-    ]
-  },
-  {
-    id: "step_3a",
-    title: "Дополнительное предупреждение",
-    instruction: "Хорошо. Но помни:\n\nЦифровое хранение seed-фразы — это риск.\n- Телефоны взламывают\n- Облака утекают\n- Приложения крашатся\n- Устройства ломаются\n\nБумага существует 100+ лет.\nЦифровой файл может исчезнуть за секунду.\n\nИдем дальше?",
-    buttons: [
-      { text: "Понял, идем дальше", type: "next", target: "step_4" }
-    ]
-  },
-  {
-    id: "step_4",
-    title: "Забери своё",
-    instruction: "Сейчас ты получишь свои заработанные SATS.\n\nКак это работает:\n\nКогда нажмешь кнопку \"ПОЛУЧИТЬ 1000 SATS\" внизу, произойдет следующее:\n\n1. Автоматически откроется Phoenix Wallet\n   (Если не открылся — открой вручную)\n\n2. Phoenix покажет уведомление о входящем платеже\n   \"Incoming payment: 1000 sats\"\n\n3. Через пару секунд ты увидишь их на балансе\n   Ты увидишь \"+1000\" в приложении\n\n4. Готово. Деньги твои.\n\nЭто Bitcoin. Мгновенно, анонимно и без посредников.\n\nОт нас к тебе напрямую. Через математику  и криптографию. Через свободу.\n\nДобро пожаловать в параллельную экономику.\n\nТы только что сделал то, что большинство людей никогда не решится сделать:\nВзял контроль над своими деньгами.\n\nТы больше не гость в чужом доме.\nТы — хозяин.\n\nНажимай кнопку. Твои сатоши ждут.",
-    buttons: [
-      { text: "ПОЛУЧИТЬ 1000 SATS", type: "deeplink", url: "lightning:LNURL1DP68GURN8GHJ7ET4WP5X7UNFVDEKZUNYD9HX2UEJ9EKXUCNFW3EJUCM0D5HHW6T5DPJ8YCTH9ASHQ6F0WCCJ7MRWW4EXCT6P0PZKYUJP8YE8SNPKWQMRVA23DPD8SERCVC2YC4CH", target: "step_5" }
-    ]
-  },
-  {
-    id: "step_5",
-    title: "Добро пожаловать в сопротивление",
-    instruction: "Ты сделал это.\n\n1000 SATS только что прилетели на твой кошелек.\n\nЭто твои первые деньги в параллельной экономике.\n\nЧто дальше?\n\nЕсли хочешь, изучи Phoenix Wallet\n- Попробуй отправить 10 sats другу (если у него тоже есть кошелек)\n- Найди свой адрес\n- Изучи настройки\n\nСледи за обновлениями проекта\nВ ближайшее время выйдут модули 2-7:\n- Приватность и обход слежки\n- Защищенная коммуникация\n- Обход цензуры\n- Свободный доступ к знаниям\n- Техно-философия\n- Инструменты выживания оффлайн\n\nПередай прозрачную карту тому, кто готов.",
-    buttons: []
-  }
-];
-
-const SATOSHI_WISDOM = [
-  "Корень проблемы традиционных валют — доверие. Нужно доверять центральному банку, что он не обесценит валюту. История полна примеров нарушения этого доверия.",
-  "Bitcoin — это первая реализация концепции криптовалюты. Главное нововведение: сеть без доверенного центра или третьих сторон.",
-  "Природа Bitcoin такова, что после выхода версии 0.1 ядро протокола высечено в камне. Я хочу, чтобы вы могли представить его как неизменный.",
-  "Потерянные монеты только делают монеты других чуть более ценными. Думайте об этом как о пожертвовании всем остальным.",
-  "Сеть устойчива в своей неструктурированной простоте. Узлы работают одновременно с небольшой координацией. Они не нуждаются в идентификации, поскольку сообщения не направляются в конкретное место.",
-  "Проблема двойной траты решена через peer-to-peer сеть. Сеть ставит метку времени на транзакции, хешируя их в непрерывную цепь доказательств работы.",
-  "Если вы не верите мне или не понимаете — у меня нет времени убеждать вас, извините.",
-  "Bitcoin генерируется скоростью, приближающейся к запланированному графику, и это остается верным независимо от того, сколько майнеров участвует.",
-  "Через несколько десятилетий, когда награда станет слишком маленькой, комиссия за транзакции станет основным стимулом для узлов.",
-  "Написание описания для этого для обычных людей чертовски сложно. Здесь нет ничего, к чему можно привязаться.",
-];
 
 const PixelSendIcon = () => (
   <svg width="20" height="20" viewBox="0 0 16 16" fill="currentColor" style={{ imageRendering: 'pixelated' }}>
@@ -419,7 +186,7 @@ function clearWalletState() {
   try { localStorage.removeItem("liberta_wallet_state"); } catch (_) {}
 }
 
-function SkillNotificationBanner({ onClose, iconRect }: { onClose: () => void; iconRect?: { x: number; y: number } | null }) {
+function SkillNotificationBanner({ onClose, iconRect, skillText = "+SKILL" }: { onClose: () => void; iconRect?: { x: number; y: number } | null; skillText?: string }) {
   const [phase, setPhase] = useState<"show" | "fly">("show");
 
   useEffect(() => {
@@ -469,7 +236,7 @@ function SkillNotificationBanner({ onClose, iconRect }: { onClose: () => void; i
             textShadow: '0 0 8px #FFD700, 0 0 16px #B87333',
           }}
         >
-          Новый скилл
+          {skillText}
         </span>
       </motion.div>
     </motion.div>
@@ -517,7 +284,12 @@ function loadTerminalProgress(): { blockIndex: number; sats: number; progress: n
 let msgIdCounter = 0;
 function nextMsgId() { return ++msgIdCounter; }
 
-export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats, skipFirstTypewriter, userStats, userToken, onGrantSkill, levelUpSkill, onDismissLevelUp }: TerminalChatProps) {
+export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats, skipFirstTypewriter, userStats, userToken, onGrantSkill, levelUpSkill, onDismissLevelUp, lang = "IT" }: TerminalChatProps) {
+  const LEARNING_BLOCKS_LOCAL = getLearningBlocks(lang);
+  const WALLET_STEPS_LOCAL = getWalletSteps(lang);
+  const SATOSHI_WISDOM_LOCAL = getSatoshiWisdom(lang);
+  const uiTexts = getUITexts(lang);
+
   const [showProfile, setShowProfile] = useState(false);
   const [iconBlinking, setIconBlinking] = useState(false);
   const dosierIconRef = useRef<HTMLButtonElement>(null);
@@ -675,15 +447,15 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     if (followUpdatesClicked || isTyping) return;
     playClick();
     setFollowUpdatesClicked(true);
-    setMessages(prev => [...prev, { id: nextMsgId(), text: "Как следить за обновлениями проекта?", sender: "user" }]);
+    setMessages(prev => [...prev, { id: nextMsgId(), text: uiTexts.followQuestion, sender: "user" }]);
     safeTimeout(() => {
       typeMessage(
-        "Ты можешь скачать приложение — его нельзя удалить из магазинов приложений, потому что оно создано устойчивым к цензуре.\n\nВторая опция — подпишись на фаундера в децентрализованной соц. сети Nostr и следи за всеми новостями там. Мы будем изучать её в следующих блоках.",
+        uiTexts.followResponse,
         "satoshi",
         () => { setFollowUpdatesTyped(true); }
       );
     }, 500);
-  }, [followUpdatesClicked, isTyping, typeMessage, safeTimeout]);
+  }, [followUpdatesClicked, isTyping, typeMessage, safeTimeout, uiTexts]);
 
   const handlePWAInstall = useCallback(async () => {
     playClick();
@@ -695,7 +467,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
   }, []);
 
   const startBlock = useCallback((blockIndex: number, skipTyping?: boolean) => {
-    const block = LEARNING_BLOCKS[blockIndex];
+    const block = LEARNING_BLOCKS_LOCAL[blockIndex];
     if (!block) return;
 
     userScrolledRef.current = false;
@@ -766,7 +538,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
   }, [safeTimeout]);
 
   const completeBlock = useCallback((blockIndex: number) => {
-    const block = LEARNING_BLOCKS[blockIndex];
+    const block = LEARNING_BLOCKS_LOCAL[blockIndex];
     if (!block) return;
 
     setCompletedBlockCount(prev => Math.max(prev, blockIndex + 1));
@@ -793,7 +565,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
   }, [onSatsUpdate, onProgressUpdate, showNotification, onGrantSkill, safeTimeout]);
 
   const startWalletStep = useCallback((stepId: string) => {
-    const step = WALLET_STEPS.find(s => s.id === stepId);
+    const step = WALLET_STEPS_LOCAL.find(s => s.id === stepId);
     if (!step) return;
 
     setWalletMode(true);
@@ -925,21 +697,21 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     playClick();
 
     if (flowCompleted) {
-      let idx = Math.floor(Math.random() * SATOSHI_WISDOM.length);
+      let idx = Math.floor(Math.random() * SATOSHI_WISDOM_LOCAL.length);
       if (idx === lastWisdomRef.current) {
-        idx = (idx + 1) % SATOSHI_WISDOM.length;
+        idx = (idx + 1) % SATOSHI_WISDOM_LOCAL.length;
       }
       lastWisdomRef.current = idx;
-      const wisdom = SATOSHI_WISDOM[idx];
+      const wisdom = SATOSHI_WISDOM_LOCAL[idx];
       safeTimeout(() => {
         typeMessage(wisdom, "satoshi", () => {});
       }, 500);
     } else {
       safeTimeout(() => {
-        setMessages(prev => [...prev, { id: nextMsgId(), text: "сначала пройди первый блок, все вопросы потом", sender: "satoshi" }]);
+        setMessages(prev => [...prev, { id: nextMsgId(), text: uiTexts.waitMessage, sender: "satoshi" }]);
       }, 500);
     }
-  }, [inputText, flowCompleted, typeMessage, safeTimeout]);
+  }, [inputText, flowCompleted, typeMessage, safeTimeout, SATOSHI_WISDOM_LOCAL, uiTexts]);
 
   const handleOptionClick = useCallback((option: BlockOption) => {
     if (isLockedRef.current || isTyping) return;
@@ -949,7 +721,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     setMessages(prev => [...prev, { id: nextMsgId(), text: option.text, sender: "user" }]);
     setCurrentOptions([]);
 
-    const currentBlock = LEARNING_BLOCKS[currentBlockIndex];
+    const currentBlock = LEARNING_BLOCKS_LOCAL[currentBlockIndex];
 
     if (option.action === "continue") {
       setBlockPhase("typing_speech_continued");
@@ -973,7 +745,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
             completeBlock(currentBlockIndex);
             safeTimeout(() => {
               const nextIndex = currentBlockIndex + 1;
-              if (nextIndex < LEARNING_BLOCKS.length) {
+              if (nextIndex < LEARNING_BLOCKS_LOCAL.length) {
                 startBlock(nextIndex);
               }
             }, 800);
@@ -984,7 +756,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
         safeTimeout(() => {
           isLockedRef.current = false;
           const nextIndex = currentBlockIndex + 1;
-          if (nextIndex < LEARNING_BLOCKS.length) {
+          if (nextIndex < LEARNING_BLOCKS_LOCAL.length) {
             startBlock(nextIndex);
           }
         }, 800);
@@ -1077,7 +849,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     prevSatsRef.current = totalSats;
   }, [totalSats]);
 
-  const currentBlock = LEARNING_BLOCKS[currentBlockIndex];
+  const currentBlock = LEARNING_BLOCKS_LOCAL[currentBlockIndex];
 
   return (
     <div className="flex flex-col h-full bg-[#0A0A0A] text-[#E8E8E8] font-mono">
@@ -1124,7 +896,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 rounded-full bg-[#B87333]" />
             <span className="text-[11px] tracking-[4px] font-bold text-[#B87333]">
-              re_terminal
+              re_terminal<span className="inline-block w-[2px] h-[12px] bg-[#B87333] ml-0.5 animate-pulse" />
             </span>
           </div>
           <div className="flex items-center gap-3">
@@ -1190,7 +962,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
       <div className="flex-shrink-0 px-4 py-1.5 border-b border-[#B87333]/30 bg-[#0D0D0D]">
         <div className="flex items-center justify-center max-w-[400px] mx-auto">
           <span className="text-[9px] tracking-[2px] text-[#B87333]/40 font-bold" data-testid="text-block-indicator">
-            1/7 ФИНАНСОВАЯ СВОБОДА
+            {uiTexts.moduleLabel}
           </span>
         </div>
       </div>
@@ -1319,7 +1091,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
               data-testid="button-troubleshooting"
             >
               <span className="mr-2 text-[#B87333]/30">{showTroubleshooting ? "[-]" : "[+]"}</span>
-              TROUBLESHOOTING
+              {uiTexts.troubleshootingButton}
             </motion.button>
 
             <AnimatePresence>
@@ -1332,11 +1104,10 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
                   className="overflow-hidden"
                 >
                   <div className="px-4 py-3 text-[12px] font-mono leading-relaxed text-[#B87333]/70 border border-t-0 border-[#B87333]/20 bg-[#0A0A0A]">
-                    <p className="text-[#B87333] font-bold mb-2 tracking-wider text-[11px]">ЕСЛИ ДЕНЬГИ НЕ ПРИШЛИ:</p>
-                    <p className="mb-1">- Проверь интернет-соединение</p>
-                    <p className="mb-1">- Подожди 30-60 секунд</p>
-                    <p className="mb-1">- Перезапусти Phoenix Wallet</p>
-                    <p>- Если через 5 минут деньги не пришли — свяжись с нами в чате</p>
+                    <p className="text-[#B87333] font-bold mb-2 tracking-wider text-[11px]">{uiTexts.troubleshootingTitle}</p>
+                    {uiTexts.troubleshootingSteps.map((step: string, i: number) => (
+                      <p key={i} className={i < uiTexts.troubleshootingSteps.length - 1 ? "mb-1" : ""}>- {step}</p>
+                    ))}
                   </div>
                 </motion.div>
               )}
@@ -1355,7 +1126,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
                 data-testid="button-follow-updates"
               >
                 <span className="mr-2 text-[#00e5ff]/30">[?]</span>
-                КАК СЛЕДИТЬ ЗА ОБНОВЛЕНИЯМИ ПРОЕКТА?
+                {uiTexts.followButton}
               </motion.button>
             )}
           </div>
@@ -1374,7 +1145,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
                        hover:bg-[#B87333]/20 transition-all duration-200"
               data-testid="button-install-pwa"
             >
-              СКАЧАТЬ ПРИЛОЖЕНИЕ
+              {uiTexts.downloadApp}
             </motion.button>
             <motion.a
               href="https://primal.net/p/npub1qlkwmzmrhzpuak7c2g9afdcstamqrfmxkpjkgy3wjfagxtjqs2xqnxshjp"
@@ -1388,7 +1159,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
                        hover:bg-[#00e5ff]/10 transition-all duration-200"
               data-testid="link-nostr-founder"
             >
-              ФАУНДЕР В NOSTR
+              {uiTexts.founderNostr}
             </motion.a>
           </div>
         )}
@@ -1403,7 +1174,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onKeyDown={(e) => { if (e.key === "Enter") handleInputSend(); }}
-            placeholder="Напиши сообщение..."
+            placeholder={uiTexts.inputPlaceholder}
             className="flex-1 bg-[#1A1A1A] text-[#B87333] text-[12px] font-mono px-3 py-2 border border-[#B87333]/20 outline-none focus:border-[#B87333]/50 placeholder-[#B87333]/30"
             data-testid="input-message"
           />
@@ -1431,6 +1202,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
               setIconBlinking(true);
               safeTimeout(() => setIconBlinking(false), 2600);
             }}
+            skillText={uiTexts.skillNotification}
           />
         )}
       </AnimatePresence>

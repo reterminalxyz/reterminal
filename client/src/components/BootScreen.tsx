@@ -4,7 +4,7 @@ import { Share, ArrowDown } from "lucide-react";
 
 type Lang = "RU" | "EN" | "IT";
 
-const LANGS: Lang[] = ["RU", "EN", "IT"];
+const LANGS: Lang[] = ["IT", "EN", "RU"];
 
 const TRANSLATIONS = {
   RU: {
@@ -17,22 +17,22 @@ const TRANSLATIONS = {
     openApp: "Открой приложение на главном экране",
   },
   EN: {
-    heroTitle: "You activated the freedom card",
+    heroTitle: "You have activated the Freedom Card",
     heroSubtitle: "For permanent access and censorship resistance, install the terminal on your phone",
-    stayBrowser: "Stay in browser",
-    installTerminal: "Install terminal",
+    stayBrowser: "Stay in Browser",
+    installTerminal: "Install Terminal",
     shuttingDown: "SHUTTING DOWN...",
     terminalInstalled: "TERMINAL INSTALLED",
     openApp: "Open the app on your home screen",
   },
   IT: {
-    heroTitle: "Hai attivato la carta della libertà",
-    heroSubtitle: "Per un accesso permanente e resistenza alla censura, installa il terminale sul telefono",
-    stayBrowser: "Rimani nel browser",
+    heroTitle: "Hai attivato la Carta della Libert\u00e0",
+    heroSubtitle: "Per un accesso costante e resistente alla censura, installa il terminale sul telefono",
+    stayBrowser: "Resta nel browser",
     installTerminal: "Installa terminale",
-    shuttingDown: "SPEGNIMENTO...",
+    shuttingDown: "DISCONNESSIONE...",
     terminalInstalled: "TERMINALE INSTALLATO",
-    openApp: "Apri l'app dalla schermata principale",
+    openApp: "Apri l'app nella schermata home",
   },
 };
 
@@ -91,13 +91,13 @@ type ShutdownStage = "idle" | "waiting" | "squeeze" | "line" | "dot" | "black";
 export { LangToggle, LANGS };
 export type { Lang };
 
-export function BootScreen({ onDismiss, onLangChange, lang = "RU" }: BootScreenProps) {
+export function BootScreen({ onDismiss, onLangChange, lang = "IT" }: BootScreenProps) {
   const [showIOSInstructions, setShowIOSInstructions] = useState(false);
   const [shutdownStage, setShutdownStage] = useState<ShutdownStage>("idle");
   const deferredPromptRef = useRef<any>(null);
 
-  const currentLang = (lang as Lang) || "RU";
-  const t = TRANSLATIONS[currentLang] || TRANSLATIONS.RU;
+  const currentLang = (lang as Lang) || "IT";
+  const t = TRANSLATIONS[currentLang] || TRANSLATIONS.IT;
 
   const handleLangSwitch = (l: Lang) => {
     try { localStorage.setItem("liberta_lang", l); } catch (_) {}
