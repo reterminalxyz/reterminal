@@ -1,7 +1,8 @@
-const CACHE_NAME = 'liberta-terminal-v2';
+const CACHE_NAME = 'liberta-terminal-v3';
 
 const PRECACHE_URLS = [
   '/',
+  '/activation',
   '/manifest.json',
   '/icons/icon-192.png',
   '/icons/icon-512.png'

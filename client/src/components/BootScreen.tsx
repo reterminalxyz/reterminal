@@ -68,12 +68,12 @@ function LangToggle({ lang, onLangChange, variant }: { lang: Lang; onLangChange:
           <button
             type="button"
             onClick={() => onLangChange(l)}
-            className="px-2 py-1 transition-colors duration-150"
+            className="px-2.5 py-1.5 transition-colors duration-150"
             style={{
-              fontSize: "8px",
+              fontSize: "10px",
               letterSpacing: "2px",
               color: lang === l ? "#B87333" : inactiveColor,
-              borderBottom: lang === l ? "1px solid #B87333" : "1px solid transparent",
+              borderBottom: lang === l ? "1.5px solid #B87333" : "1.5px solid transparent",
               lineHeight: 1,
             }}
             data-testid={`lang-${l.toLowerCase()}`}

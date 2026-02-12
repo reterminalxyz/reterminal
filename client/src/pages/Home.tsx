@@ -381,11 +381,11 @@ export default function Home() {
               DIGITAL RESISTANCE
             </span>
             <span className="text-[11px] tracking-[3px] font-mono font-bold" style={{ color: "#B87333" }}>
-              re_terminal
+              re_terminal<span className="animate-blink">_</span>
             </span>
           </motion.div>
           
-          <div className="w-[50px] flex justify-end">
+          <div className="flex justify-end mr-1">
             {currentQuestion === 1 && (
               <LangToggle lang={lang} onLangChange={(l) => handleLangChange(l)} variant="light" />
             )}
