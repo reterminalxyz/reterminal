@@ -278,10 +278,11 @@ export default function Home() {
             animate={{ rotate: 360 }}
             transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
           >
-            <Loader2 className="w-8 h-8 text-[#B87333]" />
+            <Loader2 className="w-8 h-8" style={{ color: "#B87333", filter: "drop-shadow(0 0 6px rgba(184, 115, 51, 0.5))" }} />
           </motion.div>
           <motion.div 
-            className="text-xs tracking-[0.3em] text-[#B87333]/70 font-mono"
+            className="text-xs tracking-[0.3em] font-mono"
+            style={{ background: "linear-gradient(135deg, #A0522D, #D4956A, #E8B89D)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", opacity: 0.8 }}
             animate={{ opacity: [0.5, 1, 0.5] }}
             transition={{ duration: 1.5, repeat: Infinity }}
           >
@@ -316,9 +317,13 @@ export default function Home() {
               exit={{ opacity: 0, y: -50 }}
               className="fixed top-4 left-0 right-0 z-50 pointer-events-none flex justify-center"
             >
-              <div className="bg-[#1E1E1E] text-[#B87333] px-6 py-3 
-                            text-[13px] tracking-[3px] font-mono font-bold
-                            border border-[#B87333]/60 shadow-lg">
+              <div className="px-6 py-3 text-[13px] tracking-[3px] font-mono font-bold"
+                style={{
+                  background: "#1E1E1E",
+                  border: "1px solid rgba(212, 149, 106, 0.6)",
+                  boxShadow: "0 0 15px rgba(184, 115, 51, 0.3), 0 0 30px rgba(184, 115, 51, 0.1)",
+                  color: "#D4956A",
+                }}>
                 ПОПРОБУЙ ЕЩЁ
               </div>
             </motion.div>
@@ -337,10 +342,10 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             className={`flex flex-col items-center gap-0.5 px-4 py-2 ${currentQuestion > 1 ? 'bg-[#F5F5F5]/90 border border-[#B87333]/20' : ''}`}
           >
-            <span className="text-[8px] text-[#B87333]/60 tracking-[2px] font-mono font-bold">
+            <span className="text-[8px] tracking-[2px] font-mono font-bold" style={{ background: "linear-gradient(135deg, #A0522D, #D4956A, #E8B89D)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", opacity: 0.7 }}>
               DIGITAL RESISTANCE
             </span>
-            <span className="text-[11px] text-[#B87333] tracking-[3px] font-mono font-bold">
+            <span className="text-[11px] tracking-[3px] font-mono font-bold" style={{ background: "linear-gradient(135deg, #8B4513, #B87333 30%, #D4956A 60%, #E8B89D 90%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
               СБОРКА ПРОТОКОЛА
             </span>
           </motion.div>
@@ -358,12 +363,14 @@ export default function Home() {
             >
               {/* Title - background only on Q2+ */}
               <motion.h1 
-                className={`text-[14px] text-[#B87333] tracking-[2px] font-bold mb-16 -mt-32 px-6 py-2 text-center max-w-[340px] leading-relaxed ${currentQuestion > 1 ? 'bg-[#F5F5F5]/90 border border-[#B87333]/20' : ''}`}
+                className={`text-[14px] tracking-[2px] font-bold mb-16 -mt-32 px-6 py-2 text-center max-w-[340px] leading-relaxed ${currentQuestion > 1 ? 'bg-[#F5F5F5]/90 border border-[#B87333]/20' : ''}`}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
               >
-                {question.title}
+                <span style={{ background: "linear-gradient(135deg, #8B4513, #B87333 30%, #D4956A 60%, #E8B89D 90%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
+                  {question.title}
+                </span>
               </motion.h1>
               
               <div className="flex gap-3">
@@ -375,11 +382,12 @@ export default function Home() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 + idx * 0.1 }}
                     onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleQuestionAnswer(question.id as QuestionId, option.correct); }}
-                    className={`w-36 h-12 border-2 border-[#B87333] text-[#3E3129] 
-                             text-[13px] font-bold tracking-wider font-mono
-                             hover:bg-[#B87333] hover:text-[#F5F5F5] 
-                             active:scale-95 transition-all duration-200
-                             ${currentQuestion > 1 ? 'bg-[#F5F5F5]/90' : 'bg-[#F5F5F5]'}`}
+                    className="w-36 h-12 text-[#F5F5F5] text-[13px] font-bold tracking-wider font-mono active:scale-95 transition-all duration-200"
+                    style={{
+                      background: "linear-gradient(135deg, #7A3B20 0%, #A0522D 20%, #B87333 40%, #D4956A 60%, #E8B89D 80%, #B87333 100%)",
+                      boxShadow: "0 0 12px rgba(184, 115, 51, 0.4), 0 0 25px rgba(184, 115, 51, 0.15), inset 0 1px 1px rgba(232, 184, 157, 0.3)",
+                      border: "1px solid rgba(212, 149, 106, 0.5)",
+                    }}
                     data-testid={`button-q${question.id}-${idx === 0 ? 'a' : 'b'}`}
                   >
                     {option.label}
@@ -423,7 +431,7 @@ export default function Home() {
           transition={{ delay: 1 }}
           className="absolute bottom-36 left-1/2 -translate-x-1/2 text-center z-10 bg-[#F5F5F5]/90 px-6 py-3 border border-[#B87333]/20"
         >
-          <p className="text-[22px] text-[#B87333] tracking-[3px] font-mono font-bold">
+          <p className="text-[22px] tracking-[3px] font-mono font-bold" style={{ background: "linear-gradient(135deg, #7A3B20, #B87333 30%, #D4956A 55%, #E8B89D 80%, #B87333)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", filter: "drop-shadow(0 0 8px rgba(184, 115, 51, 0.3))" }}>
             Жми на чип
           </p>
         </motion.div>
