@@ -194,7 +194,7 @@ function ManifestoTypewriter({ started }: { started: boolean }) {
       if (i >= MANIFESTO_FULL.length) {
         clearInterval(interval);
       }
-    }, 30);
+    }, 19);
     return () => clearInterval(interval);
   }, [started]);
 
@@ -253,14 +253,14 @@ export default function Landing() {
       <div
         className="fixed inset-0 z-0"
         style={{
-          background: "linear-gradient(145deg, #1c1410 0%, #15100b 20%, #0f0b08 40%, #0D0D0D 100%)",
+          background: "linear-gradient(145deg, #2d1e12 0%, #241810 15%, #1a110a 35%, #110c07 60%, #0D0D0D 100%)",
         }}
         data-testid="bronze-bg"
       >
         <div
           className="absolute inset-0"
           style={{
-            background: "radial-gradient(ellipse at 50% 45%, rgba(140,95,50,0.12) 0%, rgba(100,65,30,0.06) 40%, transparent 70%)",
+            background: "radial-gradient(ellipse at 50% 45%, rgba(184,115,51,0.25) 0%, rgba(160,100,45,0.12) 30%, rgba(100,65,30,0.05) 55%, transparent 75%)",
           }}
         />
         <div
@@ -269,21 +269,27 @@ export default function Landing() {
             backgroundImage: `repeating-linear-gradient(
               0deg,
               transparent,
-              transparent 2px,
-              rgba(184,115,51,0.015) 2px,
-              rgba(184,115,51,0.015) 3px
+              transparent 1px,
+              rgba(184,115,51,0.03) 1px,
+              rgba(184,115,51,0.03) 2px
             )`,
           }}
         />
         <div
           className="absolute inset-0"
           style={{
-            background: "linear-gradient(135deg, rgba(160,100,45,0.04) 0%, transparent 30%, rgba(120,75,30,0.03) 60%, transparent 100%)",
+            background: "linear-gradient(135deg, rgba(184,115,51,0.08) 0%, transparent 25%, rgba(160,100,45,0.06) 50%, transparent 75%, rgba(140,85,35,0.04) 100%)",
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background: "radial-gradient(circle at 40% 35%, rgba(217,125,69,0.1) 0%, transparent 40%), radial-gradient(circle at 65% 55%, rgba(184,115,51,0.08) 0%, transparent 35%)",
           }}
         />
       </div>
 
-      <div className="fixed inset-0 z-5 flex flex-col items-start justify-center px-8">
+      <div className="fixed inset-0 z-[5] flex flex-col items-start justify-center px-8">
         <div className="max-w-[380px]">
           <ManifestoTypewriter started={typingStarted} />
         </div>
