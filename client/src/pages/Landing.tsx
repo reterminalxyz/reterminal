@@ -157,8 +157,73 @@ function DigitalFogCanvas() {
   );
 }
 
-function BlinkingUnderscore() {
-  return <span className="animate-blink">_</span>;
+const MANIFESTO_LINES = [
+  { text: "The internet has become a digital panopticon.", color: "#999", delay: 0 },
+  { text: "re_terminal is the breach.", color: "#D97D45", delay: 1800, hasBlinkUnderscore: true },
+  { text: "Post-privacy is our current reality.", color: "#999", delay: 3400 },
+  { text: "Offline hardware. Stateless money. Direct signal.", color: "#999", delay: 5000 },
+  { text: "Reclaim your digital sovereignty.", color: "#ccc", delay: 7000, bold: true },
+];
+
+function TypewriterLine({ text, color, delay, bold, hasBlinkUnderscore }: {
+  text: string;
+  color: string;
+  delay: number;
+  bold?: boolean;
+  hasBlinkUnderscore?: boolean;
+}) {
+  const [displayedText, setDisplayedText] = useState("");
+  const [started, setStarted] = useState(false);
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    const startTimer = setTimeout(() => setStarted(true), delay);
+    return () => clearTimeout(startTimer);
+  }, [delay]);
+
+  useEffect(() => {
+    if (!started) return;
+    let i = 0;
+    const interval = setInterval(() => {
+      i++;
+      setDisplayedText(text.slice(0, i));
+      if (i >= text.length) {
+        clearInterval(interval);
+        setDone(true);
+      }
+    }, 35);
+    return () => clearInterval(interval);
+  }, [started, text]);
+
+  if (!started) return <p className="mt-3 invisible">&nbsp;</p>;
+
+  if (hasBlinkUnderscore && displayedText.length > 0) {
+    const idx = 2;
+    let content;
+    if (displayedText.length <= idx) {
+      content = <>{displayedText}<span className="animate-blink">_</span></>;
+    } else if (displayedText.length <= idx + 1) {
+      content = <>{displayedText.slice(0, idx)}<span className="animate-blink">_</span>{displayedText.slice(idx + 1)}</>;
+    } else {
+      content = <>{displayedText.slice(0, idx)}<span className="animate-blink">_</span>{displayedText.slice(idx + 1)}{!done && <span className="animate-blink">|</span>}</>;
+    }
+
+    return (
+      <p className="mt-3" style={{ color }}>
+        {content}
+      </p>
+    );
+  }
+
+  return (
+    <p
+      className={`mt-3 ${bold ? "font-bold" : ""}`}
+      style={{ color, letterSpacing: bold ? "1.5px" : undefined }}
+    >
+      {displayedText}
+      {!done && <span className="animate-blink">|</span>}
+    </p>
+  );
 }
 
 export default function Landing() {
@@ -167,42 +232,45 @@ export default function Landing() {
       <div
         className="fixed inset-0 z-0"
         style={{
-          background: "radial-gradient(ellipse at center, #2a1a0a 0%, #1a0f05 30%, #0D0D0D 70%)",
+          background: "radial-gradient(ellipse at center, #3d2212 0%, #2a1508 25%, #1a0c03 50%, #0D0D0D 80%)",
         }}
         data-testid="bronze-bg"
       >
         <div
           className="absolute inset-0"
           style={{
-            background: "radial-gradient(circle at 50% 40%, rgba(184,115,51,0.15) 0%, rgba(184,115,51,0.05) 40%, transparent 70%)",
+            background: "radial-gradient(circle at 50% 40%, rgba(184,115,51,0.3) 0%, rgba(217,125,69,0.15) 30%, rgba(184,115,51,0.05) 55%, transparent 75%)",
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background: "radial-gradient(circle at 30% 60%, rgba(166,94,46,0.12) 0%, transparent 50%), radial-gradient(circle at 70% 30%, rgba(255,179,138,0.08) 0%, transparent 40%)",
           }}
         />
       </div>
 
-      <div className="fixed inset-0 z-5 flex flex-col items-center justify-center px-6">
+      <div className="fixed inset-0 z-5 flex flex-col items-center justify-center px-8">
         <div className="flex flex-col items-center max-w-[380px]">
           <div
             className="text-center font-mono leading-loose"
             style={{
-              color: "#999",
-              fontSize: "11px",
-              lineHeight: "2.2",
+              fontSize: "13px",
+              lineHeight: "2.4",
               letterSpacing: "0.5px",
             }}
             data-testid="text-manifesto"
           >
-            <p>The internet has become a digital panopticon.</p>
-            <p className="mt-3" style={{ color: "#D97D45" }}>
-              re<BlinkingUnderscore />terminal is the breach.
-            </p>
-            <p className="mt-3">Post-privacy is our current reality.</p>
-            <p className="mt-3">Offline hardware. Stateless money. Direct signal.</p>
-            <p
-              className="mt-4 font-bold"
-              style={{ color: "#bbb", letterSpacing: "1.5px", fontSize: "11px" }}
-            >
-              Reclaim your digital sovereignty.
-            </p>
+            {MANIFESTO_LINES.map((line, i) => (
+              <TypewriterLine
+                key={i}
+                text={line.text}
+                color={line.color}
+                delay={line.delay}
+                bold={line.bold}
+                hasBlinkUnderscore={line.hasBlinkUnderscore}
+              />
+            ))}
           </div>
         </div>
       </div>
