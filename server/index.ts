@@ -60,6 +60,13 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  console.log("========================================");
+  console.log(`Node.js version: ${process.version}`);
+  console.log(`NODE_ENV: ${process.env.NODE_ENV || "not set"}`);
+  console.log(`PORT: ${process.env.PORT || "5000 (default)"}`);
+  console.log(`DATABASE_URL: ${process.env.DATABASE_URL ? "set" : "NOT SET"}`);
+  console.log("========================================");
+
   await registerRoutes(httpServer, app);
 
   app.use((err: any, _req: Request, res: Response, next: NextFunction) => {

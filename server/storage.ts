@@ -2,6 +2,11 @@ import { db } from "./db";
 import { sessions, users, userSkills, type Session, type InsertSession, type User, type UserSkill } from "@shared/schema";
 import { eq, sql, and } from "drizzle-orm";
 
+function getDb() {
+  if (!db) throw new Error("Database is not available. Check DATABASE_URL.");
+  return db;
+}
+
 export interface IStorage {
   createSession(session: InsertSession): Promise<Session>;
   getSession(id: number): Promise<Session | undefined>;
@@ -14,7 +19,7 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
   async createSession(insertSession: InsertSession): Promise<Session> {
-    const [session] = await db
+    const [session] = await getDb()
       .insert(sessions)
       .values(insertSession)
       .returning();
@@ -22,7 +27,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getSession(id: number): Promise<Session | undefined> {
-    const [session] = await db
+    const [session] = await getDb()
       .select()
       .from(sessions)
       .where(eq(sessions.id, id));
@@ -30,7 +35,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateSession(id: number, actionId: string, scoreDelta: number, nextStepId: string): Promise<Session> {
-    const [session] = await db
+    const [session] = await getDb()
       .update(sessions)
       .set({
         independenceScore: sql`${sessions.independenceScore} + ${scoreDelta}`,
@@ -42,13 +47,13 @@ export class DatabaseStorage implements IStorage {
     return session;
   }
   async syncUser(token: string): Promise<User> {
-    const [existing] = await db
+    const [existing] = await getDb()
       .select()
       .from(users)
       .where(eq(users.token, token));
     if (existing) return existing;
 
-    const [newUser] = await db
+    const [newUser] = await getDb()
       .insert(users)
       .values({ token, xp: 0, level: 1 })
       .returning();
@@ -56,7 +61,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async saveProgress(token: string, progress: { currentModuleId: string | null; currentStepIndex: number; totalSats: number; independenceProgress: number }): Promise<User | undefined> {
-    const [updated] = await db
+    const [updated] = await getDb()
       .update(users)
       .set({
         currentModuleId: progress.currentModuleId,
@@ -70,17 +75,17 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserSkills(userId: number): Promise<UserSkill[]> {
-    return db.select().from(userSkills).where(eq(userSkills.userId, userId));
+    return getDb().select().from(userSkills).where(eq(userSkills.userId, userId));
   }
 
   async grantSkill(userId: number, skillKey: string): Promise<UserSkill | null> {
-    const [existing] = await db
+    const [existing] = await getDb()
       .select()
       .from(userSkills)
       .where(and(eq(userSkills.userId, userId), eq(userSkills.skillKey, skillKey)));
     if (existing) return null;
 
-    const [skill] = await db
+    const [skill] = await getDb()
       .insert(userSkills)
       .values({ userId, skillKey })
       .returning();
