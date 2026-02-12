@@ -565,29 +565,6 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     return () => window.removeEventListener("beforeinstallprompt", handler);
   }, []);
 
-  const handleFollowUpdatesClick = useCallback(() => {
-    if (followUpdatesClicked || isTyping) return;
-    playClick();
-    setFollowUpdatesClicked(true);
-    setMessages(prev => [...prev, { id: nextMsgId(), text: "Как следить за обновлениями проекта?", sender: "user" }]);
-    safeTimeout(() => {
-      typeMessage(
-        "Ты можешь скачать приложение — его нельзя удалить из магазинов приложений, потому что оно создано устойчивым к цензуре.\n\nВторая опция — подпишись на фаундера в децентрализованной соц. сети Nostr и следи за всеми новостями там. Мы будем изучать её в следующих блоках.",
-        "satoshi",
-        () => { setFollowUpdatesTyped(true); }
-      );
-    }, 500);
-  }, [followUpdatesClicked, isTyping, typeMessage, safeTimeout, setMessages, setFollowUpdatesClicked, setFollowUpdatesTyped]);
-
-  const handlePWAInstall = useCallback(async () => {
-    playClick();
-    if (deferredInstallRef.current) {
-      deferredInstallRef.current.prompt();
-      await deferredInstallRef.current.userChoice;
-      deferredInstallRef.current = null;
-    }
-  }, [deferredInstallRef]);
-
   const scrollToBottom = useCallback(() => {
     if (!userScrolledRef.current) {
       const container = messagesContainerRef.current;
@@ -692,6 +669,29 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
         });
       }
     }, 12);
+  }, []);
+
+  const handleFollowUpdatesClick = useCallback(() => {
+    if (followUpdatesClicked || isTyping) return;
+    playClick();
+    setFollowUpdatesClicked(true);
+    setMessages(prev => [...prev, { id: nextMsgId(), text: "Как следить за обновлениями проекта?", sender: "user" }]);
+    safeTimeout(() => {
+      typeMessage(
+        "Ты можешь скачать приложение — его нельзя удалить из магазинов приложений, потому что оно создано устойчивым к цензуре.\n\nВторая опция — подпишись на фаундера в децентрализованной соц. сети Nostr и следи за всеми новостями там. Мы будем изучать её в следующих блоках.",
+        "satoshi",
+        () => { setFollowUpdatesTyped(true); }
+      );
+    }, 500);
+  }, [followUpdatesClicked, isTyping, typeMessage, safeTimeout]);
+
+  const handlePWAInstall = useCallback(async () => {
+    playClick();
+    if (deferredInstallRef.current) {
+      deferredInstallRef.current.prompt();
+      await deferredInstallRef.current.userChoice;
+      deferredInstallRef.current = null;
+    }
   }, []);
 
   const startBlock = useCallback((blockIndex: number, skipTyping?: boolean) => {
