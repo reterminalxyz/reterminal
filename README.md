@@ -1,4 +1,4 @@
-# Liberta Terminal
+# re_terminal
 
 Bitcoin Lightning Network educational onboarding PWA. A two-phase, state-machine driven experience that educates users on Bitcoin through an interactive dialogue with "Satoshi."
 
