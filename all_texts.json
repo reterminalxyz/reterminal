@@ -1,80 +1,30 @@
 {
   "boot_screen": {
-    "RU": {
-      "heroTitle": "Ты активировал карту свободы",
-      "heroSubtitle": "Для постоянного доступа и устойчивости к цензуре, установи терминал на телефон",
-      "stayBrowser": "Остаться в браузере",
-      "installTerminal": "Установить терминал",
-      "shuttingDown": "ОТКЛЮЧЕНИЕ...",
-      "terminalInstalled": "ТЕРМИНАЛ УСТАНОВЛЕН",
-      "openApp": "Открой приложение на главном экране"
-    },
-    "EN": {
-      "heroTitle": "You activated the freedom card",
-      "heroSubtitle": "For permanent access and censorship resistance, install the terminal on your phone",
-      "stayBrowser": "Stay in browser",
-      "installTerminal": "Install terminal",
-      "shuttingDown": "SHUTTING DOWN...",
-      "terminalInstalled": "TERMINAL INSTALLED",
-      "openApp": "Open the app on your home screen"
-    },
-    "IT": {
-      "heroTitle": "Hai attivato la carta della libertà",
-      "heroSubtitle": "Per un accesso permanente e resistenza alla censura, installa il terminale sul telefono",
-      "stayBrowser": "Rimani nel browser",
-      "installTerminal": "Installa terminale",
-      "shuttingDown": "SPEGNIMENTO...",
-      "terminalInstalled": "TERMINALE INSTALLATO",
-      "openApp": "Apri l'app dalla schermata principale"
-    },
-    "static_labels": {
-      "version": "LIBERTA TERMINAL v0.1",
-      "tagline": "DECENTRALIZED / CENSORSHIP-RESISTANT / OPEN"
-    }
+    "heroTitle": "Ты активировал карту свободы",
+    "heroSubtitle": "Для постоянного доступа и устойчивости к цензуре, установи терминал на телефон",
+    "stayBrowser": "Остаться в браузере",
+    "installTerminal": "Установить терминал",
+    "shuttingDown": "ОТКЛЮЧЕНИЕ...",
+    "terminalInstalled": "ТЕРМИНАЛ УСТАНОВЛЕН",
+    "openApp": "Открой приложение на главном экране",
+    "version": "LIBERTA TERMINAL v0.1",
+    "tagline": "DECENTRALIZED / CENSORSHIP-RESISTANT / OPEN"
   },
 
   "phase_1_questions": {
-    "RU": {
-      "titles": [
-        "Хочешь стать свободнее?",
-        "Как думаешь, государства и корпорации хотят забрать свободу людей?",
-        "Можно ли с этим что-то сделать?",
-        "Готов узнать что с этим можно сделать?"
-      ],
-      "yes": "ДА",
-      "no": "НЕТ",
-      "notYet": "ПОКА НЕТ",
-      "tryAgain": "ПОПРОБУЙ ЕЩЁ"
-    },
-    "EN": {
-      "titles": [
-        "Do you want to become freer?",
-        "Do you think governments and corporations want to take people's freedom?",
-        "Can something be done about it?",
-        "Ready to learn what can be done?"
-      ],
-      "yes": "YES",
-      "no": "NO",
-      "notYet": "NOT YET",
-      "tryAgain": "TRY AGAIN"
-    },
-    "IT": {
-      "titles": [
-        "Vuoi diventare più libero?",
-        "Pensi che i governi e le corporation vogliano togliere la libertà alle persone?",
-        "Si può fare qualcosa al riguardo?",
-        "Pronto a scoprire cosa si può fare?"
-      ],
-      "yes": "SÌ",
-      "no": "NO",
-      "notYet": "NON ANCORA",
-      "tryAgain": "RIPROVA"
-    }
+    "titles": [
+      "Хочешь стать свободнее?",
+      "Как думаешь, государства и корпорации хотят забрать свободу людей?",
+      "Можно ли с этим что-то сделать?",
+      "Готов узнать что с этим можно сделать?"
+    ],
+    "yes": "ДА",
+    "no": "НЕТ",
+    "notYet": "ПОКА НЕТ",
+    "tryAgain": "ПОПРОБУЙ ЕЩЁ"
   },
 
-  "terminal_header": {
-    "title": "re_terminal"
-  },
+  "terminal_header": "re_terminal",
 
   "learning_blocks": [
     {
@@ -290,28 +240,15 @@
     "title": "НАБОР НАВЫКОВ",
     "empty_state": "НАВЫКИ НЕ ОБНАРУЖЕНЫ",
     "segments": [
-      {
-        "label": "ПРОТОКОЛ ВОЛИ",
-        "skill_key": "WILL_TO_FREEDOM",
-        "color": "#00e5ff"
-      },
-      {
-        "label": "МОДУЛЬ ЗНАНИЯ",
-        "skill_keys": ["TRUTH_SEEKER", "HARD_MONEY"],
-        "color": "#ffaa00"
-      },
-      {
-        "label": "СЕТЕВОЙ ПРИВОД",
-        "skill_key": "GRID_RUNNER",
-        "color": "#b87333"
-      }
+      { "label": "ПРОТОКОЛ ВОЛИ", "skill_key": "WILL_TO_FREEDOM", "color": "#00e5ff" },
+      { "label": "МОДУЛЬ ЗНАНИЯ", "skill_keys": ["TRUTH_SEEKER", "HARD_MONEY"], "color": "#ffaa00" },
+      { "label": "СЕТЕВОЙ ПРИВОД", "skill_key": "GRID_RUNNER", "color": "#b87333" }
     ],
     "skill_notification_banner": "+СКИЛЛ"
   },
 
   "ui_labels": {
     "sats_counter_prefix": "SATS",
-    "independence_label": "НЕЗАВИСИМОСТЬ",
-    "phase_1_header": "re_terminal"
+    "independence_label": "НЕЗАВИСИМОСТЬ"
   }
 }
