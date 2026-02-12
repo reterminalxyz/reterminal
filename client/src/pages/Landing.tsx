@@ -45,9 +45,9 @@ function DigitalFogCanvas({ onFirstTouch }: { onFirstTouch: () => void }) {
 
       const imageData = fogCtx.getImageData(0, 0, fogCanvas.width, fogCanvas.height);
       const data = imageData.data;
-      const step = 4;
+      const step = 3;
       for (let i = 0; i < data.length; i += step * 4) {
-        const noise = Math.random() * 30;
+        const noise = Math.random() * 55;
         data[i] = 26 + noise;
         data[i + 1] = 26 + noise;
         data[i + 2] = 26 + noise;
@@ -163,8 +163,8 @@ function DigitalFogCanvas({ onFirstTouch }: { onFirstTouch: () => void }) {
             <span
               className="font-mono text-[11px] tracking-[2px] animate-blink relative"
               style={{
-                color: "#888",
-                textShadow: "0 0 8px rgba(136,136,136,0.4), 0 0 20px rgba(136,136,136,0.2), 0 0 40px rgba(136,136,136,0.1)",
+                color: "#D97D45",
+                textShadow: "0 0 8px rgba(217,125,69,0.4), 0 0 20px rgba(184,115,51,0.2), 0 0 40px rgba(184,115,51,0.1)",
               }}
             >
               CLEAR THE FOG TO REVEAL THE SIGNAL<span className="animate-blink">_</span>
@@ -289,7 +289,7 @@ export default function Landing() {
         />
       </div>
 
-      <div className="fixed inset-0 z-[5] flex flex-col items-start justify-center px-8">
+      <div className="fixed inset-0 z-[5] flex flex-col items-start justify-start px-8 pt-[25vh]">
         <div className="max-w-[380px]">
           <ManifestoTypewriter started={typingStarted} />
         </div>
