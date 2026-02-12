@@ -610,16 +610,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     playClick();
 
     if (button.type === "external" && button.url) {
-      try {
-        const a = document.createElement("a");
-        a.href = button.url;
-        a.target = "_blank";
-        a.rel = "noopener noreferrer";
-        a.style.cssText = "position:fixed;top:-9999px;left:-9999px;opacity:0;pointer-events:none;";
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(() => { try { document.body.removeChild(a); } catch (_) {} }, 500);
-      } catch (_) {}
+      window.open(button.url, "_blank", "noopener,noreferrer");
       return;
     }
 
