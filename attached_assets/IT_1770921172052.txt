@@ -1,0 +1,343 @@
+{
+  "boot_screen": {
+    "heroTitle": "Hai attivato la Carta della Libertà",
+    "heroSubtitle": "Per un accesso costante e resistente alla censura, installa il terminale sul telefono",
+    "stayBrowser": "Resta nel browser",
+    "installTerminal": "Installa terminale",
+    "shuttingDown": "DISCONNESSIONE...",
+    "terminalInstalled": "TERMINALE INSTALLATO",
+    "openApp": "Apri l'app nella schermata home",
+    "version": "LIBERTA TERMINAL v0.1",
+    "tagline": "DECENTRALIZZATO / RESISTENTE ALLA CENSURA / APERTO"
+  },
+  "phase_1_questions": {
+    "titles": [
+      "Vuoi essere più libero?",
+      "Pensi che governi e aziende vogliano togliere la libertà alle persone?",
+      "Si può fare qualcosa al riguardo?",
+      "Sei pronto a scoprire qual è la soluzione?"
+    ],
+    "yes": "SÌ",
+    "no": "NO",
+    "notYet": "NON ANCORA",
+    "tryAgain": "RIPROVA"
+  },
+  "terminal_header": "re_terminal",
+  "learning_blocks": [
+    {
+      "id": 1,
+      "title": "Disclaimer (Primo Colpo)",
+      "speech": "Ascolta attentamente.\n\nNon sei finito qui per caso. Questo è un alpha test di un progetto sulla libertà digitale. Ti darò strumenti che cambieranno il tuo modo di pensare alla libertà su internet.\n\n10-15 minuti. È tutto ciò che ti serve per iniziare.\nÈ più semplice che ordinare una pizza su Glovo. Davvero.\nNiente:\n- Registrazioni\n- Abbonamenti\n- Dati personali\n- Carte bancarie\nSolo tu e questa chat.\n\nEcco l'accordo: Per ogni risposta corretta ricevi frazioni di veri Bitcoin.\nLa barra in basso mostra i tuoi progressi. Ogni percentuale è denaro.\nCrederci o no: è una tua scelta.\nMa se sei qui, significa che senti che c'è qualcosa che non va nel sistema.\nPronto a fare il primo passo?",
+      "skill": "Il primo passo verso la libertà",
+      "grantSkillKey": "WILL_TO_FREEDOM",
+      "reward": 100,
+      "options": [
+        {
+          "text": "Sì",
+          "action": "next_block"
+        },
+        {
+          "text": "No",
+          "action": "go_back",
+          "conditional_text": "Capisco. Il sistema è comodo. Se cambi idea, sarò qui."
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "Schiavitù Bancaria (La verità sui tuoi soldi)",
+      "speech": "Sei sulla strada giusta!\nIniziamo con una domanda semplice: a chi appartengono i soldi sul tuo conto?",
+      "intermediate_question": {
+        "text": "A chi appartengono i soldi sul tuo conto?",
+        "options": [
+          {
+            "text": "A me",
+            "action": "continue",
+            "continued_text": "In realtà no, anche se la banca ti dice che sono tuoi.\n\nNonostante la loro app mostri un saldo, quei soldi non sono di tua proprietà. Sono una registrazione nel LORO database che ti è PERMESSO utilizzare.\nProva questo:\nInvia una somma ingente a un amico in un altro paese. La banca ti chiederà inevitabilmente: \"Da dove vengono? Perché? Per chi sono?\" Possono bloccare il tuo conto semplicemente perché al loro algoritmo non è piaciuto il tuo acquisto.\nHai deciso di comprare qualcosa che non piace al tuo governo? Magari una donazione a dei manifestanti, un libro proibito o una VPN? Conto congelato. Senza processo.\nI soldi in banca non sono soldi. Sono una promessa della banca.\nE questa promessa funziona solo finché fai quello che ci si aspetta da te.\nControllano l'accesso al tuo tempo, al tuo lavoro, alla tua vita.\nLavori tutta la settimana scambiando quel tempo per numeri in un'app. Ma i numeri non ti appartengono.\nLa banca è padrona del tuo tempo.\n\"Il saldo nell'app\" non è possesso, è un permesso."
+          },
+          {
+            "text": "Alla Banca",
+            "action": "continue",
+            "continued_text": "Corretto, anche se la banca ti dice che sono tuoi.\n\nNonostante la loro app mostri un saldo, quei soldi non sono di tua proprietà. Sono una registrazione nel loro database che ti è permesso utilizzare.\nProva questo:\nInvia una somma ingente a un amico in un altro paese. La banca ti chiederà inevitabilmente: \"Da dove vengono? Perché? Per chi sono?\" Possono bloccare il tuo conto semplicemente perché al loro algoritmo non è piaciuto il tuo acquisto.\nHai deciso di comprare qualcosa che non piace al tuo governo? Magari una donazione a dei manifestanti, un libro proibito o una VPN? Conto congelato. Senza processo.\nI soldi in banca non sono soldi. Sono una promessa della banca.\nE questa promessa funziona solo finché fai quello che ci si aspetta da te.\nControllano l'accesso al tuo tempo, al tuo lavoro, alla tua vita.\nLavori tutta la settimana scambiando quel tempo per numeri in un'app. Ma i numeri non ti appartengono.\nLa banca è padrona del tuo tempo.\n\"Il saldo nell'app\" non è possesso, è un permesso."
+          }
+        ]
+      },
+      "speech_continued": "In realtà no, anche se la banca ti dice che sono tuoi.\n\nNonostante la loro app mostri un saldo, quei soldi non sono di tua proprietà. Sono una registrazione nel LORO database che ti è PERMESSO utilizzare.\nProva questo:\nInvia una somma ingente a un amico in un altro paese. La banca ti chiederà inevitabilmente: \"Da dove vengono? Perché? Per chi sono?\" Possono bloccare il tuo conto semplicemente perché al loro algoritmo non è piaciuto il tuo acquisto.\nHai deciso di comprare qualcosa che non piace al tuo governo? Magari una donazione a dei manifestanti, un libro proibito o una VPN? Conto congelato. Senza processo.\nI soldi in banca sono solo promesse della banca. E queste promesse funzionano finché fai quello che ci si aspetta da te.\nNe consegue che il sistema controlla l'accesso al tuo tempo, al tuo lavoro, alla tua vita.\nLavori tutta la settimana e scambi questo tempo per dei numeri in un'app. Ma i numeri non ti appartengono.\nLa banca è padrona del tuo tempo.\n\"Il saldo nell'app\" non è possesso, ma un permesso.",
+      "skill": "Capire che il saldo nell'app è un permesso, non possesso",
+      "grantSkillKey": "TRUTH_SEEKER",
+      "reward": 100,
+      "options": [
+        {
+          "text": "Ok, ma cosa posso farci?",
+          "action": "next_block"
+        },
+        {
+          "text": "Ma è sempre stato così, è normale",
+          "action": "show_conditional_text",
+          "conditional_text": "\"Normale\" è quando la banca ti fa pagare una commissione per custodire i TUOI soldi.\n\n\"Normale\" è quando non puoi comprare un biglietto per un altro paese senza l'approvazione della banca.\n\nAnche la schiavitù un tempo era considerata \"normale\".\n\nSei pronto a vedere l'uscita o tornerai alla \"normalità\"?",
+          "conditional_options": [
+            {
+              "text": "Mostrami l'uscita",
+              "action": "next_block"
+            },
+            {
+              "text": "Torna all'inizio",
+              "action": "restart"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Bitcoin è l'Uscita (Matematica contro Promesse)",
+      "speech": "Bene. Sei pronto a vedere l'uscita: Bitcoin!\n\nDimentica tutto ciò che hai sentito prima: \"criptovaluta\", \"investimento\", \"speculazione\". Per essere precisi, tecnicamente è un database distribuito.\nImmagina regole che non possono essere modificate unilateralmente. Per falsificare una transazione o cambiare l'algoritmo, dovresti convincere milioni di nodi indipendenti in tutto il mondo. Non è la volontà di una banca o la promessa di un governo: è una legge matematica, protetta dalla crittografia.\nBitcoin è il primo sistema nella storia dell'umanità in cui la fiducia è sostituita dalla prova. Le regole qui sono fatte rispettare dalla rete stessa, non dal decreto di qualcuno.\nViene anche chiamato \"oro digitale\".\nImmagina che l'oro:\n- Possa stare in un file crittografato sul tuo telefono\n- Possa essere inviato in pochi secondi in qualsiasi paese\n- Non possa essere confiscato da nessuno\n- Non sia controllato da nessuna banca\n\nLe banche possono fallire. I governi possono svalutare il denaro.\nBitcoin? Funziona da 17 anni senza sosta. 24/7. Senza weekend. Senza bancarotte.\nÈ il primo metodo nella storia per conservare il frutto del tuo lavoro dove nessun governo può arrivare.",
+      "skill": "Bitcoin = matematica + scarsità + libertà",
+      "grantSkillKey": "HARD_MONEY",
+      "reward": 100,
+      "options": [
+        {
+          "text": "Capito, ma come funziona?",
+          "action": "next_block"
+        },
+        {
+          "text": "Quali sono gli altri vantaggi?",
+          "action": "next_block"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Chiavi (Chi le possiede, comanda)",
+      "speech": "Una precisazione importante, ricercatore. Il tuo wallet (come Phoenix) non è un conto bancario.\nI Bitcoin non esistono fisicamente né nel tuo telefono, né nel cloud, né in banca. Sono solo registrazioni in un database globale distribuito (blockchain).\nIl tuo telefono non custodisce soldi, ma CHIAVI PRIVATE. Questa è la tua firma digitale. La tua \"chiave\" è l'unica prova del tuo diritto a gestire una parte delle risorse della rete.\nRicorda: Not your keys, not your bitcoin. Se hai le chiavi, sei sovrano. Se le chiavi sono in mano a una terza parte, sei solo un utente del loro servizio. Phoenix ti dà il pieno controllo delle chiavi proprio qui, nel tuo terminale.",
+      "skill": "Concetto di possesso personale senza intermediari",
+      "reward": 100,
+      "options": [
+        {
+          "text": "Wow, raccontami di più",
+          "action": "next_block"
+        },
+        {
+          "text": "Come si usa nella vita reale?",
+          "action": "next_block"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Privacy (Essere invisibili)",
+      "speech": "Ora sei pronto per il livello successivo.\n\nIl sistema vuole sapere tutto.\nCosa hai mangiato a colazione. Dove sei andato ieri. Quanto hai speso per il caffè. Chi hai incontrato.\nLe banche trasmettono i dati al governo. Google sa dove sei stato. La tua carta di credito è il diario della tua vita.\n\nIn Italia ogni transazione superiore ai 2000€ viene tracciata automaticamente. Compri un'auto usata da un amico? Devi renderne conto allo stato.\n\nE se non volessi? Bitcoin ti dà una scelta.\nIl tuo indirizzo è solo una stringa di lettere e numeri. Niente nome. Niente passaporto.\nPuoi creare un nuovo indirizzo per ogni transazione. In pochi secondi. Gratis.\n\nVuoi inviare denaro a un amico? Nessuna domanda tipo \"Perché?\". Nessuna commissione bancaria. Nessuna registrazione nel tuo profilo.\n\nLe tue spese sono affar tuo.\nAnche il livello base di Bitcoin ti dà più libertà di qualsiasi banca al mondo.",
+      "skill": "Igiene digitale di base e diritto alla privacy",
+      "reward": 100,
+      "options": [
+        {
+          "text": "Davvero nessuno tra me e il destinatario?!",
+          "action": "next_block"
+        },
+        {
+          "text": "Posso usarlo per acquisti quotidiani o prelevare contanti?",
+          "action": "next_block"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Lightning (Energia Istantanea)",
+      "speech": "Ecco dove Bitcoin diventa un'arma del futuro.\n\nPuoi pagare un'enorme quantità di cose con Bitcoin, e il numero di paesi e aziende che lo accettano è in costante crescita. Oltre ai pagamenti online, se necessario ci sono centinaia di modi per convertirlo in contanti.\n\nRicordi la ricompensa di cui parlavo all'inizio? Riceverai satoshi (abbreviato: SATS).\nUn Satoshi è la più piccola parte di un bitcoin. In 1 bitcoin ci sono 100 milioni di SATS. Sono chiamati così in onore di me: il creatore di Bitcoin, Satoshi Nakamoto.\n\nEd ecco cosa è importante: possono essere inviati l'uno all'altro in una frazione di secondo.\nVuoi mandare soldi in Giappone? 0,5 secondi.\nCommissione? Meno di un centesimo di euro. A volte frazioni di centesimo.\nSi chiama Lightning Network.\n\nUna rete senza confini. Il tuo telefono si connette a milioni di nodi in tutto il mondo.\nNessuna banca nel mezzo. Nessuno SWIFT. Nessun \"orario di ufficio\".\nIl denaro si muove alla velocità del pensiero.",
+      "skill": "Pagamenti istantanei senza confini",
+      "grantSkillKey": "GRID_RUNNER",
+      "reward": 100,
+      "options": [
+        {
+          "text": "A chi serve tutto questo?",
+          "action": "next_block"
+        },
+        {
+          "text": "Sembra complicato, bisogna saper programmare?",
+          "action": "next_block",
+          "conditional_text": "No. Lo abbiamo reso più semplice di Glovo. Andiamo avanti."
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Carta Scudo (Il tuo pass per la resistenza)",
+      "speech": "Hai quasi completato il prototipo del Modulo 1 e tra un paio di minuti potrai ritirare la tua ricompensa! È ora di spiegarti dove sei finito.\n\nSei nel club della resistenza digitale all'autoritarismo.\n\nCi saranno 7 moduli in totale.\nProssimamente:\n\n→ 2: Privacy ed elusione della sorveglianza\n→ 3: Comunicazione sicura\n→ 4: Aggiramento della censura\n→ 5: Libero accesso alla conoscenza\n→ 6: Tecno-filosofia\n→ 7: Strumenti di sopravvivenza offline\n\nOgni modulo è un'abilità. Ogni abilità è un pezzo dello scudo della tua indipendenza.\n\nAlla fine saprai come:\nConservare il denaro in modo che nessuno possa portartelo via\n- Comunicare in modo che nessuno possa leggere\n- Accedere a informazioni che cercano di nascondere\nSopravvivere in un mondo in cui il sistema cerca di controllarti\n\nE soprattutto otterrai decine di abilità pratiche per difendere la tua libertà esattamente come serve a te. Nessun programma politico, solo il diritto umano alla libertà!\n\nQuella carta trasparente è un pass per una rete globale di persone che vogliono vivere in un mondo più onesto. Passa la carta a chi può capire.\n\nStiamo costruendo un internet parallelo. E tu ne sei appena diventato parte.",
+      "skill": "Comprensione dell'ecosistema della libertà",
+      "reward": 200,
+      "options": [
+        {
+          "text": "Bene, sono pronto a ritirare i SATS",
+          "action": "next_block"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Scelta Finale (Il momento della verità)",
+      "speech": "1000 SATS: i tuoi primi soldi che non appartengono a una banca.\n\nMa c'è un problema... Non hai ancora un wallet. Proprio ora, questi SATS esistono solo qui.\n\nIl tuo passo finale:\n\nCreare un wallet Bitcoin personale. Ci vorranno 2 minuti.\nE tutti i SATS che hai guadagnato arriveranno al tuo indirizzo. Automaticamente.\nQuesto è il momento in cui la teoria diventa realtà.",
+      "skill": "Momento della decisione finale",
+      "reward": 0,
+      "options": [
+        {
+          "text": "Creiamo il wallet",
+          "action": "create_wallet"
+        },
+        {
+          "text": "No, devo pensarci",
+          "action": "show_conditional_text",
+          "conditional_text": "Capisco. La libertà spaventa.\n\nI tuoi satoshi ti aspetteranno qui per 72 ore. Dopo di che svaniranno.\n\nLa scelta è tua. Lo è sempre stata.",
+          "conditional_options": [
+            {
+              "text": "Torna alla creazione del wallet",
+              "action": "create_wallet"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "wallet_steps": [
+    {
+      "id": "step_1",
+      "title": "Scarica la tua cassaforte personale",
+      "instruction": "Ai principianti consigliamo di usare Phoenix Wallet. È semplice, veloce e tuo.\n\nUna precisazione importante: il tuo wallet non è un conto bancario.\nI Bitcoin non esistono fisicamente né nel tuo telefono, né nel cloud, né in banca. Sono solo registrazioni in un database globale distribuito (blockchain).\nIl tuo telefono non custodisce soldi, ma CHIAVI PRIVATE. Questa è la tua firma digitale. La tua \"chiave\" è l'unica prova del tuo diritto a gestire una parte delle risorse della rete.\nRicorda: Not your keys, not your bitcoin. Se hai le chiavi, sei sovrano. Se le chiavi sono in mano a terzi, sei solo un utente del loro servizio.",
+      "buttons": [
+        {
+          "text": "Scarica wallet per iPhone",
+          "url": "https://apps.apple.com/it/app/phoenix-wallet/id1544097028",
+          "type": "external"
+        },
+        {
+          "text": "Scarica wallet per Android",
+          "url": "https://play.google.com/store/apps/details?id=fr.acinq.phoenix.mainnet&pli=1",
+          "type": "external"
+        },
+        {
+          "text": "Già scaricato, e ora?",
+          "type": "next",
+          "target": "step_2"
+        }
+      ]
+    },
+    {
+      "id": "step_2",
+      "title": "Crea il tuo wallet",
+      "instruction": "Ottimo. App scaricata.\n\nOra apri Phoenix Wallet sul telefono.\n\nEcco cosa vedrai:\n\nAl primo avvio:\nPhoenix mostrerà una schermata di benvenuto con due opzioni:\n- \"Create a new wallet\" (Crea nuovo wallet)\n- \"Restore a wallet\" (Ripristina wallet)\n\nCosa fare:\nTocca su \"Create a new wallet\"\n\nPhoenix farà automaticamente questo:\n- Genererà il tuo wallet unico\n- Creerà il tuo indirizzo Bitcoin personale\n- Preparerà tutto per ricevere pagamenti\n\nCi vorranno 3-5 secondi.\n\nFatto. Wallet creato.\n\nSei appena entrato nell'economia parallela. Hai un indirizzo Bitcoin personale che può ricevere pagamenti da tutto il mondo.\n\nNessun intermediario. Nessun permesso. Nessun confine.\n\nMa c'è ancora un passo criticamente importante: salvare le chiavi di questo wallet.",
+      "buttons": [
+        {
+          "text": "Wallet creato, e ora?",
+          "type": "next",
+          "target": "step_3"
+        }
+      ]
+    },
+    {
+      "id": "step_3",
+      "title": "12 parole = potere assoluto",
+      "instruction": "Questa è la parte più importante.\n\nIl tuo wallet è protetto da 12 parole. Si chiama \"seed phrase\". La tua chiave maestra.\n\nQueste 12 parole sono l'UNICO modo per ripristinare l'accesso ai tuoi soldi.\n\nHai perso il telefono? Le parole ripristineranno il wallet su uno nuovo.\nHai perso le parole? Fine. Game over. Nessuna assistenza tecnica. Nessun recupero. Mai.\n\nIstruzioni passo dopo passo:\n\n1. Apri Phoenix Wallet sul telefono\n\n2. Trova l'icona dell'ingranaggio nell'angolo in alto a destra\n  Sono le impostazioni dell'app\n\n3. Tocca l'ingranaggio\n  Si aprirà il menu impostazioni\n\n4. Trova la voce \"Recovery phrase\" o \"Seed\" o \"Display seed\"\n  (Potrebbe chiamarsi diversamente a seconda della versione)\n\n5. Tocca questa voce\n  Phoenix mostrerà un avviso di sicurezza\n\n6. Conferma di aver capito i rischi\n  (Di solito un pulsante \"I understand\" o \"Show seed\")\n\n7. Phoenix mostrerà le tue 12 parole\n  Sono numerate da 1 a 12\n\n8. Ora SALVA queste parole:\n\n═══════════════════════════════\n\nOPZIONE MIGLIORE (la più sicura):\n\nCarta e Penna\n- Prendi un foglio di carta pulito\n- Scrivi tutte le 12 parole a PENNA (non a matita)\n- Assicurati di mantenere l'ordine (1, 2, 3... 12)\n- Controlla due volte che non ci siano errori\n- Nascondi il foglio in un luogo sicuro:\n  Non nel portafoglio (puoi perderlo)\n  Non sul frigorifero (possono vederlo)\n  Ideale: cassaforte, un libro, una busta nel cassetto\n\n═══════════════════════════════\n\nNON HAI CARTA E PENNA A PORTATA DI MANO?\n\nAlternative temporanee (fallo OGGI):\n\nOpzione 1: Note del telefono (OFFLINE)\n- Apri l'app \"Note\"\n- Crea una nuova nota\n- Scrivi tutte le 12 parole nell'ordine corretto\n- Cancella questa nota IMMEDIATAMENTE dopo averle trascritte su carta!\n\nOpzione 2: Impara a memoria (Estremo)\n- Leggi tutte le 12 parole ad alta voce 3 volte di fila\n- Chiudi gli occhi e ripeti a memoria\n- Ripeti dopo 10 minuti\n\nNon conservare MAI la seed phrase:\n- Nel cloud (Google Drive, iCloud)\n- Nelle chat (WhatsApp, Telegram)\n- Nelle email\n- In uno screenshot\n\nFatto?",
+      "buttons": [
+        {
+          "text": "Sì, scritto su carta",
+          "type": "next",
+          "target": "step_4"
+        },
+        {
+          "text": "Sì, salvato temporaneamente (trascrivo dopo)",
+          "type": "next",
+          "target": "step_3a"
+        }
+      ]
+    },
+    {
+      "id": "step_3a",
+      "title": "Avviso aggiuntivo",
+      "instruction": "Bene. Ma ricorda:\n\nL'archiviazione digitale della seed phrase è un rischio.\n- Gli hacker bucano i telefoni\n- I cloud hanno perdite di dati\n- Le app crashano\n- I dispositivi si rompono\n\nLa carta esiste da centinaia di anni.\nUn file digitale può sparire in un secondo.\n\nAndiamo avanti?",
+      "buttons": [
+        {
+          "text": "Capito, proseguiamo",
+          "type": "next",
+          "target": "step_4"
+        }
+      ]
+    },
+    {
+      "id": "step_4",
+      "title": "Prenditi ciò che è tuo",
+      "instruction": "Ora riceverai i SATS che hai guadagnato.\n\nCome funziona:\n\nQuando premerai il pulsante \"RICEVI 1000 SATS\" in basso, succederà questo:\n\n1. Phoenix Wallet si aprirà automaticamente\n  (Se non si apre, aprilo manualmente)\n\n2. Phoenix mostrerà una notifica di pagamento in entrata\n  \"Incoming payment: 1000 sats\"\n\n3. Tra pochi secondi li vedrai nel saldo\n  Vedrai \"+1000\" nell'app\n\n4. Fatto. I soldi sono tuoi.\n\nQuesto è Bitcoin. Istantaneo, anonimo e senza intermediari.\n\nDa noi a te direttamente. Attraverso la matematica e la crittografia. Attraverso la libertà.\n\nBenvenuto nell'economia parallela.\n\nHai appena fatto ciò che la maggior parte delle persone non osa mai fare:\nHai preso il controllo dei tuoi soldi.\n\nNon sei più un ospite in casa d'altri.\nSei il padrone.\n\nPremi il pulsante. I tuoi satoshi ti aspettano.",
+      "buttons": [
+        {
+          "text": "RICEVI 1000 SATS",
+          "type": "deeplink",
+          "url": "lightning:LNURL1DP68GURN8GHJ7ET4WP5X7UNFVDEKZUNYD9HX2UEJ9EKXUCNFW3EJUCM0D5HHW6T5DPJ8YCTH9ASHQ6F0WCCJ7MRWW4EXCT6P0PZKYUJP8YE8SNPKWQMRVA23DPD8SERCVC2YC4CH",
+          "target": "step_5"
+        }
+      ]
+    },
+    {
+      "id": "step_5",
+      "title": "Benvenuto nella resistenza",
+      "instruction": "Ce l'hai fatta.\n\n1000 SATS sono appena atterrati nel tuo wallet.\n\nSono i tuoi primi soldi nell'economia parallela.\n\nE adesso?\n\nSe vuoi, esplora Phoenix Wallet\n- Prova a inviare 10 sats a un amico (se anche lui ha un wallet)\n- Trova il tuo indirizzo\n- Esplora le impostazioni\n\nSegui gli aggiornamenti del progetto\nProssimamente usciranno i moduli 2-7:\n- Privacy ed elusione della sorveglianza\n- Comunicazione sicura\n- Aggiramento della censura\n- Libero accesso alla conoscenza\n- Tecno-filosofia\n- Strumenti di sopravvivenza offline\n\nPassa la carta trasparente a chi è pronto.",
+      "buttons": []
+    }
+  ],
+  "follow_updates_flow": {
+    "button_text": "COME SEGUIRE GLI AGGIORNAMENTI?",
+    "user_message": "Come seguo gli aggiornamenti del progetto?",
+    "satoshi_response": "Puoi scaricare l'app: non può essere rimossa dagli store perché è creata per resistere alla censura.\n\nLa seconda opzione: segui il founder sul social network decentralizzato Nostr e leggi tutte le notizie lì. Lo studieremo nei prossimi blocchi.",
+    "pwa_button_text": "SCARICA L'APP",
+    "nostr_button_text": "FOUNDER SU NOSTR",
+    "nostr_url": "https://primal.net/p/npub1qlkwmzmrhzpuak7c2g9afdcstamqrfmxkpjkgy3wjfagxtjqs2xqnxshjp"
+  },
+  "troubleshooting": {
+    "button_text": "RISOLUZIONE PROBLEMI",
+    "title": "SE I SOLDI NON SONO ARRIVATI:",
+    "steps": [
+      "Controlla la connessione internet",
+      "Aspetta 30-60 secondi",
+      "Riavvia Phoenix Wallet",
+      "Se dopo 5 minuti i soldi non sono arrivati, contattaci in chat"
+    ]
+  },
+  "satoshi_wisdom_quotes": [
+    "Il problema alla radice delle valute tradizionali è tutta la fiducia necessaria per farle funzionare. Ci si deve fidare che la banca centrale non svaluti la moneta, ma la storia delle valute fiat è piena di violazioni di tale fiducia.",
+    "Bitcoin è la prima implementazione di un concetto chiamato criptovaluta. L'innovazione principale: una rete senza un'autorità centrale fidata o terze parti.",
+    "La natura di Bitcoin è tale che, una volta rilasciata la versione 0.1, il design del nucleo è scolpito nella pietra. Voglio che riusciate a visualizzarlo come immutabile.",
+    "Le monete perse rendono solo le monete di tutti gli altri leggermente più preziose. Pensatelo come una donazione a tutti gli altri.",
+    "La rete è robusta nella sua semplicità non strutturata. I nodi lavorano tutti insieme con poco coordinamento. Non hanno bisogno di essere identificati, poiché i messaggi non vengono instradati in un luogo particolare.",
+    "Il problema della doppia spesa è risolto attraverso una rete peer-to-peer. La rete appone una marcatura temporale sulle transazioni facendone l'hash in una catena continua di prove di lavoro (proof-of-work).",
+    "Se non mi credete o non capite, non ho tempo per cercare di convincervi, mi dispiace.",
+    "I Bitcoin vengono generati a una velocità che si avvicina al programma pianificato, e questo rimane vero indipendentemente da quanti minatori siano attivi.",
+    "Tra qualche decennio, quando la ricompensa diventerà troppo piccola, la commissione di transazione diventerà il principale incentivo per i nodi.",
+    "Scrivere una descrizione di questa cosa per il pubblico generico è dannatamente difficile. Non c'è nulla a cui poterlo paragonare."
+  ],
+  "profile_overlay": {
+    "title": "SET DI ABILITÀ",
+    "empty_state": "NESSUNA ABILITÀ RILEVATA",
+    "segments": [
+      {
+        "label": "PROTOCOLLO DELLA VOLONTÀ",
+        "skill_key": "WILL_TO_FREEDOM",
+        "color": "#00e5ff"
+      },
+      {
+        "label": "MODULO CONOSCENZA",
+        "skill_keys": [
+          "TRUTH_SEEKER",
+          "HARD_MONEY"
+        ],
+        "color": "#ffaa00"
+      },
+      {
+        "label": "DRIVE DI RETE",
+        "skill_key": "GRID_RUNNER",
+        "color": "#b87333"
+      }
+    ],
+    "skill_notification_banner": "+SKILL"
+  },
+  "ui_labels": {
+    "sats_counter_prefix": "SATS",
+    "independence_label": "INDIPENDENZA"
+  }
+}
