@@ -369,8 +369,31 @@ export default function Home() {
         <GridBackground intensity={bgIntensity} />
         <BiometricCircuit revealProgress={circuitReveal} />
 
-        {currentQuestion === 1 && (
-          <LangToggle lang={lang} onLangChange={(l) => handleLangChange(l)} variant="light" />
+        <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 pt-3">
+          <div className="w-[50px]" />
+          
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            className={`flex flex-col items-center gap-0.5 px-3 py-1.5 ${currentQuestion > 1 ? 'bg-[#F5F5F5]/90 border border-[#B87333]/20' : ''}`}
+          >
+            <span className="text-[8px] tracking-[2px] font-mono font-bold" style={{ color: "#B87333", opacity: 0.7 }}>
+              DIGITAL RESISTANCE
+            </span>
+            <span className="text-[11px] tracking-[3px] font-mono font-bold" style={{ color: "#B87333" }}>
+              re_terminal
+            </span>
+          </motion.div>
+          
+          <div className="w-[50px] flex justify-end">
+            {currentQuestion === 1 && (
+              <LangToggle lang={lang} onLangChange={(l) => handleLangChange(l)} variant="light" />
+            )}
+          </div>
+        </div>
+        
+        {currentQuestion > 1 && (
+          <BackButton onClick={handleBack} isDark={false} />
         )}
         
         <AnimatePresence>
@@ -393,25 +416,6 @@ export default function Home() {
             </motion.div>
           )}
         </AnimatePresence>
-        
-        {currentQuestion > 1 && (
-          <BackButton onClick={handleBack} isDark={false} />
-        )}
-        
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={`flex flex-col items-center gap-0.5 px-4 py-2 ${currentQuestion > 1 ? 'bg-[#F5F5F5]/90 border border-[#B87333]/20' : ''}`}
-          >
-            <span className="text-[8px] tracking-[2px] font-mono font-bold" style={{ color: "#B87333", opacity: 0.7 }}>
-              DIGITAL RESISTANCE
-            </span>
-            <span className="text-[11px] tracking-[3px] font-mono font-bold" style={{ color: "#B87333" }}>
-              re_terminal
-            </span>
-          </motion.div>
-        </div>
 
         <div className="h-full flex flex-col items-center justify-center relative z-10 px-4">
           <AnimatePresence mode="wait">

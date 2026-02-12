@@ -53,7 +53,7 @@ function LangToggle({ lang, onLangChange, variant }: { lang: Lang; onLangChange:
 
   return (
     <div
-      className={`absolute top-4 right-4 z-20 flex items-center border ${borderClass}`}
+      className={`flex items-center border ${borderClass}`}
       style={{ fontFamily: "monospace" }}
       data-testid="lang-toggle"
     >
@@ -196,7 +196,9 @@ export function BootScreen({ onDismiss, onLangChange, lang = "IT" }: BootScreenP
 
   return (
     <div className="fixed inset-0 z-[10000] bg-black">
-      <LangToggle lang={currentLang} onLangChange={handleLangSwitch} variant="dark" />
+      <div className="absolute top-4 right-4 z-20">
+        <LangToggle lang={currentLang} onLangChange={handleLangSwitch} variant="dark" />
+      </div>
 
       <motion.div
         initial={{ opacity: 0 }}
