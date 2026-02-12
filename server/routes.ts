@@ -10,7 +10,11 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
-  
+
+  app.get("/api/health", (_req, res) => {
+    res.status(200).json({ status: "ok" });
+  });
+
   app.post(api.sessions.create.path, async (req, res) => {
     try {
       const nodeId = req.body.nodeId || `#RE_CHAIN_${randomBytes(2).toString('hex').toUpperCase()}`;
