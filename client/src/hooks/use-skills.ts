@@ -1,9 +1,23 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import type { SkillKey } from "@shared/schema";
 
 export function useGrantSkill() {
   const [pendingSkill, setPendingSkill] = useState<SkillKey | null>(null);
   const grantedRef = useRef<Set<string>>(new Set());
+  const preloadedRef = useRef(false);
+
+  useEffect(() => {
+    if (preloadedRef.current) return;
+    preloadedRef.current = true;
+    const token = localStorage.getItem("liberta_token");
+    if (!token) return;
+    fetch(`/api/skills/${token}`)
+      .then(r => r.ok ? r.json() : [])
+      .then((skills: { skillKey: string }[]) => {
+        skills.forEach(s => grantedRef.current.add(s.skillKey));
+      })
+      .catch(() => {});
+  }, []);
 
   const grantSkill = useCallback(async (skillKey: SkillKey): Promise<boolean> => {
     const token = localStorage.getItem("liberta_token");

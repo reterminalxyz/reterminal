@@ -887,7 +887,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
           <div className="flex items-center gap-3">
             <div className="w-3 h-3 rounded-full bg-[#B87333]" />
             <span className="text-[11px] tracking-[4px] font-bold text-[#B87333]">
-              re_terminal<span className="inline-block w-[2px] h-[12px] bg-[#B87333] ml-0.5 animate-pulse" />
+              re_terminal
             </span>
           </div>
           <div className="flex items-center gap-3">

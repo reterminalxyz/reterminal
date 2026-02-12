@@ -212,7 +212,7 @@ function PixelDevice({ segments, shimmer }: { segments: [boolean, boolean, boole
   );
 }
 
-function SkillRow({ skillKey, granted, isNew }: { skillKey: SkillKey; granted: boolean; isNew: boolean }) {
+function SkillRow({ skillKey, granted, isNew, lang = "IT" }: { skillKey: SkillKey; granted: boolean; isNew: boolean; lang?: Lang }) {
   const meta = SKILL_META[skillKey];
   const [showCheck, setShowCheck] = useState(false);
 
@@ -254,13 +254,13 @@ function SkillRow({ skillKey, granted, isNew }: { skillKey: SkillKey; granted: b
             textShadow: granted ? `0 0 4px ${color}30` : "none",
           }}
         >
-          {meta.name}
+          {meta.name[lang]}
         </div>
         <div
           className="text-[8px] font-mono mt-0.5 truncate"
           style={{ color: granted ? "#666" : "#222" }}
         >
-          {meta.description}
+          {meta.description[lang]}
         </div>
       </div>
       <div className="flex-shrink-0 w-5 h-5 flex items-center justify-center">
@@ -482,6 +482,7 @@ export default function ProfileOverlay({ onClose, token, originRect, completedBl
                           skillKey={key}
                           granted={true}
                           isNew={newSkillKeys.has(key)}
+                          lang={(lang as Lang)}
                         />
                       ))}
                     </div>

@@ -50,11 +50,29 @@ export type SessionResponse = Session;
 export const SKILL_KEYS = ["WILL_TO_FREEDOM", "TRUTH_SEEKER", "HARD_MONEY", "GRID_RUNNER"] as const;
 export type SkillKey = typeof SKILL_KEYS[number];
 
-export const SKILL_META: Record<SkillKey, { name: string; description: string; layer: string }> = {
-  WILL_TO_FREEDOM: { name: "Воля к Свободе", description: "Ты сделал первый шаг. Протокол активирован.", layer: "core" },
-  TRUTH_SEEKER: { name: "Искатель Истины", description: "Ты видишь сквозь ложь системы. Визор активирован.", layer: "visor" },
-  HARD_MONEY: { name: "Твёрдые Деньги", description: "Ты понял суть звонкой монеты. Ключ в твоих руках.", layer: "hand_item" },
-  GRID_RUNNER: { name: "Бегущий по Сетке", description: "Ты освоил сеть Lightning. Аура цифрового сопротивления.", layer: "aura" },
+type LangKey = "IT" | "EN" | "RU";
+
+export const SKILL_META: Record<SkillKey, { name: Record<LangKey, string>; description: Record<LangKey, string>; layer: string }> = {
+  WILL_TO_FREEDOM: {
+    name: { IT: "Volont\u00e0 di Libert\u00e0", EN: "Will to Freedom", RU: "\u0412\u043e\u043b\u044f \u043a \u0421\u0432\u043e\u0431\u043e\u0434\u0435" },
+    description: { IT: "Hai fatto il primo passo. Protocollo attivato.", EN: "You took the first step. Protocol activated.", RU: "\u0422\u044b \u0441\u0434\u0435\u043b\u0430\u043b \u043f\u0435\u0440\u0432\u044b\u0439 \u0448\u0430\u0433. \u041f\u0440\u043e\u0442\u043e\u043a\u043e\u043b \u0430\u043a\u0442\u0438\u0432\u0438\u0440\u043e\u0432\u0430\u043d.",  },
+    layer: "core",
+  },
+  TRUTH_SEEKER: {
+    name: { IT: "Cercatore di Verit\u00e0", EN: "Truth Seeker", RU: "\u0418\u0441\u043a\u0430\u0442\u0435\u043b\u044c \u0418\u0441\u0442\u0438\u043d\u044b" },
+    description: { IT: "Vedi attraverso le bugie del sistema. Visore attivato.", EN: "You see through the system's lies. Visor activated.", RU: "\u0422\u044b \u0432\u0438\u0434\u0438\u0448\u044c \u0441\u043a\u0432\u043e\u0437\u044c \u043b\u043e\u0436\u044c \u0441\u0438\u0441\u0442\u0435\u043c\u044b. \u0412\u0438\u0437\u043e\u0440 \u0430\u043a\u0442\u0438\u0432\u0438\u0440\u043e\u0432\u0430\u043d." },
+    layer: "visor",
+  },
+  HARD_MONEY: {
+    name: { IT: "Denaro Solido", EN: "Hard Money", RU: "\u0422\u0432\u0451\u0440\u0434\u044b\u0435 \u0414\u0435\u043d\u044c\u0433\u0438" },
+    description: { IT: "Hai capito l'essenza del denaro reale. La chiave \u00e8 nelle tue mani.", EN: "You understood the essence of real money. The key is in your hands.", RU: "\u0422\u044b \u043f\u043e\u043d\u044f\u043b \u0441\u0443\u0442\u044c \u0437\u0432\u043e\u043d\u043a\u043e\u0439 \u043c\u043e\u043d\u0435\u0442\u044b. \u041a\u043b\u044e\u0447 \u0432 \u0442\u0432\u043e\u0438\u0445 \u0440\u0443\u043a\u0430\u0445." },
+    layer: "hand_item",
+  },
+  GRID_RUNNER: {
+    name: { IT: "Corridore della Rete", EN: "Grid Runner", RU: "\u0411\u0435\u0433\u0443\u0449\u0438\u0439 \u043f\u043e \u0421\u0435\u0442\u043a\u0435" },
+    description: { IT: "Hai padroneggiato la rete Lightning. Aura della resistenza digitale.", EN: "You mastered the Lightning Network. Digital resistance aura.", RU: "\u0422\u044b \u043e\u0441\u0432\u043e\u0438\u043b \u0441\u0435\u0442\u044c Lightning. \u0410\u0443\u0440\u0430 \u0446\u0438\u0444\u0440\u043e\u0432\u043e\u0433\u043e \u0441\u043e\u043f\u0440\u043e\u0442\u0438\u0432\u043b\u0435\u043d\u0438\u044f." },
+    layer: "aura",
+  },
 };
 
 export const userSkills = pgTable("user_skills", {
