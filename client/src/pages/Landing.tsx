@@ -1,12 +1,13 @@
 import { useEffect, useRef, useCallback, useState } from "react";
 
-function DigitalFogCanvas() {
+function DigitalFogCanvas({ onFirstTouch }: { onFirstTouch: () => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const fogCanvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef<number>(0);
   const lastTimeRef = useRef<number>(0);
   const clearedAreasRef = useRef<Array<{ x: number; y: number; radius: number; opacity: number; time: number }>>([]);
   const [hintVisible, setHintVisible] = useState(true);
+  const touchedRef = useRef(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -101,8 +102,15 @@ function DigitalFogCanvas() {
     };
   }, []);
 
+  const triggerFirstTouch = useCallback(() => {
+    if (!touchedRef.current) {
+      touchedRef.current = true;
+      setHintVisible(false);
+      onFirstTouch();
+    }
+  }, [onFirstTouch]);
+
   const addClearArea = useCallback((clientX: number, clientY: number) => {
-    setHintVisible(false);
     const now = performance.now();
     clearedAreasRef.current.push({
       x: clientX,
@@ -114,7 +122,9 @@ function DigitalFogCanvas() {
   }, []);
 
   const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    addClearArea(e.clientX, e.clientY);
+    if (touchedRef.current) {
+      addClearArea(e.clientX, e.clientY);
+    }
   }, [addClearArea]);
 
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
@@ -134,10 +144,14 @@ function DigitalFogCanvas() {
         onMouseMove={handleMouseMove}
         onTouchMove={handleTouchMove}
         onTouchStart={(e) => {
+          triggerFirstTouch();
           const touch = e.touches[0];
           if (touch) addClearArea(touch.clientX, touch.clientY);
         }}
-        onClick={(e) => addClearArea(e.clientX, e.clientY)}
+        onClick={(e) => {
+          triggerFirstTouch();
+          addClearArea(e.clientX, e.clientY);
+        }}
         data-testid="fog-canvas"
       />
       {hintVisible && (
@@ -145,137 +159,137 @@ function DigitalFogCanvas() {
           className="fixed inset-0 z-20 flex items-center justify-center pointer-events-none"
           data-testid="text-hint"
         >
-          <span
-            className="font-mono text-[11px] tracking-[2px] animate-blink"
-            style={{ color: "#D97D45", opacity: 0.8 }}
-          >
-            CLEAR THE FOG TO REVEAL THE SIGNAL<span className="animate-blink">_</span>
-          </span>
+          <div className="relative">
+            <span
+              className="font-mono text-[11px] tracking-[2px] animate-blink relative"
+              style={{
+                color: "#888",
+                textShadow: "0 0 8px rgba(136,136,136,0.4), 0 0 20px rgba(136,136,136,0.2), 0 0 40px rgba(136,136,136,0.1)",
+              }}
+            >
+              CLEAR THE FOG TO REVEAL THE SIGNAL<span className="animate-blink">_</span>
+            </span>
+          </div>
         </div>
       )}
     </>
   );
 }
 
-const MANIFESTO_LINES = [
-  { text: "The internet has become a digital panopticon.", color: "#999", delay: 0 },
-  { text: "re_terminal is the breach.", color: "#D97D45", delay: 1800, hasBlinkUnderscore: true },
-  { text: "Post-privacy is our current reality.", color: "#999", delay: 3400 },
-  { text: "Offline hardware. Stateless money. Direct signal.", color: "#999", delay: 5000 },
-  { text: "Reclaim your digital sovereignty.", color: "#ccc", delay: 7000, bold: true },
-];
+const MANIFESTO_FULL = "The internet has become a digital panopticon. re_terminal is the breach. Post-privacy is our current reality. Offline hardware. Stateless money. Direct signal. Reclaim your digital sovereignty.";
 
-function TypewriterLine({ text, color, delay, bold, hasBlinkUnderscore }: {
-  text: string;
-  color: string;
-  delay: number;
-  bold?: boolean;
-  hasBlinkUnderscore?: boolean;
-}) {
-  const [displayedText, setDisplayedText] = useState("");
-  const [started, setStarted] = useState(false);
-  const [done, setDone] = useState(false);
+const COPPER_START = MANIFESTO_FULL.indexOf("re_terminal");
+const COPPER_END = MANIFESTO_FULL.indexOf("the breach.") + "the breach.".length;
+const BLINK_POS = COPPER_START + 2;
 
-  useEffect(() => {
-    const startTimer = setTimeout(() => setStarted(true), delay);
-    return () => clearTimeout(startTimer);
-  }, [delay]);
+function ManifestoTypewriter({ started }: { started: boolean }) {
+  const [charIndex, setCharIndex] = useState(0);
 
   useEffect(() => {
     if (!started) return;
     let i = 0;
     const interval = setInterval(() => {
       i++;
-      setDisplayedText(text.slice(0, i));
-      if (i >= text.length) {
+      setCharIndex(i);
+      if (i >= MANIFESTO_FULL.length) {
         clearInterval(interval);
-        setDone(true);
       }
-    }, 35);
+    }, 30);
     return () => clearInterval(interval);
-  }, [started, text]);
+  }, [started]);
 
-  if (!started) return <p className="mt-3 invisible">&nbsp;</p>;
+  if (!started) return null;
 
-  if (hasBlinkUnderscore && displayedText.length > 0) {
-    const idx = 2;
-    let content;
-    if (displayedText.length <= idx) {
-      content = <>{displayedText}<span className="animate-blink">_</span></>;
-    } else if (displayedText.length <= idx + 1) {
-      content = <>{displayedText.slice(0, idx)}<span className="animate-blink">_</span>{displayedText.slice(idx + 1)}</>;
-    } else {
-      content = <>{displayedText.slice(0, idx)}<span className="animate-blink">_</span>{displayedText.slice(idx + 1)}{!done && <span className="animate-blink">|</span>}</>;
+  const len = charIndex;
+  const done = len >= MANIFESTO_FULL.length;
+
+  const beforeCopper = MANIFESTO_FULL.slice(0, Math.min(len, COPPER_START));
+  const copperPart = len > COPPER_START ? MANIFESTO_FULL.slice(COPPER_START, Math.min(len, COPPER_END)) : "";
+  const afterCopper = len > COPPER_END ? MANIFESTO_FULL.slice(COPPER_END, len) : "";
+
+  const renderCopper = (text: string) => {
+    if (!text) return null;
+    const localBlinkPos = BLINK_POS - COPPER_START;
+    if (text.length <= localBlinkPos) {
+      return <span style={{ color: "#D97D45" }}>{text}</span>;
     }
-
     return (
-      <p className="mt-3" style={{ color }}>
-        {content}
-      </p>
+      <span style={{ color: "#D97D45" }}>
+        {text.slice(0, localBlinkPos)}
+        <span className="animate-blink">{text[localBlinkPos]}</span>
+        {text.slice(localBlinkPos + 1)}
+      </span>
     );
-  }
+  };
 
   return (
-    <p
-      className={`mt-3 ${bold ? "font-bold" : ""}`}
-      style={{ color, letterSpacing: bold ? "1.5px" : undefined }}
+    <div
+      className="font-mono text-left"
+      style={{
+        fontSize: "13px",
+        lineHeight: "2.2",
+        letterSpacing: "0.5px",
+        color: "#999",
+      }}
+      data-testid="text-manifesto"
     >
-      {displayedText}
-      {!done && <span className="animate-blink">|</span>}
-    </p>
+      {beforeCopper}
+      {renderCopper(copperPart)}
+      {afterCopper}
+      {!done && <span className="animate-blink" style={{ color: "#999" }}>|</span>}
+    </div>
   );
 }
 
 export default function Landing() {
+  const [typingStarted, setTypingStarted] = useState(false);
+
+  const handleFirstTouch = useCallback(() => {
+    setTypingStarted(true);
+  }, []);
+
   return (
     <div className="fixed inset-0 overflow-hidden" data-testid="landing-page">
       <div
         className="fixed inset-0 z-0"
         style={{
-          background: "radial-gradient(ellipse at center, #3d2212 0%, #2a1508 25%, #1a0c03 50%, #0D0D0D 80%)",
+          background: "linear-gradient(145deg, #1c1410 0%, #15100b 20%, #0f0b08 40%, #0D0D0D 100%)",
         }}
         data-testid="bronze-bg"
       >
         <div
           className="absolute inset-0"
           style={{
-            background: "radial-gradient(circle at 50% 40%, rgba(184,115,51,0.3) 0%, rgba(217,125,69,0.15) 30%, rgba(184,115,51,0.05) 55%, transparent 75%)",
+            background: "radial-gradient(ellipse at 50% 45%, rgba(140,95,50,0.12) 0%, rgba(100,65,30,0.06) 40%, transparent 70%)",
           }}
         />
         <div
           className="absolute inset-0"
           style={{
-            background: "radial-gradient(circle at 30% 60%, rgba(166,94,46,0.12) 0%, transparent 50%), radial-gradient(circle at 70% 30%, rgba(255,179,138,0.08) 0%, transparent 40%)",
+            backgroundImage: `repeating-linear-gradient(
+              0deg,
+              transparent,
+              transparent 2px,
+              rgba(184,115,51,0.015) 2px,
+              rgba(184,115,51,0.015) 3px
+            )`,
+          }}
+        />
+        <div
+          className="absolute inset-0"
+          style={{
+            background: "linear-gradient(135deg, rgba(160,100,45,0.04) 0%, transparent 30%, rgba(120,75,30,0.03) 60%, transparent 100%)",
           }}
         />
       </div>
 
-      <div className="fixed inset-0 z-5 flex flex-col items-center justify-center px-8">
-        <div className="flex flex-col items-center max-w-[380px]">
-          <div
-            className="text-center font-mono leading-loose"
-            style={{
-              fontSize: "13px",
-              lineHeight: "2.4",
-              letterSpacing: "0.5px",
-            }}
-            data-testid="text-manifesto"
-          >
-            {MANIFESTO_LINES.map((line, i) => (
-              <TypewriterLine
-                key={i}
-                text={line.text}
-                color={line.color}
-                delay={line.delay}
-                bold={line.bold}
-                hasBlinkUnderscore={line.hasBlinkUnderscore}
-              />
-            ))}
-          </div>
+      <div className="fixed inset-0 z-5 flex flex-col items-start justify-center px-8">
+        <div className="max-w-[380px]">
+          <ManifestoTypewriter started={typingStarted} />
         </div>
       </div>
 
-      <DigitalFogCanvas />
+      <DigitalFogCanvas onFirstTouch={handleFirstTouch} />
     </div>
   );
 }
