@@ -289,8 +289,8 @@ export default function Landing() {
         />
       </div>
 
-      <div className="fixed inset-0 z-[5] flex flex-col items-start justify-start px-8 pt-[25vh]">
-        <div className="max-w-[380px]">
+      <div className="fixed inset-0 z-[5] flex items-start justify-center pt-[25vh] px-8">
+        <div className="w-full max-w-[400px]">
           <ManifestoTypewriter started={typingStarted} />
         </div>
       </div>
