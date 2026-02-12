@@ -2,20 +2,107 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Share, ArrowDown } from "lucide-react";
 
+type Lang = "RU" | "EN" | "IT";
+
+const LANGS: Lang[] = ["RU", "EN", "IT"];
+
+const TRANSLATIONS = {
+  RU: {
+    heroTitle: "Ты активировал карту свободы",
+    heroSubtitle: "Для постоянного доступа и устойчивости к цензуре, установи терминал на телефон",
+    stayBrowser: "Остаться в браузере",
+    installTerminal: "Установить терминал",
+    shuttingDown: "ОТКЛЮЧЕНИЕ...",
+    terminalInstalled: "ТЕРМИНАЛ УСТАНОВЛЕН",
+    openApp: "Открой приложение на главном экране",
+  },
+  EN: {
+    heroTitle: "You activated the freedom card",
+    heroSubtitle: "For permanent access and censorship resistance, install the terminal on your phone",
+    stayBrowser: "Stay in browser",
+    installTerminal: "Install terminal",
+    shuttingDown: "SHUTTING DOWN...",
+    terminalInstalled: "TERMINAL INSTALLED",
+    openApp: "Open the app on your home screen",
+  },
+  IT: {
+    heroTitle: "Hai attivato la carta della libertà",
+    heroSubtitle: "Per un accesso permanente e resistenza alla censura, installa il terminale sul telefono",
+    stayBrowser: "Rimani nel browser",
+    installTerminal: "Installa terminale",
+    shuttingDown: "SPEGNIMENTO...",
+    terminalInstalled: "TERMINALE INSTALLATO",
+    openApp: "Apri l'app dalla schermata principale",
+  },
+};
+
 interface BootScreenProps {
   onDismiss: () => void;
+  onLangChange?: (lang: string) => void;
+  lang?: string;
 }
 
 function isIOS(): boolean {
   return /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
 }
 
+function LangToggle({ lang, onLangChange, variant }: { lang: Lang; onLangChange: (l: Lang) => void; variant: "dark" | "light" }) {
+  const borderClass = variant === "dark" ? "border-[#333]" : "border-[#B87333]/20";
+  const inactiveColor = variant === "dark" ? "#555" : "#aaa";
+  const separatorColor = variant === "dark" ? "#333" : "#ccc";
+
+  return (
+    <div
+      className={`absolute top-4 right-4 z-20 flex items-center border ${borderClass}`}
+      style={{ fontFamily: "monospace" }}
+      data-testid="lang-toggle"
+    >
+      {LANGS.map((l, i) => (
+        <span key={l} className="flex items-center">
+          {i > 0 && (
+            <span
+              className="block w-px self-stretch"
+              style={{ backgroundColor: separatorColor }}
+            />
+          )}
+          <button
+            type="button"
+            onClick={() => onLangChange(l)}
+            className="px-2 py-1 transition-colors duration-150"
+            style={{
+              fontSize: "8px",
+              letterSpacing: "2px",
+              color: lang === l ? "#B87333" : inactiveColor,
+              borderBottom: lang === l ? "1px solid #B87333" : "1px solid transparent",
+              lineHeight: 1,
+            }}
+            data-testid={`lang-${l.toLowerCase()}`}
+          >
+            {l}
+          </button>
+        </span>
+      ))}
+    </div>
+  );
+}
+
 type ShutdownStage = "idle" | "waiting" | "squeeze" | "line" | "dot" | "black";
 
-export function BootScreen({ onDismiss }: BootScreenProps) {
+export { LangToggle, LANGS };
+export type { Lang };
+
+export function BootScreen({ onDismiss, onLangChange, lang = "RU" }: BootScreenProps) {
   const [showIOSInstructions, setShowIOSInstructions] = useState(false);
   const [shutdownStage, setShutdownStage] = useState<ShutdownStage>("idle");
   const deferredPromptRef = useRef<any>(null);
+
+  const currentLang = (lang as Lang) || "RU";
+  const t = TRANSLATIONS[currentLang] || TRANSLATIONS.RU;
+
+  const handleLangSwitch = (l: Lang) => {
+    try { localStorage.setItem("liberta_lang", l); } catch (_) {}
+    onLangChange?.(l);
+  };
 
   useEffect(() => {
     const handler = (e: Event) => {
@@ -62,10 +149,10 @@ export function BootScreen({ onDismiss }: BootScreenProps) {
           className="text-center px-8"
         >
           <div className="text-[#B87333] font-mono text-[13px] tracking-[3px] font-bold mb-4">
-            ТЕРМИНАЛ УСТАНОВЛЕН
+            {t.terminalInstalled}
           </div>
           <div className="text-[#555] font-mono text-[11px] leading-relaxed max-w-[280px]">
-            Открой приложение на главном экране
+            {t.openApp}
           </div>
           <motion.div
             className="mt-6 w-2 h-2 bg-[#B87333] mx-auto rounded-full"
@@ -109,6 +196,8 @@ export function BootScreen({ onDismiss }: BootScreenProps) {
 
   return (
     <div className="fixed inset-0 z-[10000] bg-black">
+      <LangToggle lang={currentLang} onLangChange={handleLangSwitch} variant="dark" />
+
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -232,7 +321,7 @@ export function BootScreen({ onDismiss }: BootScreenProps) {
               LIBERTA TERMINAL v0.1
             </div>
             <h1 className="text-[#B87333] font-mono text-[18px] font-bold leading-tight tracking-wide">
-              Ты активировал карту свободы
+              {t.heroTitle}
             </h1>
           </motion.div>
 
@@ -242,7 +331,7 @@ export function BootScreen({ onDismiss }: BootScreenProps) {
             transition={{ delay: isShuttingDown ? 0 : 0.6, duration: isShuttingDown ? 0.3 : 0.6 }}
             className="text-[#888] font-mono text-[12px] text-center leading-relaxed mb-10 max-w-[300px]"
           >
-            Для постоянного доступа и устойчивости к цензуре, установи терминал на телефон
+            {t.heroSubtitle}
           </motion.p>
 
           <motion.div
@@ -263,7 +352,7 @@ export function BootScreen({ onDismiss }: BootScreenProps) {
               }}
               data-testid="button-stay-browser"
             >
-              Остаться в браузере
+              {t.stayBrowser}
             </button>
 
             <button
@@ -277,9 +366,9 @@ export function BootScreen({ onDismiss }: BootScreenProps) {
                 border: "1px solid rgba(212, 149, 106, 0.5)",
               }}
               data-testid="button-install-terminal"
-              data-text="Установить терминал"
+              data-text={t.installTerminal}
             >
-              <span className="relative z-10">Установить терминал</span>
+              <span className="relative z-10">{t.installTerminal}</span>
               <div className="absolute inset-0 bg-[#B87333]/5 animate-pulse" />
             </button>
           </motion.div>
@@ -295,7 +384,7 @@ export function BootScreen({ onDismiss }: BootScreenProps) {
                 animate={{ opacity: [1, 0.3, 1] }}
                 transition={{ duration: 1.2, repeat: Infinity }}
               >
-                ОТКЛЮЧЕНИЕ...
+                {t.shuttingDown}
               </motion.span>
             </motion.div>
           )}

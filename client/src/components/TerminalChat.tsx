@@ -83,7 +83,7 @@ const LEARNING_BLOCKS: LearningBlock[] = [
         }
       ]
     },
-    speech_continued: "На самом деле нет, хотя банк говорит тебе, что это твои деньги.\n\nНесмотря на то, что их приложение и показывает баланс, эти деньги не твоя собственность. Это запись в ИХ базе данных, которую тебе РАЗРЕШАЮТ использовать.\nПопробуй вот что:\nОтправь крупную сумму другу в другую страну. Банк обязательно спросит: «Откуда деньги? Зачем? Кому?» Они могут заблокировать твой счет просто потому, что их алгоритму не понравилась твоя покупка.\nРешил купить что-то, что не нравится твоему правительству? Может быть, пожертвование протестующим, запрещенную книгу или VPN? Счет заморожен. Без суда.\nДеньги в банке — это не деньги. Это обещание банка.\nИ это обещание работает, пока ты делаешь то, что от тебя ожидают.\nОни контролируют доступ к твоему времени, твоему труду, твоей жизни.\nТы работаешь всю неделю и обмениваешь это время на цифры в приложении. А цифры принадлежат не тебе.\nБанк — хозяин твоего времени.\n«Баланс в приложении» — это не владение, разрешение.",
+    speech_continued: "На самом деле нет, хотя банк говорит тебе, что это твои деньги.\n\nНесмотря на то, что их приложение и показывает баланс, эти деньги не твоя собственность. Это запись в ИХ базе данных, которую тебе РАЗРЕШАЮТ использовать.\nПопробуй вот что:\nОтправь крупную сумму другу в другую страну. Банк обязательно спросит: «Откуда деньги? Зачем? Кому?» Они могут заблокировать твой счет просто потому, что их алгоритму не понравилась твоя покупка.\nРешил купить что-то, что не нравится твоему правительству? Может быть, пожертвование протестующим, запрещенную книгу или VPN? Счет заморожен. Без суда.\nДеньги в банке — это лишь обещания банка. И эти обещания работают, пока ты делаешь то, что от тебя ожидают.\nПолучается, что система контролирует доступ к твоему времени, твоему труду, твоей жизни.\nТы работаешь всю неделю и обмениваешь это время на цифры в приложении. А цифры принадлежат не тебе.\nБанк — хозяин твоего времени.\n«Баланс в приложении» — это не владение, а разрешение.",
     skill: "Понимание, что баланс в приложении — это не владение, а разрешение",
     reward: 100,
     progress_target: 22,
@@ -103,7 +103,7 @@ const LEARNING_BLOCKS: LearningBlock[] = [
   {
     id: 3,
     title: "Bitcoin — выход (Математика против обещаний)",
-    speech: "Хорошо. Ты готов увидеть выход.\n\nЭто Bitcoin!\n\nЗабудь всё, что ты слышал о нём: \"криптовалюта\", \"инвестиция\", \"спекуляция\".\nНа самом деле Bitcoin это математика, которую невозможно подделать.\nПредставь золото. Его нельзя напечатать. Его количество ограничено. Его ценность признают люди во всем мире.\n\nТеперь представь, что золото:\n- Помещается в зашифрованном файле в твоем телефоне\n- Его можно отправить за секунды в любую страну\n- Никто не может его конфисковать\n- Никакой банк его не контролирует\n\n21 миллион монет. Больше никогда не будет. Никакой центральный банк не может напечатать еще.\nЭто не обещание. Это неизменяемый математический закон, записанный в коде навсегда.\nБанк может обанкротиться. Правительство может обесценить деньги.\nBitcoin? Работает 17 лет без остановки. 24/7. Без выходных. Без банкротств.\nЭто первый в истории способ хранить результат твоего труда там, где его не достанет ни одно правительство.",
+    speech: "Хорошо. Ты готов увидеть выход — Bitcoin!\n\nЗабудь всё, что ты слышал о нём раньше \"криптовалюта\", \"инвестиция\", «спекуляция\". Если быть точным, технически это распределенная база данных.\nПредставь правила, которые невозможно изменить в одностороннем порядке. Чтобы подделать транзакцию или изменить алгоритм, нужно убедить миллионы независимых узлов по всему миру. Это не воля банка или обещание правительства — это математический закон, защищенный криптографией.\nБиткоин — это первая в истории человечества система, где доверие заменено доказательством. Правила здесь соблюдаются самой сетью, а не чьим-то указом.\nЕго ещё называют «цифровым золотом»\nПредставь, что золото:\n- Помещается в зашифрованном файле в твоем телефоне\n- Его можно отправить за секунды в любую страну\n- Никто не может его конфисковать\n- Никакой банк его не контролирует\n\nБанк может обанкротиться. Правительство может обесценить деньги.\nBitcoin? Работает 17 лет без остановки. 24/7. Без выходных. Без банкротств.\nЭто первый в истории способ хранить результат твоего труда там, где его не достанет ни одно правительство.",
     skill: "Bitcoin = математика + редкость + свобода",
     reward: 100,
     progress_target: 23,
@@ -115,7 +115,7 @@ const LEARNING_BLOCKS: LearningBlock[] = [
   {
     id: 4,
     title: "Ключи (Кто владеет, тот и хозяин)",
-    speech: "Отличный вопрос. Вот где начинается настоящая свобода.\n\nВ обычном мире банк даёт тебе приложение, карту, PIN-код. Но настоящие ключи у них. Они решают, когда ты можешь войти в аккаунт. В их силах закрыть его в любой момент.\n\nВ мире Bitcoin ключи только у тебя.\nЕсть 12 или 24 слова (их называют seed-фраза). Это твой личный ключ.\nКто владеет этими словами — владеет аккаунтом и биткоинами на нём. Точка.\nНе банк. Не правительство. Не приложение.\nТолько тот, кто знает seed-фразу.\n\nПотерял слова? Никто не поможет. Нет «восстановления пароля». Нет техподдержки.\nЭто цена свободы. Это ответственность.\nС ответственностью приходит свобода, ведь никто даже теоритически не сможет:\n- Заморозить твой счет\n- Забрать твои деньги\n- Ограничить твои траты\n- Потребовать объяснений\nТы даже можешь запомнить эти слова наизусть и перевезти любую сумму через любую границу, имея только слова в голове.\n\nЕсли у тебя есть ключи — ты владеешь своими деньгами.\nЕсли нет — ты просто гость в чужом доме.",
+    speech: "Важное уточнение, исследователь. Твой кошелек (например, Phoenix) — это не банковский счет.\nБиткоинов не существует физически ни в твоем телефоне, ни в облаке, ни в банке. Они — лишь записи в глобальной распределенной базе данных (блокчейне).\nТвой телефон хранит не деньги, а ПРИВАТНЫЕ КЛЮЧИ. Это твоя цифровая подпись. Твой «ключ» — это единственное доказательство твоего права распоряжаться частью ресурсов сети.\nЗапомни: Not your keys, not your bitcoin. Если у тебя есть ключи — ты суверенен. Если ключи у третьей стороны — ты лишь пользователь их сервиса. Phoenix дает тебе полный контроль над ключами прямо здесь, в твоем терминале.",
     skill: "Понятие личного владения без посредников",
     reward: 100,
     progress_target: 24,
@@ -162,7 +162,7 @@ const LEARNING_BLOCKS: LearningBlock[] = [
   {
     id: 8,
     title: "Финальный выбор (Момент истины)",
-    speech: "1000 SATS это примерно 7 евро. Это твои первые деньги, которые не принадлежат банку.\n\nЭти деньги реальны. Ты можешь их потратить уже сегодня.\n\nНо есть одна проблема… У тебя еще нет кошелька.\n\nПрямо сейчас эти SATS существуют только тут.\n\nТвой финальный шаг:\n\nСоздать личный Bitcoin-кошелек. Это займёт 2 минуты.\nИ все SATS, которые ты заработал, придут на твой адрес. Автоматически.\nЭто момент, когда теория становится реальностью.",
+    speech: "1000 SATS — твои первые деньги, которые не принадлежат банку.\n\nНо есть одна проблема… У тебя еще нет кошелька. Прямо сейчас эти SATS существуют только тут.\n\nТвой финальный шаг:\n\nСоздать личный Bitcoin-кошелек. Это займёт 2 минуты.\nИ все SATS, которые ты заработал, придут на твой адрес. Автоматически.\nЭто момент, когда теория становится реальностью.",
     skill: "Момент принятия финального решения",
     reward: 0,
     progress_target: 27,
@@ -198,7 +198,7 @@ const WALLET_STEPS: WalletStep[] = [
   {
     id: "step_1",
     title: "Скачай свой личный сейф",
-    instruction: "Слушай внимательно.\n\nМы используем Phoenix Wallet. Это лучший кошелек для новичков. Простой. Быстрый. Твой.\n\nВажно понять одну вещь: в системе Bitcoin нет «твоего аккаунта». Нет логина. Нет пароля. Нет восстановления через email.\nЕсть только твоё устройство. И то, что на нём хранится.\nPhoenix — это не приложение банка. Это твой личный сейф.\n\nСкачай приложение и возвращайся сюда.",
+    instruction: "Новичкам советуем используем Phoenix Wallet. Он простой, быстрый и твой.\n\nВажное уточнение, твой кошелек это не банковский счет.\nБиткоинов не существует физически ни в твоем телефоне, ни в облаке, ни в банке. Они — лишь записи в глобальной распределенной базе данных (блокчейне).\nТвой телефон хранит не деньги, а ПРИВАТНЫЕ КЛЮЧИ. Это твоя цифровая подпись. Твой «ключ» — это единственное доказательство твоего права распоряжаться частью ресурсов сети.\nЗапомни: Not your keys, not your bitcoin. Если у тебя есть ключи — ты суверенен. Если ключи у третьей стороны — ты лишь пользователь их сервиса.",
     buttons: [
       { text: "Скачать кошелек для iPhone", url: "https://apps.apple.com/it/app/phoenix-wallet/id1544097028", type: "external" },
       { text: "Скачать кошелек для Android", url: "https://play.google.com/store/apps/details?id=fr.acinq.phoenix.mainnet&pli=1", type: "external" },
@@ -235,7 +235,7 @@ const WALLET_STEPS: WalletStep[] = [
     title: "Забери своё",
     instruction: "Сейчас ты получишь свои заработанные SATS.\n\nКак это работает:\n\nКогда нажмешь кнопку \"ПОЛУЧИТЬ 1000 SATS\" внизу, произойдет следующее:\n\n1. Автоматически откроется Phoenix Wallet\n   (Если не открылся — открой вручную)\n\n2. Phoenix покажет уведомление о входящем платеже\n   \"Incoming payment: 1000 sats\"\n\n3. Через пару секунд ты увидишь их на балансе\n   Ты увидишь \"+1000\" в приложении\n\n4. Готово. Деньги твои.\n\nЭто Bitcoin. Мгновенно, анонимно и без посредников.\n\nОт нас к тебе напрямую. Через математику  и криптографию. Через свободу.\n\nДобро пожаловать в параллельную экономику.\n\nТы только что сделал то, что большинство людей никогда не решится сделать:\nВзял контроль над своими деньгами.\n\nТы больше не гость в чужом доме.\nТы — хозяин.\n\nНажимай кнопку. Твои сатоши ждут.",
     buttons: [
-      { text: "ПОЛУЧИТЬ 1000 SATS", type: "deeplink", url: "lightning:LNURL1DP68GURN8GHJ7ET4WP5X7UNFVDEKZUNYD9HX2UEJ9EKXUCNFW3EJUCM0D5HHW6T5DPJ8YCTH9ASHQ6F0WCCJ7MRWW4EXCT6EFFMH2WRGVATK7KNTX4M8X3ZZ0QENX7PJ0YH42U35DFSNVNPKDYE5UATCV9RH5WF52EE527SGJD0GM", target: "step_5" }
+      { text: "ПОЛУЧИТЬ 1000 SATS", type: "deeplink", url: "lightning:LNURL1DP68GURN8GHJ7ET4WP5X7UNFVDEKZUNYD9HX2UEJ9EKXUCNFW3EJUCM0D5HHW6T5DPJ8YCTH9ASHQ6F0WCCJ7MRWW4EXCT6P0PZKYUJP8YE8SNPKWQMRVA23DPD8SERCVC2YC4CH", target: "step_5" }
     ]
   },
   {
@@ -539,6 +539,9 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
   const [showTroubleshooting, setShowTroubleshooting] = useState(false);
   const [flowCompleted, setFlowCompleted] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
+  const [followUpdatesClicked, setFollowUpdatesClicked] = useState(false);
+  const [followUpdatesTyped, setFollowUpdatesTyped] = useState(false);
+  const deferredInstallRef = useRef<any>(null);
 
   const isLockedRef = useRef(false);
   const mountedRef = useRef(true);
@@ -552,6 +555,38 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
   const lastScrollTopRef = useRef(0);
   const pendingTimeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const deeplinkCleanupRef = useRef<(() => void) | null>(null);
+
+  useEffect(() => {
+    const handler = (e: Event) => {
+      e.preventDefault();
+      deferredInstallRef.current = e;
+    };
+    window.addEventListener("beforeinstallprompt", handler);
+    return () => window.removeEventListener("beforeinstallprompt", handler);
+  }, []);
+
+  const handleFollowUpdatesClick = useCallback(() => {
+    if (followUpdatesClicked || isTyping) return;
+    playClick();
+    setFollowUpdatesClicked(true);
+    setMessages(prev => [...prev, { id: nextMsgId(), text: "Как следить за обновлениями проекта?", sender: "user" }]);
+    safeTimeout(() => {
+      typeMessage(
+        "Ты можешь скачать приложение — его нельзя удалить из магазинов приложений, потому что оно создано устойчивым к цензуре.\n\nВторая опция — подпишись на фаундера в децентрализованной соц. сети Nostr и следи за всеми новостями там. Мы будем изучать её в следующих блоках.",
+        "satoshi",
+        () => { setFollowUpdatesTyped(true); }
+      );
+    }, 500);
+  }, [followUpdatesClicked, isTyping, typeMessage, safeTimeout, setMessages, setFollowUpdatesClicked, setFollowUpdatesTyped]);
+
+  const handlePWAInstall = useCallback(async () => {
+    playClick();
+    if (deferredInstallRef.current) {
+      deferredInstallRef.current.prompt();
+      await deferredInstallRef.current.userChoice;
+      deferredInstallRef.current = null;
+    }
+  }, [deferredInstallRef]);
 
   const scrollToBottom = useCallback(() => {
     if (!userScrolledRef.current) {
@@ -1087,9 +1122,9 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
       <div className="flex-shrink-0 bg-[#111111] border-b-2 border-[#B87333]/60 z-50">
         <div className="flex items-center justify-between px-4 py-3">
           <div className="flex items-center gap-3">
-            <div className="w-3 h-3 bg-[#B87333]" />
-            <span className="text-[11px] tracking-[4px] font-bold text-[#B87333] uppercase">
-              TERMINAL://
+            <div className="w-3 h-3 rounded-full bg-[#B87333]" />
+            <span className="text-[11px] tracking-[4px] font-bold text-[#B87333]">
+              re_terminal
             </span>
           </div>
           <div className="flex items-center gap-3">
@@ -1271,7 +1306,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
         )}
 
         {flowCompleted && !isTyping && (
-          <div className="pt-3">
+          <div className="pt-3 space-y-2">
             <motion.button
               type="button"
               initial={{ opacity: 0 }}
@@ -1306,6 +1341,55 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
                 </motion.div>
               )}
             </AnimatePresence>
+
+            {!followUpdatesClicked && (
+              <motion.button
+                type="button"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1 }}
+                onClick={(e) => { e.preventDefault(); e.stopPropagation(); handleFollowUpdatesClick(); }}
+                className="w-full px-4 py-3 text-left text-[11px] font-mono font-bold tracking-[2px]
+                         border border-[#00e5ff]/30 bg-[#00e5ff]/5 text-[#00e5ff]/60
+                         hover:bg-[#00e5ff]/10 hover:text-[#00e5ff] transition-all duration-200"
+                data-testid="button-follow-updates"
+              >
+                <span className="mr-2 text-[#00e5ff]/30">[?]</span>
+                КАК СЛЕДИТЬ ЗА ОБНОВЛЕНИЯМИ ПРОЕКТА?
+              </motion.button>
+            )}
+          </div>
+        )}
+
+        {followUpdatesTyped && !isTyping && (
+          <div className="pt-3 space-y-2">
+            <motion.button
+              type="button"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              onClick={(e) => { e.preventDefault(); e.stopPropagation(); handlePWAInstall(); }}
+              className="w-full px-4 py-3 text-left text-[12px] font-mono font-bold tracking-[1px]
+                       border border-[#B87333]/40 bg-[#B87333]/10 text-[#B87333]
+                       hover:bg-[#B87333]/20 transition-all duration-200"
+              data-testid="button-install-pwa"
+            >
+              СКАЧАТЬ ПРИЛОЖЕНИЕ
+            </motion.button>
+            <motion.a
+              href="https://primal.net/p/npub1qlkwmzmrhzpuak7c2g9afdcstamqrfmxkpjkgy3wjfagxtjqs2xqnxshjp"
+              target="_blank"
+              rel="noopener noreferrer"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.5 }}
+              className="block w-full px-4 py-3 text-left text-[12px] font-mono font-bold tracking-[1px]
+                       border border-[#00e5ff]/30 bg-[#00e5ff]/5 text-[#00e5ff]
+                       hover:bg-[#00e5ff]/10 transition-all duration-200"
+              data-testid="link-nostr-founder"
+            >
+              ФАУНДЕР В NOSTR
+            </motion.a>
           </div>
         )}
 

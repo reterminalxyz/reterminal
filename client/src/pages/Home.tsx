@@ -5,7 +5,8 @@ import { GridBackground } from "@/components/GridBackground";
 import { IndependenceBar } from "@/components/IndependenceBar";
 import { BackButton } from "@/components/BackButton";
 import { TerminalChat } from "@/components/TerminalChat";
-import { BootScreen } from "@/components/BootScreen";
+import { BootScreen, LangToggle } from "@/components/BootScreen";
+import type { Lang } from "@/components/BootScreen";
 import { useCreateSession, useUpdateSession, useSession } from "@/hooks/use-sessions";
 import { useGrantSkill } from "@/hooks/use-skills";
 import { Loader2 } from "lucide-react";
@@ -33,11 +34,50 @@ type QuestionId = 1 | 2 | 3 | 4;
 const PROGRESS_PER_QUESTION = [5, 10, 15, 20];
 const SATS_PER_QUESTION = 50;
 
+const Q_TRANSLATIONS: Record<string, { titles: string[]; yes: string; no: string; notYet: string; tryAgain: string }> = {
+  RU: {
+    titles: [
+      "Хочешь стать свободнее?",
+      "Как думаешь, государства и корпорации хотят забрать свободу людей?",
+      "Можно ли с этим что-то сделать?",
+      "Готов узнать что с этим можно сделать?",
+    ],
+    yes: "ДА",
+    no: "НЕТ",
+    notYet: "ПОКА НЕТ",
+    tryAgain: "ПОПРОБУЙ ЕЩЁ",
+  },
+  EN: {
+    titles: [
+      "Do you want to become freer?",
+      "Do you think governments and corporations want to take people's freedom?",
+      "Can something be done about it?",
+      "Ready to learn what can be done?",
+    ],
+    yes: "YES",
+    no: "NO",
+    notYet: "NOT YET",
+    tryAgain: "TRY AGAIN",
+  },
+  IT: {
+    titles: [
+      "Vuoi diventare più libero?",
+      "Pensi che i governi e le corporation vogliano togliere la libertà alle persone?",
+      "Si può fare qualcosa al riguardo?",
+      "Pronto a scoprire cosa si può fare?",
+    ],
+    yes: "SÌ",
+    no: "NO",
+    notYet: "NON ANCORA",
+    tryAgain: "RIPROVA",
+  },
+};
+
 const QUESTIONS = [
-  { id: 1, title: "Хочешь стать свободнее?", options: [{ label: "ДА", correct: true }, { label: "НЕТ", correct: false }] },
-  { id: 2, title: "Как думаешь, государства и корпорации хотят забрать свободу людей?", options: [{ label: "ДА", correct: true }, { label: "НЕТ", correct: false }] },
-  { id: 3, title: "Можно ли с этим что-то сделать?", options: [{ label: "ДА", correct: true }, { label: "НЕТ", correct: false }] },
-  { id: 4, title: "Готов узнать что с этим можно сделать?", options: [{ label: "ДА", correct: true }, { label: "ПОКА НЕТ", correct: false }] },
+  { id: 1, options: [{ correct: true }, { correct: false }] },
+  { id: 2, options: [{ correct: true }, { correct: false }] },
+  { id: 3, options: [{ correct: true }, { correct: false }] },
+  { id: 4, options: [{ correct: true }, { correct: false }] },
 ];
 
 
@@ -74,12 +114,27 @@ export default function Home() {
   const [skipTypewriter, setSkipTypewriter] = useState(false);
   const [answeredQuestions, setAnsweredQuestions] = useState<Set<QuestionId>>(new Set());
   const [userStats, setUserStats] = useState<{ level: number; xp: number } | null>(null);
+  const [lang, setLang] = useState<Lang>(() => {
+    try {
+      const stored = localStorage.getItem("liberta_lang");
+      if (stored === "EN" || stored === "IT" || stored === "RU") return stored;
+    } catch (_) {}
+    return "RU";
+  });
   const { grantSkill, pendingSkill, dismissPopup } = useGrantSkill();
   const handleSatsUpdate = useCallback((sats: number) => setTotalSats(Math.min(sats, 1000)), []);
   const handleProgressUpdate = useCallback((p: number) => setProgress(Math.min(p, 27)), []);
   const isAnsweringRef = useRef(false);
   const mountedRef = useRef(true);
   const pendingTimeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
+
+  const handleLangChange = (l: string) => {
+    const newLang = l as Lang;
+    setLang(newLang);
+    try { localStorage.setItem("liberta_lang", newLang); } catch (_) {}
+  };
+
+  const qt = Q_TRANSLATIONS[lang] || Q_TRANSLATIONS.RU;
   
   useEffect(() => {
     const bgColor = phase === "boot" ? '#000000' : phase === "phase_2" ? '#0A0A0A' : '#F5F5F5';
@@ -159,12 +214,10 @@ export default function Home() {
   }, [phase]);
 
   const handleQuestionAnswer = (questionId: QuestionId, isCorrect: boolean) => {
-    // Synchronous ref check prevents any race conditions
     if (isAnsweringRef.current) return;
-    // Check if this question was already answered
     if (answeredQuestions.has(questionId)) return;
     
-    isAnsweringRef.current = true; // Lock immediately (synchronous)
+    isAnsweringRef.current = true;
     
     if (isCorrect) {
       playClick();
@@ -210,7 +263,6 @@ export default function Home() {
   };
 
   const handleBack = () => {
-    // Reset answering lock in case it got stuck
     isAnsweringRef.current = false;
     
     if (phase === "phase_1" && currentQuestion > 1) {
@@ -260,17 +312,19 @@ export default function Home() {
 
 
 
-  // Boot screen (install gateway)
   if (phase === "boot") {
     return (
-      <BootScreen onDismiss={() => {
-        try { localStorage.setItem("liberta_boot_dismissed", "1"); } catch (_) {}
-        setPhase("loading");
-      }} />
+      <BootScreen
+        onDismiss={() => {
+          try { localStorage.setItem("liberta_boot_dismissed", "1"); } catch (_) {}
+          setPhase("loading");
+        }}
+        lang={lang}
+        onLangChange={handleLangChange}
+      />
     );
   }
 
-  // Loading state
   if (phase === "loading" || !sessionId || isSessionLoading) {
     return (
       <div className="fixed inset-0 bg-[#F5F5F5] flex items-center justify-center">
@@ -295,11 +349,16 @@ export default function Home() {
     );
   }
 
-  // Phase 1: Questions
   if (phase === "phase_1") {
     const question = QUESTIONS[currentQuestion - 1];
-    // First question gets high intensity background, rest get low
+    const questionTitle = qt.titles[currentQuestion - 1];
     const bgIntensity = currentQuestion === 1 ? "high" : "low";
+
+    const getOptionLabel = (qIdx: number, optIdx: number) => {
+      if (optIdx === 0) return qt.yes;
+      if (qIdx === 3) return qt.notYet;
+      return qt.no;
+    };
     
     return (
       <motion.div 
@@ -309,8 +368,11 @@ export default function Home() {
       >
         <GridBackground intensity={bgIntensity} />
         <BiometricCircuit revealProgress={circuitReveal} />
+
+        {currentQuestion === 1 && (
+          <LangToggle lang={lang} onLangChange={(l) => handleLangChange(l)} variant="light" />
+        )}
         
-        {/* Error notification - dark terminal style, TOP toast, properly centered */}
         <AnimatePresence>
           {showError && (
             <motion.div
@@ -326,18 +388,16 @@ export default function Home() {
                   boxShadow: "0 0 15px rgba(184, 115, 51, 0.3), 0 0 30px rgba(184, 115, 51, 0.1)",
                   color: "#D4956A",
                 }}>
-                ПОПРОБУЙ ЕЩЁ
+                {qt.tryAgain}
               </div>
             </motion.div>
           )}
         </AnimatePresence>
         
-        {/* Back button on all questions except first */}
         {currentQuestion > 1 && (
           <BackButton onClick={handleBack} isDark={false} />
         )}
         
-        {/* Header - background only on Q2+ */}
         <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -348,12 +408,11 @@ export default function Home() {
               DIGITAL RESISTANCE
             </span>
             <span className="text-[11px] tracking-[3px] font-mono font-bold" style={{ background: "linear-gradient(135deg, #8B4513, #B87333 30%, #D4956A 60%, #E8B89D 90%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-              СБОРКА ПРОТОКОЛА
+              re_terminal
             </span>
           </motion.div>
         </div>
 
-        {/* Question - centered, only TITLE moved slightly higher */}
         <div className="h-full flex flex-col items-center justify-center relative z-10 px-4">
           <AnimatePresence mode="wait">
             <motion.div
@@ -363,21 +422,20 @@ export default function Home() {
               exit={{ opacity: 0, y: -20 }}
               className="flex flex-col items-center"
             >
-              {/* Title - background only on Q2+ */}
               <motion.h1 
                 className={`text-[14px] text-[#B87333] tracking-[2px] font-bold mb-16 -mt-32 px-6 py-2 text-center max-w-[340px] leading-relaxed ${currentQuestion > 1 ? 'bg-[#F5F5F5]/90 border border-[#B87333]/20' : ''}`}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
               >
-                {question.title}
+                {questionTitle}
               </motion.h1>
               
               <div className="flex gap-3">
                 {question.options.map((option, idx) => (
                   <motion.button
                     type="button"
-                    key={option.label}
+                    key={idx}
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.3 + idx * 0.1 }}
@@ -390,7 +448,7 @@ export default function Home() {
                     }}
                     data-testid={`button-q${question.id}-${idx === 0 ? 'a' : 'b'}`}
                   >
-                    {option.label}
+                    {getOptionLabel(currentQuestion - 1, idx)}
                   </motion.button>
                 ))}
               </div>
@@ -403,11 +461,9 @@ export default function Home() {
     );
   }
 
-  // Phase 1 Complete - NO animated background on chip screen
   if (phase === "phase_1_complete") {
     return (
       <div className="fixed inset-0 bg-[#F5F5F5] overflow-hidden flex flex-col items-center justify-center">
-        {/* Simple static aluminum background - no animated orbs */}
         <div 
           className="fixed inset-0"
           style={{
@@ -421,10 +477,8 @@ export default function Home() {
           skipTraceAnimation={true}
         />
         
-        {/* Back button */}
         <BackButton onClick={handleBack} isDark={false} />
         
-        {/* Label under chip - with background, no subtitle */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -441,11 +495,9 @@ export default function Home() {
     );
   }
 
-  // Phase 2 - Terminal Chat with Satoshi (final screen)
   if (phase === "phase_2") {
     return (
       <div className="fixed inset-0 bg-[#0D0D0D] flex flex-col overflow-hidden">
-        {/* Terminal fills screen above independence bar */}
         <div className="flex-1 min-h-0">
           <TerminalChat 
             key={terminalKey} 
@@ -462,7 +514,6 @@ export default function Home() {
           />
         </div>
         
-        {/* Independence bar at very bottom */}
         <div className="flex-shrink-0">
           <IndependenceBar progress={progress} phase="phase_2" showBackground={false} />
         </div>

@@ -39,10 +39,12 @@ function PixelDevice({ segments, shimmer }: { segments: [boolean, boolean, boole
               <stop offset="100%" stopColor="#00e5ff" stopOpacity="0.3" />
               <animateTransform attributeName="gradientTransform" type="translate" values="-1 -1;1 1" dur="2s" repeatCount="indefinite" />
             </linearGradient>
-            <filter id="cyanGlow">
-              <feGaussianBlur stdDeviation="2" result="blur" />
+            <filter id="cyanGlow" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="4" result="blur1" />
+              <feGaussianBlur in="SourceGraphic" stdDeviation="1.5" result="blur2" />
               <feMerge>
-                <feMergeNode in="blur" />
+                <feMergeNode in="blur1" />
+                <feMergeNode in="blur2" />
                 <feMergeNode in="SourceGraphic" />
               </feMerge>
             </filter>
@@ -67,27 +69,33 @@ function PixelDevice({ segments, shimmer }: { segments: [boolean, boolean, boole
 
       {/* SEGMENT 1: Top - Protocol Core (WILL_TO_FREEDOM) */}
       <g opacity={segments[0] ? 1 : 0.2} filter={shimmer && segments[0] ? "url(#cyanGlow)" : undefined}>
-        <circle cx="100" cy="66" r="28" fill="none" stroke={segments[0] ? (shimmer ? "url(#cyanShimmer)" : "#00e5ff") : "#333"} strokeWidth="1.5">
-          {segments[0] && <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite" />}
+        <circle cx="100" cy="66" r="28" fill="none" stroke={segments[0] ? (shimmer ? "url(#cyanShimmer)" : "#00e5ff") : "#333"} strokeWidth={shimmer && segments[0] ? 2.5 : 1.5}>
+          {segments[0] && <animate attributeName="opacity" values="0.6;1;0.6" dur={shimmer ? "1.5s" : "3s"} repeatCount="indefinite" />}
         </circle>
-        <circle cx="100" cy="66" r="20" fill="none" stroke={segments[0] ? (shimmer ? "url(#cyanShimmer)" : "#00e5ff") : "#333"} strokeWidth="0.5" opacity="0.5" />
-        <circle cx="100" cy="66" r="12" fill={segments[0] ? "#00e5ff15" : "none"} stroke={segments[0] ? (shimmer ? "url(#cyanShimmer)" : "#00e5ff") : "#333"} strokeWidth="1">
-          {segments[0] && <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite" />}
+        <circle cx="100" cy="66" r="20" fill="none" stroke={segments[0] ? (shimmer ? "url(#cyanShimmer)" : "#00e5ff") : "#333"} strokeWidth={shimmer && segments[0] ? 1 : 0.5} opacity={shimmer && segments[0] ? 0.8 : 0.5} />
+        <circle cx="100" cy="66" r="12" fill={segments[0] ? (shimmer ? "#00e5ff30" : "#00e5ff15") : "none"} stroke={segments[0] ? (shimmer ? "url(#cyanShimmer)" : "#00e5ff") : "#333"} strokeWidth={shimmer && segments[0] ? 1.5 : 1}>
+          {segments[0] && <animate attributeName="opacity" values="0.5;1;0.5" dur={shimmer ? "1s" : "2s"} repeatCount="indefinite" />}
         </circle>
-        <circle cx="100" cy="66" r="4" fill={segments[0] ? "#00e5ff" : "#333"} />
+        <circle cx="100" cy="66" r="4" fill={segments[0] ? "#00e5ff" : "#333"}>
+          {shimmer && segments[0] && <animate attributeName="r" values="4;6;4" dur="1.5s" repeatCount="indefinite" />}
+        </circle>
 
-        <line x1="60" y1="44" x2="72" y2="44" stroke={segments[0] ? (shimmer ? "url(#cyanShimmer)" : "#00e5ff") : "#333"} strokeWidth="0.5" />
-        <rect x="56" y="42" width="4" height="4" fill={segments[0] ? "#00e5ff" : "#333"} opacity="0.6" />
-        <line x1="128" y1="44" x2="140" y2="44" stroke={segments[0] ? (shimmer ? "url(#cyanShimmer)" : "#00e5ff") : "#333"} strokeWidth="0.5" />
-        <rect x="140" y="42" width="4" height="4" fill={segments[0] ? "#00e5ff" : "#333"} opacity="0.6" />
+        <line x1="60" y1="44" x2="72" y2="44" stroke={segments[0] ? (shimmer ? "url(#cyanShimmer)" : "#00e5ff") : "#333"} strokeWidth={shimmer && segments[0] ? 1 : 0.5} />
+        <rect x="56" y="42" width="4" height="4" fill={segments[0] ? "#00e5ff" : "#333"} opacity={shimmer && segments[0] ? 1 : 0.6}>
+          {shimmer && segments[0] && <animate attributeName="opacity" values="0.6;1;0.6" dur="1s" repeatCount="indefinite" />}
+        </rect>
+        <line x1="128" y1="44" x2="140" y2="44" stroke={segments[0] ? (shimmer ? "url(#cyanShimmer)" : "#00e5ff") : "#333"} strokeWidth={shimmer && segments[0] ? 1 : 0.5} />
+        <rect x="140" y="42" width="4" height="4" fill={segments[0] ? "#00e5ff" : "#333"} opacity={shimmer && segments[0] ? 1 : 0.6}>
+          {shimmer && segments[0] && <animate attributeName="opacity" values="0.6;1;0.6" dur="1.2s" repeatCount="indefinite" />}
+        </rect>
 
-        <line x1="60" y1="88" x2="72" y2="88" stroke={segments[0] ? (shimmer ? "url(#cyanShimmer)" : "#00e5ff") : "#333"} strokeWidth="0.5" />
-        <line x1="128" y1="88" x2="140" y2="88" stroke={segments[0] ? (shimmer ? "url(#cyanShimmer)" : "#00e5ff") : "#333"} strokeWidth="0.5" />
+        <line x1="60" y1="88" x2="72" y2="88" stroke={segments[0] ? (shimmer ? "url(#cyanShimmer)" : "#00e5ff") : "#333"} strokeWidth={shimmer && segments[0] ? 1 : 0.5} />
+        <line x1="128" y1="88" x2="140" y2="88" stroke={segments[0] ? (shimmer ? "url(#cyanShimmer)" : "#00e5ff") : "#333"} strokeWidth={shimmer && segments[0] ? 1 : 0.5} />
 
-        <rect x="56" y="50" width="12" height="3" fill={segments[0] ? "#00e5ff" : "#222"} opacity="0.4" />
-        <rect x="56" y="56" width="8" height="3" fill={segments[0] ? "#00e5ff" : "#222"} opacity="0.3" />
-        <rect x="132" y="50" width="12" height="3" fill={segments[0] ? "#00e5ff" : "#222"} opacity="0.4" />
-        <rect x="134" y="56" width="8" height="3" fill={segments[0] ? "#00e5ff" : "#222"} opacity="0.3" />
+        <rect x="56" y="50" width="12" height="3" fill={segments[0] ? "#00e5ff" : "#222"} opacity={shimmer && segments[0] ? 0.8 : 0.4} />
+        <rect x="56" y="56" width="8" height="3" fill={segments[0] ? "#00e5ff" : "#222"} opacity={shimmer && segments[0] ? 0.6 : 0.3} />
+        <rect x="132" y="50" width="12" height="3" fill={segments[0] ? "#00e5ff" : "#222"} opacity={shimmer && segments[0] ? 0.8 : 0.4} />
+        <rect x="134" y="56" width="8" height="3" fill={segments[0] ? "#00e5ff" : "#222"} opacity={shimmer && segments[0] ? 0.6 : 0.3} />
 
         <text x="100" y="106" textAnchor="middle" fill={segments[0] ? "#00e5ff" : "#333"} fontSize="5" fontFamily="monospace" letterSpacing="2">
           {segments[0] ? "ACTIVATED" : "OFFLINE"}
