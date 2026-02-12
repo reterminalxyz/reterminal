@@ -243,6 +243,7 @@ export default function Home() {
     if (circuitReveal >= 100) {
       playPhaseComplete();
       setTotalSats(200);
+      try { localStorage.removeItem("liberta_terminal_progress"); } catch (_) {}
       setTerminalKey(prev => prev + 1);
       setPhase("phase_2");
     }
@@ -250,6 +251,7 @@ export default function Home() {
 
   const handleTerminalBack = () => {
     try { localStorage.removeItem("liberta_wallet_state"); } catch (_) {}
+    try { localStorage.removeItem("liberta_terminal_progress"); } catch (_) {}
     setSkipTypewriter(true);
     setTotalSats(200);
     setProgress(20);
@@ -363,14 +365,12 @@ export default function Home() {
             >
               {/* Title - background only on Q2+ */}
               <motion.h1 
-                className={`text-[14px] tracking-[2px] font-bold mb-16 -mt-32 px-6 py-2 text-center max-w-[340px] leading-relaxed ${currentQuestion > 1 ? 'bg-[#F5F5F5]/90 border border-[#B87333]/20' : ''}`}
+                className={`text-[14px] text-[#B87333] tracking-[2px] font-bold mb-16 -mt-32 px-6 py-2 text-center max-w-[340px] leading-relaxed ${currentQuestion > 1 ? 'bg-[#F5F5F5]/90 border border-[#B87333]/20' : ''}`}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2 }}
               >
-                <span style={{ background: "linear-gradient(135deg, #8B4513, #B87333 30%, #D4956A 60%, #E8B89D 90%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-                  {question.title}
-                </span>
+                {question.title}
               </motion.h1>
               
               <div className="flex gap-3">

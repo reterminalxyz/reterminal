@@ -33,8 +33,7 @@ export function IndependenceBar({ progress, phase, showBackground = false }: Ind
         transition={{ duration: 2, repeat: Infinity }}
       >
         <motion.span 
-          className={`text-[12px] tracking-[5px] font-bold ${!isDark && showBackground ? 'bg-[#F5F5F5]/90 px-4 py-1 border border-[#B87333]/20' : ''}`}
-          style={isDark ? { color: "#B87333" } : { background: "linear-gradient(135deg, #8B4513, #B87333 30%, #D4956A 60%, #E8B89D 90%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}
+          className={`text-[12px] tracking-[5px] font-bold text-[#B87333] ${!isDark && showBackground ? 'bg-[#F5F5F5]/90 px-4 py-1 border border-[#B87333]/20' : ''}`}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
         >
@@ -112,16 +111,15 @@ export function IndependenceBar({ progress, phase, showBackground = false }: Ind
         
         <motion.span 
           key={progress}
-          className="font-bold text-[16px] tracking-[0.3em]"
+          className="text-[#B87333] font-bold text-[16px] tracking-[0.3em]"
           initial={{ scale: 1.3, opacity: 0.5 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ duration: 0.3 }}
           style={isDark ? {
-            color: "#B87333",
             textShadow: isPulsing 
               ? "0 0 20px rgba(184,115,51,0.9), 0 0 40px rgba(255,215,0,0.4)"
               : "0 0 15px rgba(184,115,51,0.6)"
-          } : { background: "linear-gradient(135deg, #8B4513, #B87333 30%, #D4956A 60%, #E8B89D 90%)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}
+          } : {}}
         >
           {Math.round(progress)}%
         </motion.span>

@@ -8,8 +8,6 @@ type GrantedSkill = { skillKey: string; grantedAt: string | null };
 
 const SEGMENT_SKILLS: { keys: SkillKey[]; label: string; color: string; colorDim: string }[] = [
   { keys: ["WILL_TO_FREEDOM"], label: "ПРОТОКОЛ ВОЛИ", color: "#00e5ff", colorDim: "#00e5ff" },
-  { keys: ["TRUTH_SEEKER", "HARD_MONEY"], label: "МОДУЛЬ ЗНАНИЯ", color: "#ffaa00", colorDim: "#ffaa00" },
-  { keys: ["GRID_RUNNER"], label: "СЕТЕВОЙ ПРИВОД", color: "#b87333", colorDim: "#b87333" },
 ];
 
 function GridBackground() {
@@ -27,9 +25,30 @@ function GridBackground() {
   );
 }
 
-function PixelDevice({ segments }: { segments: [boolean, boolean, boolean] }) {
+function PixelDevice({ segments, shimmer }: { segments: [boolean, boolean, boolean]; shimmer?: boolean }) {
   return (
     <svg viewBox="0 0 200 340" width="200" height="340" className="mx-auto" data-testid="pixel-device">
+      <defs>
+        {shimmer && segments[0] && (
+          <>
+            <linearGradient id="cyanShimmer" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0%" stopColor="#00e5ff" stopOpacity="0.3" />
+              <stop offset="40%" stopColor="#00e5ff" stopOpacity="1" />
+              <stop offset="50%" stopColor="#ffffff" stopOpacity="1" />
+              <stop offset="60%" stopColor="#00e5ff" stopOpacity="1" />
+              <stop offset="100%" stopColor="#00e5ff" stopOpacity="0.3" />
+              <animateTransform attributeName="gradientTransform" type="translate" values="-1 -1;1 1" dur="2s" repeatCount="indefinite" />
+            </linearGradient>
+            <filter id="cyanGlow">
+              <feGaussianBlur stdDeviation="2" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </>
+        )}
+      </defs>
       <rect x="40" y="10" width="120" height="320" rx="4" fill="#1a1a1a" stroke="#333" strokeWidth="1.5" />
       <rect x="44" y="14" width="112" height="312" rx="2" fill="#111" />
 
@@ -47,23 +66,23 @@ function PixelDevice({ segments }: { segments: [boolean, boolean, boolean] }) {
       <line x1="44" y1="222" x2="156" y2="222" stroke="#333" strokeWidth="0.5" strokeDasharray="2 2" />
 
       {/* SEGMENT 1: Top - Protocol Core (WILL_TO_FREEDOM) */}
-      <g opacity={segments[0] ? 1 : 0.2}>
-        <circle cx="100" cy="66" r="28" fill="none" stroke={segments[0] ? "#00e5ff" : "#333"} strokeWidth="1.5">
+      <g opacity={segments[0] ? 1 : 0.2} filter={shimmer && segments[0] ? "url(#cyanGlow)" : undefined}>
+        <circle cx="100" cy="66" r="28" fill="none" stroke={segments[0] ? (shimmer ? "url(#cyanShimmer)" : "#00e5ff") : "#333"} strokeWidth="1.5">
           {segments[0] && <animate attributeName="opacity" values="0.6;1;0.6" dur="3s" repeatCount="indefinite" />}
         </circle>
-        <circle cx="100" cy="66" r="20" fill="none" stroke={segments[0] ? "#00e5ff" : "#333"} strokeWidth="0.5" opacity="0.5" />
-        <circle cx="100" cy="66" r="12" fill={segments[0] ? "#00e5ff15" : "none"} stroke={segments[0] ? "#00e5ff" : "#333"} strokeWidth="1">
+        <circle cx="100" cy="66" r="20" fill="none" stroke={segments[0] ? (shimmer ? "url(#cyanShimmer)" : "#00e5ff") : "#333"} strokeWidth="0.5" opacity="0.5" />
+        <circle cx="100" cy="66" r="12" fill={segments[0] ? "#00e5ff15" : "none"} stroke={segments[0] ? (shimmer ? "url(#cyanShimmer)" : "#00e5ff") : "#333"} strokeWidth="1">
           {segments[0] && <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite" />}
         </circle>
         <circle cx="100" cy="66" r="4" fill={segments[0] ? "#00e5ff" : "#333"} />
 
-        <line x1="60" y1="44" x2="72" y2="44" stroke={segments[0] ? "#00e5ff" : "#333"} strokeWidth="0.5" />
+        <line x1="60" y1="44" x2="72" y2="44" stroke={segments[0] ? (shimmer ? "url(#cyanShimmer)" : "#00e5ff") : "#333"} strokeWidth="0.5" />
         <rect x="56" y="42" width="4" height="4" fill={segments[0] ? "#00e5ff" : "#333"} opacity="0.6" />
-        <line x1="128" y1="44" x2="140" y2="44" stroke={segments[0] ? "#00e5ff" : "#333"} strokeWidth="0.5" />
+        <line x1="128" y1="44" x2="140" y2="44" stroke={segments[0] ? (shimmer ? "url(#cyanShimmer)" : "#00e5ff") : "#333"} strokeWidth="0.5" />
         <rect x="140" y="42" width="4" height="4" fill={segments[0] ? "#00e5ff" : "#333"} opacity="0.6" />
 
-        <line x1="60" y1="88" x2="72" y2="88" stroke={segments[0] ? "#00e5ff" : "#333"} strokeWidth="0.5" />
-        <line x1="128" y1="88" x2="140" y2="88" stroke={segments[0] ? "#00e5ff" : "#333"} strokeWidth="0.5" />
+        <line x1="60" y1="88" x2="72" y2="88" stroke={segments[0] ? (shimmer ? "url(#cyanShimmer)" : "#00e5ff") : "#333"} strokeWidth="0.5" />
+        <line x1="128" y1="88" x2="140" y2="88" stroke={segments[0] ? (shimmer ? "url(#cyanShimmer)" : "#00e5ff") : "#333"} strokeWidth="0.5" />
 
         <rect x="56" y="50" width="12" height="3" fill={segments[0] ? "#00e5ff" : "#222"} opacity="0.4" />
         <rect x="56" y="56" width="8" height="3" fill={segments[0] ? "#00e5ff" : "#222"} opacity="0.3" />
@@ -327,8 +346,8 @@ export default function ProfileOverlay({ onClose, token, originRect, completedBl
   const unlockedCount = skills.length;
 
   const seg1Active = SEGMENT_SKILLS[0].keys.some(k => grantedKeys.has(k));
-  const seg2Active = SEGMENT_SKILLS[1].keys.some(k => grantedKeys.has(k));
-  const seg3Active = SEGMENT_SKILLS[2].keys.some(k => grantedKeys.has(k));
+  const seg2Active = false;
+  const seg3Active = false;
 
   const ox = originRect ? `${originRect.x}px` : "50%";
   const oy = originRect ? `${originRect.y}px` : "0%";
@@ -381,10 +400,10 @@ export default function ProfileOverlay({ onClose, token, originRect, completedBl
               <div className="text-[7px] tracking-[4px] font-mono uppercase mb-3" style={{ color: "#333" }}>
                 DIAGNOSTIC DEVICE v0.1
               </div>
-              <PixelDevice segments={[seg1Active, seg2Active, seg3Active]} />
+              <PixelDevice segments={[seg1Active, seg2Active, seg3Active]} shimmer={newSkillKeys.size > 0} />
               <div className="flex items-center justify-center gap-2 mt-2">
                 <span className="text-[7px] tracking-[2px] font-mono" style={{ color: "#333" }}>
-                  {unlockedCount}/{SKILL_KEYS.length} НАВЫКОВ
+                  {unlockedCount}/1 НАВЫКОВ
                 </span>
               </div>
             </div>

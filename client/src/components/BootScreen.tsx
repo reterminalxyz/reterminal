@@ -255,7 +255,12 @@ export function BootScreen({ onDismiss }: BootScreenProps) {
               type="button"
               onClick={onDismiss}
               disabled={isShuttingDown}
-              className="relative w-full py-4 border-2 border-[#555] bg-[#555]/10 text-[#999] font-mono text-[13px] font-bold tracking-[3px] uppercase transition-all duration-200 active:scale-[0.97] hover:border-[#777] hover:text-[#bbb]"
+              className="relative w-full py-4 font-mono text-[13px] font-bold tracking-[3px] uppercase transition-all duration-200 active:scale-[0.97] text-[#F5F5F5]"
+              style={{
+                background: "linear-gradient(135deg, #333 0%, #555 40%, #666 60%, #555 80%, #333 100%)",
+                boxShadow: "0 0 12px rgba(100, 100, 100, 0.3), inset 0 1px 1px rgba(255,255,255,0.1)",
+                border: "1px solid rgba(150, 150, 150, 0.4)",
+              }}
               data-testid="button-stay-browser"
             >
               Остаться в браузере
@@ -265,7 +270,12 @@ export function BootScreen({ onDismiss }: BootScreenProps) {
               type="button"
               onClick={handleInstall}
               disabled={isShuttingDown}
-              className="install-btn-glitch relative w-full py-4 border-2 border-[#B87333] bg-[#B87333]/10 text-[#B87333] font-mono text-[13px] font-bold tracking-[3px] uppercase transition-all duration-200 active:scale-[0.97]"
+              className="install-btn-glitch relative w-full py-4 font-mono text-[13px] font-bold tracking-[3px] uppercase transition-all duration-200 active:scale-[0.97] text-[#F5F5F5]"
+              style={{
+                background: "linear-gradient(135deg, #7A3B20 0%, #A0522D 20%, #B87333 40%, #D4956A 60%, #E8B89D 80%, #B87333 100%)",
+                boxShadow: "0 0 12px rgba(184, 115, 51, 0.4), 0 0 25px rgba(184, 115, 51, 0.15), inset 0 1px 1px rgba(232, 184, 157, 0.3)",
+                border: "1px solid rgba(212, 149, 106, 0.5)",
+              }}
               data-testid="button-install-terminal"
               data-text="Установить терминал"
             >
