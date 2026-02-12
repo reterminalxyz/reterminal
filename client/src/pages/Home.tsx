@@ -369,9 +369,7 @@ export default function Home() {
         <GridBackground intensity={bgIntensity} />
         <BiometricCircuit revealProgress={circuitReveal} />
 
-        <div className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between px-4 pt-3">
-          <div className="w-[50px]" />
-          
+        <div className="absolute top-0 left-0 right-0 z-20 flex flex-col items-center px-4 pt-3">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -381,15 +379,15 @@ export default function Home() {
               DIGITAL RESISTANCE
             </span>
             <span className="text-[11px] tracking-[3px] font-mono font-bold" style={{ color: "#B87333" }}>
-              re_terminal<span className="animate-blink">_</span>
+              re<span className="animate-blink">_</span>terminal
             </span>
           </motion.div>
           
-          <div className="flex justify-end mr-1">
-            {currentQuestion === 1 && (
+          {currentQuestion === 1 && (
+            <div className="mt-1">
               <LangToggle lang={lang} onLangChange={(l) => handleLangChange(l)} variant="light" />
-            )}
-          </div>
+            </div>
+          )}
         </div>
         
         {currentQuestion > 1 && (
