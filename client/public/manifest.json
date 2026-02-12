@@ -1,6 +1,6 @@
 {
-  "name": "Liberta Terminal",
-  "short_name": "Liberta",
+  "name": "re_terminal",
+  "short_name": "re_terminal",
   "description": "Digital resistance protocol. Bitcoin Lightning Network onboarding.",
   "start_url": "/activation",
   "display": "standalone",
