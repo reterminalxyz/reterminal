@@ -13,7 +13,7 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
   
   // When skipTraceAnimation is true, traces appear instantly
   const traceInitial = skipTraceAnimation ? { pathLength: 1 } : { pathLength: 0 };
-  const viaInitial = skipTraceAnimation ? { scale: 1 } : { scale: 0 };
+  const viaInitial = skipTraceAnimation ? { scale: 1, opacity: 1 } : { scale: 0, opacity: 0 };
   const traceDuration = skipTraceAnimation ? 0 : 0.7;
   const viaDuration = skipTraceAnimation ? 0 : 0.2;
   
@@ -115,28 +115,28 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
           
           {/* Via nodes - asymmetric positions */}
           <motion.circle cx={175} cy={140} r={3} fill="none" stroke="url(#copperTrace)" strokeWidth={1.5}
-            initial={viaInitial} animate={{ scale: revealProgress >= 25 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 25 ? 1 : 0, opacity: revealProgress >= 25 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.5 }} />
           <motion.circle cx={175} cy={140} r={1.5} fill="url(#copperMetal)"
-            initial={viaInitial} animate={{ scale: revealProgress >= 25 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 25 ? 1 : 0, opacity: revealProgress >= 25 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.55 }} />
           <motion.circle cx={355} cy={280} r={3} fill="none" stroke="url(#copperTrace)" strokeWidth={1.5}
-            initial={viaInitial} animate={{ scale: revealProgress >= 25 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 25 ? 1 : 0, opacity: revealProgress >= 25 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.5 }} />
           <motion.circle cx={355} cy={280} r={1.5} fill="url(#copperMetal)"
-            initial={viaInitial} animate={{ scale: revealProgress >= 25 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 25 ? 1 : 0, opacity: revealProgress >= 25 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.55 }} />
           <motion.circle cx={190} cy={560} r={3} fill="none" stroke="url(#copperTrace)" strokeWidth={1.5}
-            initial={viaInitial} animate={{ scale: revealProgress >= 25 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 25 ? 1 : 0, opacity: revealProgress >= 25 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.5 }} />
           <motion.circle cx={190} cy={560} r={1.5} fill="url(#copperMetal)"
-            initial={viaInitial} animate={{ scale: revealProgress >= 25 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 25 ? 1 : 0, opacity: revealProgress >= 25 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.55 }} />
           <motion.circle cx={45} cy={320} r={3} fill="none" stroke="url(#copperTrace)" strokeWidth={1.5}
-            initial={viaInitial} animate={{ scale: revealProgress >= 25 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 25 ? 1 : 0, opacity: revealProgress >= 25 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.5 }} />
           <motion.circle cx={45} cy={320} r={1.5} fill="url(#copperMetal)"
-            initial={viaInitial} animate={{ scale: revealProgress >= 25 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 25 ? 1 : 0, opacity: revealProgress >= 25 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.55 }} />
         </motion.g>
 
@@ -204,28 +204,28 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
           
           {/* Via nodes */}
           <motion.circle cx={95} cy={90} r={3} fill="none" stroke="url(#copperTrace)" strokeWidth={1.5}
-            initial={viaInitial} animate={{ scale: revealProgress >= 50 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 50 ? 1 : 0, opacity: revealProgress >= 50 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.5 }} />
           <motion.circle cx={95} cy={90} r={1.5} fill="url(#copperMetal)"
-            initial={viaInitial} animate={{ scale: revealProgress >= 50 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 50 ? 1 : 0, opacity: revealProgress >= 50 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.55 }} />
           <motion.circle cx={305} cy={70} r={3} fill="none" stroke="url(#copperTrace)" strokeWidth={1.5}
-            initial={viaInitial} animate={{ scale: revealProgress >= 50 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 50 ? 1 : 0, opacity: revealProgress >= 50 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.5 }} />
           <motion.circle cx={305} cy={70} r={1.5} fill="url(#copperMetal)"
-            initial={viaInitial} animate={{ scale: revealProgress >= 50 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 50 ? 1 : 0, opacity: revealProgress >= 50 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.55 }} />
           <motion.circle cx={325} cy={185} r={3} fill="none" stroke="url(#copperTrace)" strokeWidth={1.5}
-            initial={viaInitial} animate={{ scale: revealProgress >= 50 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 50 ? 1 : 0, opacity: revealProgress >= 50 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.5 }} />
           <motion.circle cx={325} cy={185} r={1.5} fill="url(#copperMetal)"
-            initial={viaInitial} animate={{ scale: revealProgress >= 50 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 50 ? 1 : 0, opacity: revealProgress >= 50 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.55 }} />
           <motion.circle cx={75} cy={215} r={3} fill="none" stroke="url(#copperTrace)" strokeWidth={1.5}
-            initial={viaInitial} animate={{ scale: revealProgress >= 50 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 50 ? 1 : 0, opacity: revealProgress >= 50 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.5 }} />
           <motion.circle cx={75} cy={215} r={1.5} fill="url(#copperMetal)"
-            initial={viaInitial} animate={{ scale: revealProgress >= 50 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 50 ? 1 : 0, opacity: revealProgress >= 50 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.55 }} />
         </motion.g>
 
@@ -293,28 +293,28 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
           
           {/* Via nodes */}
           <motion.circle cx={55} cy={135} r={3} fill="none" stroke="url(#copperTrace)" strokeWidth={1.5}
-            initial={viaInitial} animate={{ scale: revealProgress >= 75 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 75 ? 1 : 0, opacity: revealProgress >= 75 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.5 }} />
           <motion.circle cx={55} cy={135} r={1.5} fill="url(#copperMetal)"
-            initial={viaInitial} animate={{ scale: revealProgress >= 75 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 75 ? 1 : 0, opacity: revealProgress >= 75 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.55 }} />
           <motion.circle cx={345} cy={105} r={3} fill="none" stroke="url(#copperTrace)" strokeWidth={1.5}
-            initial={viaInitial} animate={{ scale: revealProgress >= 75 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 75 ? 1 : 0, opacity: revealProgress >= 75 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.5 }} />
           <motion.circle cx={345} cy={105} r={1.5} fill="url(#copperMetal)"
-            initial={viaInitial} animate={{ scale: revealProgress >= 75 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 75 ? 1 : 0, opacity: revealProgress >= 75 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.55 }} />
           <motion.circle cx={70} cy={570} r={3} fill="none" stroke="url(#copperTrace)" strokeWidth={1.5}
-            initial={viaInitial} animate={{ scale: revealProgress >= 75 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 75 ? 1 : 0, opacity: revealProgress >= 75 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.5 }} />
           <motion.circle cx={70} cy={570} r={1.5} fill="url(#copperMetal)"
-            initial={viaInitial} animate={{ scale: revealProgress >= 75 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 75 ? 1 : 0, opacity: revealProgress >= 75 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.55 }} />
           <motion.circle cx={330} cy={595} r={3} fill="none" stroke="url(#copperTrace)" strokeWidth={1.5}
-            initial={viaInitial} animate={{ scale: revealProgress >= 75 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 75 ? 1 : 0, opacity: revealProgress >= 75 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.5 }} />
           <motion.circle cx={330} cy={595} r={1.5} fill="url(#copperMetal)"
-            initial={viaInitial} animate={{ scale: revealProgress >= 75 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 75 ? 1 : 0, opacity: revealProgress >= 75 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.55 }} />
         </motion.g>
 
@@ -382,28 +382,28 @@ export function BiometricCircuit({ revealProgress, onChipClick, isComplete = fal
           
           {/* Via nodes */}
           <motion.circle cx={135} cy={55} r={3} fill="none" stroke="url(#copperTrace)" strokeWidth={1.5}
-            initial={viaInitial} animate={{ scale: revealProgress >= 100 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 100 ? 1 : 0, opacity: revealProgress >= 100 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.4 }} />
           <motion.circle cx={135} cy={55} r={1.5} fill="url(#copperMetal)"
-            initial={viaInitial} animate={{ scale: revealProgress >= 100 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 100 ? 1 : 0, opacity: revealProgress >= 100 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.45 }} />
           <motion.circle cx={265} cy={35} r={3} fill="none" stroke="url(#copperTrace)" strokeWidth={1.5}
-            initial={viaInitial} animate={{ scale: revealProgress >= 100 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 100 ? 1 : 0, opacity: revealProgress >= 100 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.4 }} />
           <motion.circle cx={265} cy={35} r={1.5} fill="url(#copperMetal)"
-            initial={viaInitial} animate={{ scale: revealProgress >= 100 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 100 ? 1 : 0, opacity: revealProgress >= 100 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.45 }} />
           <motion.circle cx={150} cy={650} r={3} fill="none" stroke="url(#copperTrace)" strokeWidth={1.5}
-            initial={viaInitial} animate={{ scale: revealProgress >= 100 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 100 ? 1 : 0, opacity: revealProgress >= 100 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.4 }} />
           <motion.circle cx={150} cy={650} r={1.5} fill="url(#copperMetal)"
-            initial={viaInitial} animate={{ scale: revealProgress >= 100 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 100 ? 1 : 0, opacity: revealProgress >= 100 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.45 }} />
           <motion.circle cx={250} cy={670} r={3} fill="none" stroke="url(#copperTrace)" strokeWidth={1.5}
-            initial={viaInitial} animate={{ scale: revealProgress >= 100 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 100 ? 1 : 0, opacity: revealProgress >= 100 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.4 }} />
           <motion.circle cx={250} cy={670} r={1.5} fill="url(#copperMetal)"
-            initial={viaInitial} animate={{ scale: revealProgress >= 100 ? 1 : 0 }}
+            initial={viaInitial} animate={{ scale: revealProgress >= 100 ? 1 : 0, opacity: revealProgress >= 100 ? 1 : 0 }}
             transition={{ duration: viaDuration, delay: skipTraceAnimation ? 0 : 0.45 }} />
         </motion.g>
 
