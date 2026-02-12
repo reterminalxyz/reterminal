@@ -120,7 +120,12 @@ export default function Home() {
       const stored = localStorage.getItem("liberta_lang");
       if (stored === "EN" || stored === "IT" || stored === "RU") return stored;
     } catch (_) {}
-    return "IT";
+    try {
+      const browserLang = navigator.language.toLowerCase();
+      if (browserLang.startsWith("it")) return "IT";
+      if (browserLang.startsWith("ru")) return "RU";
+    } catch (_) {}
+    return "EN";
   });
   const { grantSkill, pendingSkill, dismissPopup } = useGrantSkill();
   const handleSatsUpdate = useCallback((sats: number) => setTotalSats(Math.min(sats, 1000)), []);
