@@ -113,6 +113,7 @@ export default function Home() {
   const [terminalKey, setTerminalKey] = useState(0);
   const [skipTypewriter, setSkipTypewriter] = useState(false);
   const [answeredQuestions, setAnsweredQuestions] = useState<Set<QuestionId>>(new Set());
+  const [langHidden, setLangHidden] = useState(false);
   const [userStats, setUserStats] = useState<{ level: number; xp: number } | null>(null);
   const [lang, setLang] = useState<Lang>(() => {
     try {
@@ -218,6 +219,7 @@ export default function Home() {
     if (answeredQuestions.has(questionId)) return;
     
     isAnsweringRef.current = true;
+    if (currentQuestion === 1) setLangHidden(true);
     
     if (isCorrect) {
       playClick();
@@ -267,6 +269,7 @@ export default function Home() {
     
     if (phase === "phase_1" && currentQuestion > 1) {
       const prevQ = (currentQuestion - 1) as QuestionId;
+      if (prevQ === 1) setLangHidden(false);
       setAnsweredQuestions(prev => {
         const newSet = new Set(prev);
         newSet.delete(currentQuestion);
@@ -383,7 +386,7 @@ export default function Home() {
             </span>
           </motion.div>
           
-          {currentQuestion === 1 && (
+          {currentQuestion === 1 && !langHidden && (
             <div className="mt-1">
               <LangToggle lang={lang} onLangChange={(l) => handleLangChange(l)} variant="light" />
             </div>
