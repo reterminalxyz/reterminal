@@ -35,7 +35,8 @@ export async function registerRoutes(
         currentStepId: "step_0",
       });
       res.status(201).json(session);
-    } catch (err) {
+    } catch (err: any) {
+      console.error("[api] POST sessions error:", err.message);
       if (err instanceof z.ZodError) {
         return res.status(400).json({
           message: err.errors[0].message,
@@ -59,7 +60,8 @@ export async function registerRoutes(
         return res.status(404).json({ message: "Session not found" });
       }
       res.json(session);
-    } catch (err) {
+    } catch (err: any) {
+      console.error("[api] POST sessions/:id/action error:", err.message);
       if (err instanceof z.ZodError) {
         return res.status(400).json({
           message: err.errors[0].message,
@@ -77,7 +79,8 @@ export async function registerRoutes(
         return res.status(404).json({ message: "Session not found" });
       }
       res.json(session);
-    } catch (err) {
+    } catch (err: any) {
+      console.error("[api] GET sessions/:id error:", err.message);
       res.status(500).json({ message: "Internal server error" });
     }
   });
@@ -97,7 +100,8 @@ export async function registerRoutes(
         totalSats: user.totalSats,
         independenceProgress: user.independenceProgress,
       });
-    } catch (err) {
+    } catch (err: any) {
+      console.error("[api] POST sync-user error:", err.message);
       res.status(500).json({ message: "Internal server error" });
     }
   });
@@ -108,7 +112,8 @@ export async function registerRoutes(
       const user = await storage.syncUser(token);
       const skills = await storage.getUserSkills(user.id);
       res.json(skills.map(s => ({ skillKey: s.skillKey, grantedAt: s.grantedAt })));
-    } catch (err) {
+    } catch (err: any) {
+      console.error("[api] GET skills/:token error:", err.message);
       res.status(500).json({ message: "Internal server error" });
     }
   });
@@ -128,7 +133,8 @@ export async function registerRoutes(
         return res.json({ granted: false, message: "Skill already granted" });
       }
       res.json({ granted: true, skill: { skillKey: skill.skillKey, grantedAt: skill.grantedAt } });
-    } catch (err) {
+    } catch (err: any) {
+      console.error("[api] POST skills/grant error:", err.message);
       res.status(500).json({ message: "Internal server error" });
     }
   });
@@ -149,7 +155,8 @@ export async function registerRoutes(
         return res.status(404).json({ message: "User not found" });
       }
       res.json({ ok: true });
-    } catch (err) {
+    } catch (err: any) {
+      console.error("[api] POST save-progress error:", err.message);
       res.status(500).json({ message: "Internal server error" });
     }
   });

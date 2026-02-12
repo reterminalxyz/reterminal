@@ -41,8 +41,39 @@ if (!process.env.DATABASE_URL) {
     db = drizzle(pool, { schema });
 
     pool.connect()
-      .then((client) => {
+      .then(async (client) => {
         console.log("[db] Successfully connected to PostgreSQL");
+        try {
+          await client.query(`
+            CREATE TABLE IF NOT EXISTS users (
+              id SERIAL PRIMARY KEY,
+              token TEXT NOT NULL UNIQUE,
+              xp INTEGER NOT NULL DEFAULT 0,
+              level INTEGER NOT NULL DEFAULT 1,
+              current_module_id TEXT,
+              current_step_index INTEGER NOT NULL DEFAULT 0,
+              total_sats INTEGER NOT NULL DEFAULT 0,
+              independence_progress INTEGER NOT NULL DEFAULT 0
+            );
+            CREATE TABLE IF NOT EXISTS sessions (
+              id SERIAL PRIMARY KEY,
+              node_id TEXT NOT NULL,
+              independence_score INTEGER NOT NULL DEFAULT 0,
+              current_step_id TEXT NOT NULL,
+              history JSONB DEFAULT '[]',
+              created_at TIMESTAMP DEFAULT NOW()
+            );
+            CREATE TABLE IF NOT EXISTS user_skills (
+              id SERIAL PRIMARY KEY,
+              user_id INTEGER NOT NULL,
+              skill_key TEXT NOT NULL,
+              granted_at TIMESTAMP DEFAULT NOW()
+            );
+          `);
+          console.log("[db] Tables verified/created successfully");
+        } catch (migErr: any) {
+          console.error("[db] Table creation error:", migErr.message);
+        }
         dbReady = true;
         dbError = null;
         client.release();
