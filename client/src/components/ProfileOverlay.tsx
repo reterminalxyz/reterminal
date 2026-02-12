@@ -5,9 +5,44 @@ import { SKILL_META, type SkillKey, SKILL_KEYS } from "@shared/schema";
 import { playBeep } from "@/lib/sounds";
 
 type GrantedSkill = { skillKey: string; grantedAt: string | null };
+type Lang = "IT" | "EN" | "RU";
 
-const SEGMENT_SKILLS: { keys: SkillKey[]; label: string; color: string; colorDim: string }[] = [
-  { keys: ["WILL_TO_FREEDOM"], label: "ПРОТОКОЛ ВОЛИ", color: "#00e5ff", colorDim: "#00e5ff" },
+const PROFILE_I18N: Record<Lang, {
+  terminal: string;
+  skillSet: string;
+  skills: string;
+  moduleScan: string;
+  noSkills: string;
+  segmentLabel: string;
+}> = {
+  IT: {
+    terminal: "TERMINALE",
+    skillSet: "SET DI ABILIT\u00c0",
+    skills: "ABILIT\u00c0",
+    moduleScan: "SCANSIONE MODULI",
+    noSkills: "NESSUNA ABILIT\u00c0 RILEVATA",
+    segmentLabel: "PROTOCOLLO VOLONT\u00c0",
+  },
+  EN: {
+    terminal: "TERMINAL",
+    skillSet: "SKILL SET",
+    skills: "SKILLS",
+    moduleScan: "MODULE SCAN",
+    noSkills: "NO SKILLS DETECTED",
+    segmentLabel: "WILL PROTOCOL",
+  },
+  RU: {
+    terminal: "\u0422\u0415\u0420\u041c\u0418\u041d\u0410\u041b",
+    skillSet: "\u041d\u0410\u0411\u041e\u0420 \u041d\u0410\u0412\u042b\u041a\u041e\u0412",
+    skills: "\u041d\u0410\u0412\u042b\u041a\u041e\u0412",
+    moduleScan: "\u0421\u041a\u0410\u041d \u041c\u041e\u0414\u0423\u041b\u0415\u0419",
+    noSkills: "\u041d\u0410\u0412\u042b\u041a\u0418 \u041d\u0415 \u041e\u0411\u041d\u0410\u0420\u0423\u0416\u0415\u041d\u042b",
+    segmentLabel: "\u041f\u0420\u041e\u0422\u041e\u041a\u041e\u041b \u0412\u041e\u041b\u0418",
+  },
+};
+
+const SEGMENT_SKILLS: { keys: SkillKey[]; labelKey: "segmentLabel"; color: string; colorDim: string }[] = [
+  { keys: ["WILL_TO_FREEDOM"], labelKey: "segmentLabel", color: "#00e5ff", colorDim: "#00e5ff" },
 ];
 
 function GridBackground() {
@@ -311,9 +346,11 @@ interface ProfileOverlayProps {
   token: string | null;
   originRect?: { x: number; y: number } | null;
   completedBlockIndex: number;
+  lang?: string;
 }
 
-export default function ProfileOverlay({ onClose, token, originRect, completedBlockIndex }: ProfileOverlayProps) {
+export default function ProfileOverlay({ onClose, token, originRect, completedBlockIndex, lang = "IT" }: ProfileOverlayProps) {
+  const t = PROFILE_I18N[(lang as Lang)] || PROFILE_I18N.IT;
   const [skills, setSkills] = useState<GrantedSkill[]>([]);
   const [loading, setLoading] = useState(true);
   const [newSkillKeys, setNewSkillKeys] = useState<Set<string>>(new Set());
@@ -382,10 +419,10 @@ export default function ProfileOverlay({ onClose, token, originRect, completedBl
             data-testid="button-back-terminal"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span className="text-[9px] tracking-[2px] font-bold uppercase font-mono">ТЕРМИНАЛ</span>
+            <span className="text-[9px] tracking-[2px] font-bold uppercase font-mono">{t.terminal}</span>
           </button>
           <span className="text-[12px] tracking-[4px] font-bold uppercase font-mono" style={{ color: "#e0e0e0" }}>
-            НАБОР НАВЫКОВ
+            {t.skillSet}
           </span>
           <div className="w-16" />
         </div>
@@ -411,7 +448,7 @@ export default function ProfileOverlay({ onClose, token, originRect, completedBl
               <PixelDevice segments={[seg1Active, seg2Active, seg3Active]} shimmer={newSkillKeys.size > 0} />
               <div className="flex items-center justify-center gap-2 mt-2">
                 <span className="text-[7px] tracking-[2px] font-mono" style={{ color: "#333" }}>
-                  {unlockedCount}/1 НАВЫКОВ
+                  {unlockedCount}/1 {t.skills}
                 </span>
               </div>
             </div>
@@ -420,7 +457,7 @@ export default function ProfileOverlay({ onClose, token, originRect, completedBl
               <div className="flex items-center gap-2 mb-2">
                 <div className="flex-1 h-[1px]" style={{ background: "#1a1a1a" }} />
                 <span className="text-[8px] tracking-[3px] font-mono uppercase" style={{ color: "#444" }}>
-                  СКАН МОДУЛЕЙ
+                  {t.moduleScan}
                 </span>
                 <div className="flex-1 h-[1px]" style={{ background: "#1a1a1a" }} />
               </div>
@@ -428,7 +465,7 @@ export default function ProfileOverlay({ onClose, token, originRect, completedBl
               {unlockedCount === 0 ? (
                 <div className="flex items-center justify-center py-8">
                   <span className="text-[9px] tracking-[3px] font-mono uppercase" style={{ color: "#333" }}>
-                    НАВЫКИ НЕ ОБНАРУЖЕНЫ
+                    {t.noSkills}
                   </span>
                 </div>
               ) : (
@@ -437,8 +474,8 @@ export default function ProfileOverlay({ onClose, token, originRect, completedBl
                   const grantedInSeg = seg.keys.filter(k => grantedKeys.has(k));
                   if (grantedInSeg.length === 0) return null;
                   return (
-                    <div key={seg.label}>
-                      <SegmentLabel label={seg.label} active={segActive} color={seg.color} />
+                    <div key={seg.labelKey}>
+                      <SegmentLabel label={t[seg.labelKey]} active={segActive} color={seg.color} />
                       {grantedInSeg.map(key => (
                         <SkillRow
                           key={key}

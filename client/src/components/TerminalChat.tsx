@@ -1213,6 +1213,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
             onClose={() => setShowProfile(false)}
             token={userToken || localStorage.getItem("liberta_token")}
             completedBlockIndex={completedBlockCount}
+            lang={lang}
             originRect={dosierIconRef.current ? (() => {
               const r = dosierIconRef.current!.getBoundingClientRect();
               return { x: r.left + r.width / 2, y: r.top + r.height / 2 };

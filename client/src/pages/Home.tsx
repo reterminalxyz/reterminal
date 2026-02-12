@@ -197,22 +197,37 @@ export default function Home() {
   const createSession = useCreateSession();
   const updateSession = useUpdateSession();
 
+  const sessionCreatingRef = useRef(false);
+  const [sessionRetry, setSessionRetry] = useState(0);
+
   useEffect(() => {
     if (phase === "boot") return;
-    if (!sessionId) {
-      createSession.mutate({ nodeId: "#RE_CHAIN_" + Math.floor(Math.random() * 9999) }, {
-        onSuccess: (data) => {
-          setSessionId(data.id);
-          if (hasWalletRestore.current) {
-            hasWalletRestore.current = false;
-            setPhase("phase_2");
-          } else {
-            setPhase("phase_1");
-          }
+    if (sessionId) return;
+    if (sessionCreatingRef.current) return;
+
+    sessionCreatingRef.current = true;
+    createSession.mutate({ nodeId: "#RE_CHAIN_" + Math.floor(Math.random() * 9999) }, {
+      onSuccess: (data) => {
+        sessionCreatingRef.current = false;
+        setSessionId(data.id);
+        if (hasWalletRestore.current) {
+          hasWalletRestore.current = false;
+          setPhase("phase_2");
+        } else {
+          setPhase("phase_1");
         }
-      });
-    }
-  }, [phase]);
+      },
+      onError: () => {
+        sessionCreatingRef.current = false;
+        if (sessionRetry < 3) {
+          const delay = 1000 * Math.pow(2, sessionRetry + 1);
+          setTimeout(() => setSessionRetry(prev => prev + 1), delay);
+        } else {
+          setPhase("phase_1");
+        }
+      }
+    });
+  }, [phase, sessionRetry]);
 
   const handleQuestionAnswer = (questionId: QuestionId, isCorrect: boolean) => {
     if (isAnsweringRef.current) return;
