@@ -320,7 +320,7 @@ export function BootScreen({ onDismiss, onLangChange, lang = "IT" }: BootScreenP
             className="mb-8 text-center"
           >
             <div className="text-[#B87333] font-mono text-[11px] tracking-[4px] mb-4 opacity-60">
-              LIBERTA TERMINAL v0.1
+              RE_TERMINAL v0.1
             </div>
             <h1 className="text-[#B87333] font-mono text-[18px] font-bold leading-tight tracking-wide">
               {t.heroTitle}

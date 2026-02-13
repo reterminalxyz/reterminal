@@ -493,7 +493,7 @@ export default function ProfileOverlay({ onClose, token, originRect, completedBl
 
             <div className="flex items-center justify-between px-1 mt-4" style={{ borderTop: "1px solid #151515", paddingTop: "8px" }}>
               <span className="text-[7px] font-mono" style={{ color: "#222" }}>
-                LIBERTA.PROTOCOL v0.1.0
+                RE_TERMINAL.PROTOCOL v0.1.0
               </span>
               <span className="text-[7px] font-mono" style={{ color: "#222" }}>
                 ENCRYPTED

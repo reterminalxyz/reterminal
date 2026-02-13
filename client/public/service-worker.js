@@ -1,4 +1,4 @@
-const CACHE_NAME = 'liberta-terminal-v3';
+const CACHE_NAME = 're-terminal-v3';
 
 const PRECACHE_URLS = [
   '/',
