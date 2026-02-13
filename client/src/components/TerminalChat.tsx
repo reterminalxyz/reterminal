@@ -462,8 +462,15 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
       deferredInstallRef.current.prompt();
       await deferredInstallRef.current.userChoice;
       deferredInstallRef.current = null;
+    } else {
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+      const isAndroid = /Android/.test(navigator.userAgent);
+      let instruction = uiTexts.installInstructionsFallback;
+      if (isIOS) instruction = uiTexts.installInstructionsIOS;
+      else if (isAndroid) instruction = uiTexts.installInstructionsAndroid;
+      setMessages(prev => [...prev, { id: nextMsgId(), text: instruction, sender: "satoshi" }]);
     }
-  }, []);
+  }, [uiTexts]);
 
   const startBlock = useCallback((blockIndex: number, skipTyping?: boolean) => {
     const block = LEARNING_BLOCKS_LOCAL[blockIndex];
