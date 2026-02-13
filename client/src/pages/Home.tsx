@@ -7,6 +7,7 @@ import { BackButton } from "@/components/BackButton";
 import { TerminalChat } from "@/components/TerminalChat";
 import { BootScreen, LangToggle } from "@/components/BootScreen";
 import type { Lang } from "@/components/BootScreen";
+import { RU_PHASE1_QUESTIONS } from "@/lib/ru-texts";
 import { useCreateSession, useUpdateSession, useSession } from "@/hooks/use-sessions";
 import { useGrantSkill } from "@/hooks/use-skills";
 import { Loader2 } from "lucide-react";
@@ -35,18 +36,7 @@ const PROGRESS_PER_QUESTION = [5, 10, 15, 20];
 const SATS_PER_QUESTION = 50;
 
 const Q_TRANSLATIONS: Record<string, { titles: string[]; yes: string; no: string; notYet: string; tryAgain: string }> = {
-  RU: {
-    titles: [
-      "Хочешь стать свободнее?",
-      "Как думаешь, государства и корпорации хотят забрать свободу людей?",
-      "Можно ли с этим что-то сделать?",
-      "Готов узнать что с этим можно сделать?",
-    ],
-    yes: "ДА",
-    no: "НЕТ",
-    notYet: "ПОКА НЕТ",
-    tryAgain: "ПОПРОБУЙ ЕЩЁ",
-  },
+  RU: RU_PHASE1_QUESTIONS,
   EN: {
     titles: [
       "Do you want to be freer?",

@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import { SKILL_META, type SkillKey, SKILL_KEYS } from "@shared/schema";
 import { playBeep } from "@/lib/sounds";
+import { RU_PROFILE_OVERLAY } from "@/lib/ru-texts";
 
 type GrantedSkill = { skillKey: string; grantedAt: string | null };
 type Lang = "IT" | "EN" | "RU";
@@ -31,14 +32,7 @@ const PROFILE_I18N: Record<Lang, {
     noSkills: "NO SKILLS DETECTED",
     segmentLabel: "WILL PROTOCOL",
   },
-  RU: {
-    terminal: "\u0422\u0415\u0420\u041c\u0418\u041d\u0410\u041b",
-    skillSet: "\u041d\u0410\u0411\u041e\u0420 \u041d\u0410\u0412\u042b\u041a\u041e\u0412",
-    skills: "\u041d\u0410\u0412\u042b\u041a\u041e\u0412",
-    moduleScan: "\u0421\u041a\u0410\u041d \u041c\u041e\u0414\u0423\u041b\u0415\u0419",
-    noSkills: "\u041d\u0410\u0412\u042b\u041a\u0418 \u041d\u0415 \u041e\u0411\u041d\u0410\u0420\u0423\u0416\u0415\u041d\u042b",
-    segmentLabel: "\u041f\u0420\u041e\u0422\u041e\u041a\u041e\u041b \u0412\u041e\u041b\u0418",
-  },
+  RU: RU_PROFILE_OVERLAY,
 };
 
 const SEGMENT_SKILLS: { keys: SkillKey[]; labelKey: "segmentLabel"; color: string; colorDim: string }[] = [

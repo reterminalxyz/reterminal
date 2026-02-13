@@ -1,21 +1,14 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Share, ArrowDown } from "lucide-react";
+import { RU_BOOT_SCREEN } from "@/lib/ru-texts";
 
 type Lang = "RU" | "EN" | "IT";
 
 const LANGS: Lang[] = ["IT", "EN", "RU"];
 
 const TRANSLATIONS = {
-  RU: {
-    heroTitle: "Ты активировал карту свободы",
-    heroSubtitle: "Для постоянного доступа и устойчивости к цензуре, установи приложение на телефон",
-    stayBrowser: "Остаться в браузере",
-    installTerminal: "Установить приложение",
-    shuttingDown: "ОТКЛЮЧЕНИЕ...",
-    terminalInstalled: "ПРИЛОЖЕНИЕ УСТАНОВЛЕНО",
-    openApp: "Открой приложение на главном экране",
-  },
+  RU: RU_BOOT_SCREEN,
   EN: {
     heroTitle: "You have activated the Freedom Card",
     heroSubtitle: "For permanent access and censorship resistance, install the app on your phone",
