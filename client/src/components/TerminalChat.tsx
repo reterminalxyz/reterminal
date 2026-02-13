@@ -357,11 +357,10 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     const isScrollingUp = currentScrollTop < prevScrollTop - 2;
     if (isScrollingUp) {
       userScrolledRef.current = true;
-      if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
-      scrollTimeoutRef.current = setTimeout(() => {
-        userScrolledRef.current = false;
-        scrollToBottom();
-      }, 8000);
+      if (scrollTimeoutRef.current) {
+        clearTimeout(scrollTimeoutRef.current);
+        scrollTimeoutRef.current = null;
+      }
     } else if (distanceFromBottom < 10) {
       userScrolledRef.current = false;
       if (scrollTimeoutRef.current) {
