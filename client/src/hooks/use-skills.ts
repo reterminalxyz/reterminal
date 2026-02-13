@@ -19,26 +19,27 @@ export function useGrantSkill() {
       .catch(() => {});
   }, []);
 
-  const grantSkill = useCallback(async (skillKey: SkillKey): Promise<boolean> => {
+  const grantSkill = useCallback(async (skillKey: SkillKey, showNotification = false): Promise<boolean> => {
     const token = localStorage.getItem("liberta_token");
-    if (!token) return false;
-    if (grantedRef.current.has(skillKey)) return false;
 
-    try {
-      const res = await fetch("/api/skills/grant", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token, skillKey }),
-      });
-      if (!res.ok) return false;
-      const data = await res.json();
-      if (data.granted) {
-        grantedRef.current.add(skillKey);
-        setPendingSkill(skillKey);
-        return true;
-      }
+    if (token && !grantedRef.current.has(skillKey)) {
+      try {
+        const res = await fetch("/api/skills/grant", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token, skillKey }),
+        });
+        if (res.ok) {
+          grantedRef.current.add(skillKey);
+        }
+      } catch {}
+    } else {
       grantedRef.current.add(skillKey);
-    } catch {
+    }
+
+    if (showNotification) {
+      setPendingSkill(skillKey);
+      return true;
     }
 
     return false;

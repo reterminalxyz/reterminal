@@ -20,7 +20,7 @@ interface TerminalChatProps {
   skipFirstTypewriter?: boolean;
   userStats?: { level: number; xp: number } | null;
   userToken?: string;
-  onGrantSkill?: (skillKey: SkillKey) => void;
+  onGrantSkill?: (skillKey: SkillKey, showNotification?: boolean) => void;
   levelUpSkill?: SkillKey | null;
   onDismissLevelUp?: () => void;
   lang?: string;
@@ -560,7 +560,8 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
 
     if (block.grantSkillKey && onGrantSkill) {
       const skillKey = block.grantSkillKey;
-      safeTimeout(() => onGrantSkill(skillKey), 1000);
+      const notify = blockIndex === 0;
+      safeTimeout(() => onGrantSkill(skillKey, notify), 1000);
     }
 
     saveTerminalProgress({
