@@ -172,29 +172,29 @@ const WALLET_STEPS_IT: WalletStep[] = [
 ];
 
 const SATOSHI_WISDOM_EN = [
-  "The root problem with conventional currency is all the trust that's required to make it work. The central bank must be trusted not to debase the currency, but the history of fiat currencies is full of breaches of that trust.",
-  "Bitcoin is the first implementation of a concept called cryptocurrency. The main innovation: a network without a trusted central authority or third parties.",
-  "The nature of Bitcoin is such that once version 0.1 was released, the core design was set in stone. I want you to be able to visualize it as unchangeable.",
-  "Lost coins only make everyone else's coins slightly more valuable. Think of it as a donation to everyone.",
-  "The network is robust in its unstructured simplicity. Nodes work all at once with little coordination. They do not need to be identified, since messages are not routed to any particular place.",
-  "The double-spending problem is solved by a peer-to-peer network. The network timestamps transactions by hashing them into an ongoing chain of hash-based proof-of-work.",
-  "If you don't believe me or don't get it, I don't have time to try to convince you, sorry.",
-  "Bitcoin is generated at a speed closer to the planned schedule, and this remains true regardless of how many miners act.",
-  "In a few decades when the reward gets too small, the transaction fee will become the main compensation for nodes.",
-  "Writing a description for this thing for general audiences is bloody hard. There's nothing to relate it to.",
+  "The root problem with conventional currency is all the trust required. You have to trust the central bank not to debase the currency. History is full of breaches of that trust.",
+  "Bitcoin is the first system where trust is replaced with math. No need to trust a bank or government. Code doesn't lie.",
+  "Once Bitcoin launched, the rules were set in stone. No one can change them. This is protection against the arbitrary power of authority.",
+  "Lost coins make the rest more valuable. It's a donation to all other Bitcoin holders.",
+  "The network is robust in its simplicity. Millions of nodes operate independently. No need to ask permission. No coordination needed.",
+  "The double-spending problem is solved without a central controller. The peer-to-peer network timestamps every transaction. Gaming the system is impossible.",
+  "If you don't understand\u2014that's normal. Freedom requires effort. Slavery is more comfortable.",
+  "Bitcoin can't be printed at a politician's whim. Emission is coded. 21 million coins. Forever.",
+  "When block rewards become small, fees will motivate miners. The system is self-sustaining.",
+  "Explaining this to ordinary people is hard. Nothing here is familiar. This is a new paradigm of money.",
 ];
 
 const SATOSHI_WISDOM_IT = [
-  "Il problema alla radice delle valute tradizionali \u00e8 tutta la fiducia necessaria per farle funzionare. Ci si deve fidare che la banca centrale non svaluti la moneta, ma la storia delle valute fiat \u00e8 piena di violazioni di tale fiducia.",
-  "Bitcoin \u00e8 la prima implementazione di un concetto chiamato criptovaluta. L'innovazione principale: una rete senza un'autorit\u00e0 centrale fidata o terze parti.",
-  "La natura di Bitcoin \u00e8 tale che, una volta rilasciata la versione 0.1, il design del nucleo \u00e8 scolpito nella pietra. Voglio che riusciate a visualizzarlo come immutabile.",
-  "Le monete perse rendono solo le monete di tutti gli altri leggermente pi\u00f9 preziose. Pensatelo come una donazione a tutti gli altri.",
-  "La rete \u00e8 robusta nella sua semplicit\u00e0 non strutturata. I nodi lavorano tutti insieme con poco coordinamento. Non hanno bisogno di essere identificati, poich\u00e9 i messaggi non vengono instradati in un luogo particolare.",
-  "Il problema della doppia spesa \u00e8 risolto attraverso una rete peer-to-peer. La rete appone una marcatura temporale sulle transazioni facendone l'hash in una catena continua di prove di lavoro (proof-of-work).",
-  "Se non mi credete o non capite, non ho tempo per cercare di convincervi, mi dispiace.",
-  "I Bitcoin vengono generati a una velocit\u00e0 che si avvicina al programma pianificato, e questo rimane vero indipendentemente da quanti minatori siano attivi.",
-  "Tra qualche decennio, quando la ricompensa diventer\u00e0 troppo piccola, la commissione di transazione diventer\u00e0 il principale incentivo per i nodi.",
-  "Scrivere una descrizione di questa cosa per il pubblico generico \u00e8 dannatamente difficile. Non c'\u00e8 nulla a cui poterlo paragonare.",
+  "Il problema alla radice delle valute convenzionali \u00e8 tutta la fiducia richiesta. Devi fidarti che la banca centrale non svaluter\u00e0 la valuta. La storia \u00e8 piena di violazioni di quella fiducia.",
+  "Bitcoin \u00e8 il primo sistema dove la fiducia \u00e8 sostituita dalla matematica. Non serve fidarsi di una banca o di un governo. Il codice non mente.",
+  "Una volta lanciato Bitcoin, le regole sono state scolpite nella pietra. Nessuno pu\u00f2 cambiarle. Questa \u00e8 protezione contro il potere arbitrario dell'autorit\u00e0.",
+  "Le monete perse rendono le altre pi\u00f9 preziose. \u00c8 una donazione a tutti gli altri possessori di Bitcoin.",
+  "La rete \u00e8 robusta nella sua semplicit\u00e0. Milioni di nodi operano indipendentemente. Non serve chiedere permesso. Non serve coordinamento.",
+  "Il problema della doppia spesa \u00e8 risolto senza un controllore centrale. La rete peer-to-peer marca temporalmente ogni transazione. Ingannare il sistema \u00e8 impossibile.",
+  "Se non capisci\u2014\u00e8 normale. La libert\u00e0 richiede sforzo. La schiavit\u00f9 \u00e8 pi\u00f9 comoda.",
+  "Bitcoin non pu\u00f2 essere stampato al capriccio di un politico. L'emissione \u00e8 codificata. 21 milioni di monete. Per sempre.",
+  "Quando le ricompense dei blocchi diventeranno piccole, le commissioni motiveranno i miner. Il sistema si auto-sostiene.",
+  "Spiegare questo alle persone comuni \u00e8 difficile. Non c'\u00e8 niente di familiare qui. Questo \u00e8 un nuovo paradigma del denaro.",
 ];
 
 const LEARNING_BLOCKS_RU: LearningBlock[] = RU_LEARNING_BLOCKS as LearningBlock[];

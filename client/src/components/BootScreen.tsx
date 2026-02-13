@@ -10,22 +10,22 @@ const LANGS: Lang[] = ["IT", "EN", "RU"];
 const TRANSLATIONS = {
   RU: RU_BOOT_SCREEN,
   EN: {
-    heroTitle: "You have activated the Freedom Card",
+    heroTitle: "You've activated the freedom card",
     heroSubtitle: "For permanent access and censorship resistance, install the app on your phone",
-    stayBrowser: "Stay in Browser",
-    installTerminal: "Install App",
+    stayBrowser: "Stay in browser",
+    installTerminal: "Install app",
     shuttingDown: "SHUTTING DOWN...",
     terminalInstalled: "APP INSTALLED",
-    openApp: "Open the app on your home screen",
+    openApp: "Open the app from your home screen",
   },
   IT: {
-    heroTitle: "Hai attivato la Carta della Libert\u00e0",
-    heroSubtitle: "Per un accesso costante e resistente alla censura, installa l'app sul telefono",
+    heroTitle: "Hai attivato la carta della libert\u00e0",
+    heroSubtitle: "Per accesso permanente e resistenza alla censura, installa l'app sul telefono",
     stayBrowser: "Resta nel browser",
     installTerminal: "Installa app",
-    shuttingDown: "DISCONNESSIONE...",
+    shuttingDown: "SPEGNIMENTO...",
     terminalInstalled: "APP INSTALLATA",
-    openApp: "Apri l'app nella schermata home",
+    openApp: "Apri l'app dalla schermata home",
   },
 };
 

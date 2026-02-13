@@ -39,10 +39,10 @@ const Q_TRANSLATIONS: Record<string, { titles: string[]; yes: string; no: string
   RU: RU_PHASE1_QUESTIONS,
   EN: {
     titles: [
-      "Do you want to be freer?",
-      "Do you believe governments and corporations want to strip people of their freedom?",
-      "Is there anything that can be done about it?",
-      "Are you ready to find out what the solution is?",
+      "Want to be freer?",
+      "Think states and corporations want to strip people of their freedom?",
+      "Can anything be done about it?",
+      "Ready to learn what can be done?",
     ],
     yes: "YES",
     no: "NO",
@@ -52,9 +52,9 @@ const Q_TRANSLATIONS: Record<string, { titles: string[]; yes: string; no: string
   IT: {
     titles: [
       "Vuoi essere pi\u00f9 libero?",
-      "Pensi che governi e aziende vogliano togliere la libert\u00e0 alle persone?",
-      "Si pu\u00f2 fare qualcosa al riguardo?",
-      "Sei pronto a scoprire qual \u00e8 la soluzione?",
+      "Pensi che stati e corporation vogliano togliere la libert\u00e0 alle persone?",
+      "Si pu\u00f2 fare qualcosa?",
+      "Sei pronto a scoprire cosa si pu\u00f2 fare?",
     ],
     yes: "S\u00cc",
     no: "NO",

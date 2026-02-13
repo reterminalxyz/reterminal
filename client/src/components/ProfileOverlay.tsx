@@ -18,10 +18,10 @@ const PROFILE_I18N: Record<Lang, {
 }> = {
   IT: {
     terminal: "TERMINALE",
-    skillSet: "SET DI ABILIT\u00c0",
-    skills: "ABILIT\u00c0",
+    skillSet: "SET DI SKILL",
+    skills: "SKILL",
     moduleScan: "SCANSIONE MODULI",
-    noSkills: "NESSUNA ABILIT\u00c0 RILEVATA",
+    noSkills: "NESSUNA SKILL RILEVATA",
     segmentLabel: "PROTOCOLLO VOLONT\u00c0",
   },
   EN: {

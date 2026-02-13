@@ -4,6 +4,8 @@ export const RU_BOOT_SCREEN = ruData.boot_screen;
 
 export const RU_PHASE1_QUESTIONS = ruData.phase_1_questions;
 
+export const RU_TERMINAL_HEADER: string = ruData.terminal_header;
+
 export const RU_LEARNING_BLOCKS = ruData.learning_blocks as any[];
 
 export const RU_WALLET_STEPS = ruData.wallet_steps as any[];
