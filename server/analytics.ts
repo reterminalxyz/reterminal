@@ -12,15 +12,21 @@ db.exec(`
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     session_id TEXT NOT NULL,
     event_name TEXT NOT NULL,
+    source TEXT NOT NULL DEFAULT 'web',
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
   )
 `);
 
+try {
+  db.exec("ALTER TABLE events ADD COLUMN source TEXT NOT NULL DEFAULT 'web'");
+} catch (_) {}
+
 export const ANALYTICS_PASSWORD = "1209";
 
-export function trackEvent(sessionId: string, eventName: string): void {
-  const stmt = db.prepare("INSERT INTO events (session_id, event_name) VALUES (?, ?)");
-  stmt.run(sessionId, eventName);
+export function trackEvent(sessionId: string, eventName: string, source: string = "web"): void {
+  const s = source === "pwa" ? "pwa" : "web";
+  const stmt = db.prepare("INSERT INTO events (session_id, event_name, source) VALUES (?, ?, ?)");
+  stmt.run(sessionId, eventName, s);
 }
 
 export function resetEvents(): void {
@@ -43,6 +49,15 @@ export function getTotalUniqueUsers(): number {
   return row.total;
 }
 
+export function getSourceStats(): { source: string; unique_users: number }[] {
+  const stmt = db.prepare(`
+    SELECT source, COUNT(DISTINCT session_id) as unique_users
+    FROM events
+    GROUP BY source
+  `);
+  return stmt.all() as { source: string; unique_users: number }[];
+}
+
 export function getAvgSessionDuration(): string {
   const stmt = db.prepare(`
     SELECT AVG(duration) as avg_sec FROM (
@@ -62,13 +77,14 @@ export function getAvgSessionDuration(): string {
   return `${min}m ${remSec}s`;
 }
 
-export function getSessionDurations(): { session_id: string; duration_sec: number; events_count: number; first_event: string; last_event: string }[] {
+export function getSessionDurations(): { session_id: string; duration_sec: number; events_count: number; first_event: string; last_event: string; source: string }[] {
   const stmt = db.prepare(`
     SELECT session_id,
       CAST((julianday(MAX(timestamp)) - julianday(MIN(timestamp))) * 86400 AS INTEGER) as duration_sec,
       COUNT(*) as events_count,
       MIN(timestamp) as first_event,
-      MAX(timestamp) as last_event
+      MAX(timestamp) as last_event,
+      MAX(source) as source
     FROM events
     GROUP BY session_id
     HAVING COUNT(*) > 1
@@ -179,6 +195,10 @@ export function renderDashboardHTML(token: string): string {
   const totalUsers = getTotalUniqueUsers();
   const avgTime = getAvgSessionDuration();
   const sessions = getSessionDurations();
+  const sources = getSourceStats();
+  const sourceMap = new Map(sources.map(s => [s.source, s.unique_users]));
+  const webUsers = sourceMap.get("web") || 0;
+  const pwaUsers = sourceMap.get("pwa") || 0;
 
   const rows = FUNNEL_ORDER.map((step, i) => {
     const users = funnelMap.get(step.key) || 0;
@@ -207,11 +227,15 @@ export function renderDashboardHTML(token: string): string {
     const dur = s.duration_sec;
     const durStr = dur < 60 ? `${dur}s` : `${Math.floor(dur / 60)}m ${dur % 60}s`;
     const shortId = s.session_id.substring(0, 8);
+    const srcBadge = s.source === "pwa"
+      ? '<span style="background:#00e5ff22;color:#00e5ff;padding:2px 6px;border-radius:2px;font-size:10px;letter-spacing:1px">PWA</span>'
+      : '<span style="background:#ffffff11;color:#666;padding:2px 6px;border-radius:2px;font-size:10px;letter-spacing:1px">WEB</span>';
     return `
       <tr>
         <td style="color:#666">${shortId}...</td>
         <td class="num">${durStr}</td>
         <td class="num">${s.events_count}</td>
+        <td>${srcBadge}</td>
         <td style="color:#666;font-size:11px">${s.first_event}</td>
       </tr>`;
   }).join("\n");
@@ -382,6 +406,14 @@ export function renderDashboardHTML(token: string): string {
       <div class="label">Avg. Time on Site</div>
       <div class="value time">${avgTime}</div>
     </div>
+    <div class="stat-card">
+      <div class="label">Web</div>
+      <div class="value" style="color:#888">${webUsers}</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">PWA</div>
+      <div class="value" style="color:#00e5ff">${pwaUsers}</div>
+    </div>
   </div>
 
   <table>
@@ -408,6 +440,7 @@ export function renderDashboardHTML(token: string): string {
         <th>Session</th>
         <th style="text-align:right">Duration</th>
         <th style="text-align:right">Events</th>
+        <th>Source</th>
         <th>Started</th>
       </tr>
     </thead>

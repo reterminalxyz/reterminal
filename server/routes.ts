@@ -169,11 +169,11 @@ export async function registerRoutes(
 
   app.post("/api/track", async (req, res) => {
     try {
-      const { session_id, event_name } = req.body;
+      const { session_id, event_name, source } = req.body;
       if (!session_id || !event_name) {
         return res.status(400).json({ message: "session_id and event_name required" });
       }
-      trackEvent(String(session_id), String(event_name));
+      trackEvent(String(session_id), String(event_name), String(source || "web"));
       res.status(200).json({ ok: true });
     } catch (err: any) {
       console.error("[analytics] track error:", err.message);
