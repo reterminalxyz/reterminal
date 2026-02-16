@@ -513,34 +513,35 @@ export default function Home() {
           className="absolute bottom-36 left-0 right-0 flex justify-center z-10"
         >
           <motion.div
-            className="px-6 py-3 border-2 border-[#B87333]/40"
-            style={{ background: "rgba(245,245,245,0.92)" }}
+            className="px-7 py-4 border-2 border-[#B87333]"
+            style={{ background: "rgba(245,245,245,0.95)" }}
             animate={{
               boxShadow: [
-                "0 0 8px rgba(184,115,51,0.2), 0 0 20px rgba(184,115,51,0.1)",
-                "0 0 20px rgba(184,115,51,0.5), 0 0 40px rgba(184,115,51,0.25), 0 0 60px rgba(184,115,51,0.1)",
-                "0 0 8px rgba(184,115,51,0.2), 0 0 20px rgba(184,115,51,0.1)",
+                "0 0 12px rgba(184,115,51,0.3), 0 0 30px rgba(184,115,51,0.15)",
+                "0 0 30px rgba(184,115,51,0.7), 0 0 60px rgba(184,115,51,0.35), 0 0 90px rgba(184,115,51,0.15)",
+                "0 0 12px rgba(184,115,51,0.3), 0 0 30px rgba(184,115,51,0.15)",
               ],
               borderColor: [
-                "rgba(184,115,51,0.4)",
-                "rgba(184,115,51,0.8)",
-                "rgba(184,115,51,0.4)",
+                "rgba(184,115,51,0.6)",
+                "rgba(184,115,51,1)",
+                "rgba(184,115,51,0.6)",
               ],
+              scale: [1, 1.05, 1],
             }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
           >
             <motion.p 
-              className="text-[22px] tracking-[3px] font-mono font-bold"
+              className="text-[24px] tracking-[4px] font-mono font-bold"
               style={{ color: "#B87333" }}
               animate={{
                 textShadow: [
-                  "0 0 6px rgba(184,115,51,0.3)",
-                  "0 0 16px rgba(184,115,51,0.7), 0 0 30px rgba(184,115,51,0.3)",
-                  "0 0 6px rgba(184,115,51,0.3)",
+                  "0 0 8px rgba(184,115,51,0.4)",
+                  "0 0 24px rgba(184,115,51,0.9), 0 0 50px rgba(184,115,51,0.4)",
+                  "0 0 8px rgba(184,115,51,0.4)",
                 ],
-                opacity: [1, 0.85, 1],
+                opacity: [1, 0.7, 1],
               }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
+              transition={{ duration: 1.0, repeat: Infinity, ease: "easeInOut" }}
             >
               {lang === "RU" ? "Жми на чип" : lang === "EN" ? "Tap the chip" : "Tocca il chip"}
             </motion.p>
