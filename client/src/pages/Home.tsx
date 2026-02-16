@@ -163,23 +163,47 @@ export default function Home() {
         setUserStats({ level: data.level, xp: data.xp });
         if (data.totalSats > 0 || data.independenceProgress > 0) {
           const localRaw = localStorage.getItem("liberta_terminal_progress");
-          let localProgress: { blockIndex?: number; sats?: number; timestamp?: number } | null = null;
+          let localProgress: { blockIndex?: number; sats?: number; walletMode?: boolean; walletStepId?: string | null; timestamp?: number } | null = null;
           try { if (localRaw) localProgress = JSON.parse(localRaw); } catch (_) {}
 
           const serverBlockIndex = data.currentStepIndex || 0;
-          const localBlockIndex = localProgress?.blockIndex ?? -1;
-          const serverIsAhead = serverBlockIndex > localBlockIndex;
-          const localIsMissing = !localProgress;
+          const serverSats = data.totalSats || 0;
+          const serverWalletMode = data.currentModuleId?.startsWith("wallet_") || false;
+          const serverWalletStepId = serverWalletMode ? data.currentModuleId.replace("wallet_", "") : null;
 
-          if (localIsMissing || serverIsAhead) {
+          const localBlockIndex = localProgress?.blockIndex ?? -1;
+          const localSats = localProgress?.sats ?? 0;
+          const localWalletMode = localProgress?.walletMode ?? false;
+          const localWalletStepId = localProgress?.walletStepId ?? null;
+
+          const walletStepOrder = ["step_1", "step_2", "step_3", "step_4", "step_5"];
+          const serverWalletIdx = serverWalletStepId ? walletStepOrder.indexOf(serverWalletStepId) : -1;
+          const localWalletIdx = localWalletStepId ? walletStepOrder.indexOf(localWalletStepId) : -1;
+
+          const localIsMissing = !localProgress;
+          const serverBlockAhead = serverBlockIndex > localBlockIndex;
+          const sameBlockServerMoreSats = serverBlockIndex === localBlockIndex && !serverWalletMode && !localWalletMode && serverSats > localSats;
+          const serverInWalletLocalNot = serverWalletMode && !localWalletMode && serverBlockIndex >= localBlockIndex;
+          const bothWalletServerAhead = serverWalletMode && localWalletMode && serverWalletIdx > localWalletIdx;
+
+          if (localIsMissing || serverBlockAhead || sameBlockServerMoreSats || serverInWalletLocalNot || bothWalletServerAhead) {
             localStorage.setItem("liberta_terminal_progress", JSON.stringify({
               blockIndex: serverBlockIndex,
-              sats: data.totalSats || 0,
+              sats: serverSats,
               progress: data.independenceProgress || 0,
-              walletMode: data.currentModuleId?.startsWith("wallet_") || false,
-              walletStepId: data.currentModuleId?.startsWith("wallet_") ? data.currentModuleId.replace("wallet_", "") : null,
+              walletMode: serverWalletMode,
+              walletStepId: serverWalletStepId,
               timestamp: Date.now(),
             }));
+            if (serverWalletMode && serverWalletStepId) {
+              localStorage.setItem("liberta_wallet_state", JSON.stringify({
+                walletMode: true,
+                stepId: serverWalletStepId,
+                blockIndex: serverBlockIndex,
+                sats: serverSats,
+                progress: data.independenceProgress || 0,
+              }));
+            }
           }
         }
       })
