@@ -378,19 +378,19 @@ export default function Home() {
   const handleChipClick = () => {
     if (circuitReveal >= 100) {
       playPhaseComplete();
-      setTotalSats(200);
-      try { localStorage.removeItem("liberta_terminal_progress"); } catch (_) {}
+      let hasSavedProgress = false;
+      try { hasSavedProgress = !!localStorage.getItem("liberta_terminal_progress"); } catch (_) {}
+      if (!hasSavedProgress) {
+        setTotalSats(200);
+      }
       setTerminalKey(prev => prev + 1);
       setPhase("chip_exit");
     }
   };
 
   const handleTerminalBack = () => {
-    try { localStorage.removeItem("liberta_wallet_state"); } catch (_) {}
-    try { localStorage.removeItem("liberta_terminal_progress"); } catch (_) {}
     setSkipTypewriter(true);
-    setTotalSats(200);
-    setProgress(20);
+    setTerminalKey(prev => prev + 1);
     setPhase("phase_1_complete");
   };
 
