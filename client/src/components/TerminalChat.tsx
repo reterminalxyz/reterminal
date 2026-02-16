@@ -251,7 +251,25 @@ function SkillNotificationBanner({ onClose, iconRect, skillText = "+SKILL" }: { 
   );
 }
 
-function saveTerminalProgress(data: { blockIndex: number; sats: number; progress: number; walletMode?: boolean; walletStepId?: string | null }) {
+function saveTerminalMessages(msgs: Message[]) {
+  try {
+    const slim = msgs.map(m => ({ t: m.text, s: m.sender }));
+    localStorage.setItem("liberta_terminal_messages", JSON.stringify(slim));
+  } catch (_) {}
+}
+
+function loadTerminalMessages(): Message[] {
+  try {
+    const raw = localStorage.getItem("liberta_terminal_messages");
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as { t: string; s: "satoshi" | "user" | "system" }[];
+    return parsed.map(m => ({ id: nextMsgId(), text: m.t, sender: m.s }));
+  } catch (_) {
+    return [];
+  }
+}
+
+function saveTerminalProgress(data: { blockIndex: number; sats: number; progress: number; walletMode?: boolean; walletStepId?: string | null; messages?: Message[] }) {
   try {
     localStorage.setItem("liberta_terminal_progress", JSON.stringify({
       blockIndex: data.blockIndex,
@@ -262,6 +280,9 @@ function saveTerminalProgress(data: { blockIndex: number; sats: number; progress
       timestamp: Date.now(),
     }));
   } catch (_) {}
+  if (data.messages) {
+    saveTerminalMessages(data.messages);
+  }
 
   const token = localStorage.getItem("liberta_token");
   if (token) {
@@ -304,7 +325,15 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
   const savedState = useRef(loadWalletState());
   const savedProgress = useRef(loadTerminalProgress());
 
-  const [messages, setMessages] = useState<Message[]>([]);
+  const messagesRef = useRef<Message[]>([]);
+  const [messages, _setMessages] = useState<Message[]>([]);
+  const setMessages = useCallback((updater: Message[] | ((prev: Message[]) => Message[])) => {
+    _setMessages(prev => {
+      const next = typeof updater === "function" ? updater(prev) : updater;
+      messagesRef.current = next;
+      return next;
+    });
+  }, []);
   const [displayedText, setDisplayedText] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [currentBlockIndex, setCurrentBlockIndex] = useState(() => savedState.current?.blockIndex ?? 0);
@@ -399,6 +428,9 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     mountedRef.current = true;
     return () => {
       mountedRef.current = false;
+      if (messagesRef.current.length > 0) {
+        saveTerminalMessages(messagesRef.current);
+      }
       if (typeIntervalRef.current) clearInterval(typeIntervalRef.current);
       if (scrollTimeoutRef.current) clearTimeout(scrollTimeoutRef.current);
       pendingTimeoutsRef.current.forEach(t => clearTimeout(t));
@@ -542,6 +574,11 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
       onSatsUpdateRef.current(saved.sats);
       onProgressUpdateRef.current(saved.progress);
       if (saved.blockIndex > 7 && onLabelSwitch) onLabelSwitch();
+      const savedMsgs = loadTerminalMessages();
+      if (savedMsgs.length > 0) {
+        setMessages(savedMsgs);
+        messagesRef.current = savedMsgs;
+      }
       startBlock(saved.blockIndex, true);
     } else {
       startBlock(0, shouldSkip);
@@ -584,6 +621,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
       blockIndex: blockIndex + 1,
       sats: internalSatsRef.current,
       progress: newProgress,
+      messages: messagesRef.current,
     });
   }, [onSatsUpdate, onProgressUpdate, showNotification, onGrantSkill, safeTimeout, onLabelSwitch]);
 
@@ -599,7 +637,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     isLockedRef.current = true;
 
     saveWalletState({ walletMode: true, stepId, blockIndex: 7, sats: internalSatsRef.current, progress: 11 });
-    saveTerminalProgress({ blockIndex: 7, sats: internalSatsRef.current, progress: 11, walletMode: true, walletStepId: stepId });
+    saveTerminalProgress({ blockIndex: 7, sats: internalSatsRef.current, progress: 11, walletMode: true, walletStepId: stepId, messages: messagesRef.current });
 
     try { playTransition(); } catch (_) {}
 
@@ -622,6 +660,11 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
       restoredWalletRef.current = null;
       if (restored.sats) onSatsUpdate(restored.sats);
       if (onLabelSwitch) onLabelSwitch();
+      const savedMsgs = loadTerminalMessages();
+      if (savedMsgs.length > 0) {
+        setMessages(savedMsgs);
+        messagesRef.current = savedMsgs;
+      }
       startWalletStep(restored.stepId);
     }
   }, [startWalletStep, onSatsUpdate, onLabelSwitch]);
@@ -809,7 +852,8 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
         setCurrentWalletStepId(null);
         setWalletButtons([]);
         clearWalletState();
-        saveTerminalProgress({ blockIndex: 0, sats: 200, progress: 20 });
+        saveTerminalProgress({ blockIndex: 0, sats: 200, progress: 20, messages: [] });
+        try { localStorage.removeItem("liberta_terminal_messages"); } catch (_) {}
         setMessages([]);
         startBlock(0);
       };
