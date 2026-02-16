@@ -198,13 +198,22 @@ export default function Home() {
   }, []);
 
   const restoredSessionId = useRef(sessionId);
-  const { data: session, isLoading: isSessionLoading, isError: isSessionError } = useSession(sessionId);
+  const { data: session, isLoading: isSessionLoading } = useSession(sessionId);
   const createSession = useCreateSession();
   const updateSession = useUpdateSession();
 
   const sessionCreatingRef = useRef(false);
   const [sessionRetry, setSessionRetry] = useState(0);
   const sessionValidatedRef = useRef(false);
+
+  const advancePhase = useCallback(() => {
+    if (hasWalletRestore.current) {
+      hasWalletRestore.current = false;
+      setPhase("phase_2");
+    } else {
+      setPhase(prev => (prev === "boot" || prev === "phase_1" || prev === "phase_2") ? prev : "phase_1");
+    }
+  }, []);
 
   useEffect(() => {
     if (phase === "boot") return;
@@ -214,12 +223,7 @@ export default function Home() {
       if (isSessionLoading) return;
       sessionValidatedRef.current = true;
       if (session) {
-        if (hasWalletRestore.current) {
-          hasWalletRestore.current = false;
-          setPhase("phase_2");
-        } else if (phase === "loading") {
-          setPhase("phase_1");
-        }
+        advancePhase();
         return;
       }
       restoredSessionId.current = null;
@@ -236,12 +240,7 @@ export default function Home() {
         sessionCreatingRef.current = false;
         setSessionId(data.id);
         try { localStorage.setItem("liberta_session_id", String(data.id)); } catch (_) {}
-        if (hasWalletRestore.current) {
-          hasWalletRestore.current = false;
-          setPhase("phase_2");
-        } else {
-          setPhase("phase_1");
-        }
+        advancePhase();
       },
       onError: () => {
         sessionCreatingRef.current = false;
@@ -253,7 +252,7 @@ export default function Home() {
         }
       }
     });
-  }, [phase, sessionRetry, isSessionLoading, session]);
+  }, [phase, sessionRetry, isSessionLoading, session, advancePhase]);
 
   useEffect(() => {
     if (phase === "chip_exit") {
