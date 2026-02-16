@@ -1,3 +1,4 @@
+import express from "express";
 import type { Express } from "express";
 import type { Server } from "http";
 import { storage } from "./storage";
@@ -12,6 +13,9 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+
+  app.use(cookieParser());
+  app.use(express.urlencoded({ extended: false }));
 
   app.get("/api/health", async (_req, res) => {
     try {
@@ -176,8 +180,6 @@ export async function registerRoutes(
       res.status(500).json({ message: "Internal server error" });
     }
   });
-
-  app.use(cookieParser());
 
   const isStatsAuthed = (req: any): boolean => req.cookies?.stats_auth === "1";
 
