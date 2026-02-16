@@ -1,5 +1,11 @@
 import { useState, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+
+const INITIATION_LABEL: Record<string, string> = {
+  IT: "INIZIAZIONE",
+  EN: "INITIATION",
+  RU: "ИНИЦИАЦИЯ",
+};
 
 const INDEPENDENCE_LABEL: Record<string, string> = {
   IT: "INDIPENDENZA",
@@ -12,12 +18,15 @@ interface IndependenceBarProps {
   phase: "phase_1" | "phase_2";
   showBackground?: boolean;
   lang?: string;
+  labelMode?: "initiation" | "independence";
 }
 
-export function IndependenceBar({ progress, phase, showBackground = false, lang = "IT" }: IndependenceBarProps) {
+export function IndependenceBar({ progress, phase, showBackground = false, lang = "IT", labelMode = "initiation" }: IndependenceBarProps) {
   const isDark = phase === "phase_2";
   const [isPulsing, setIsPulsing] = useState(false);
   const prevProgressRef = useRef(progress);
+  const [showGlitch, setShowGlitch] = useState(false);
+  const prevLabelModeRef = useRef(labelMode);
 
   useEffect(() => {
     if (progress > prevProgressRef.current) {
@@ -28,7 +37,20 @@ export function IndependenceBar({ progress, phase, showBackground = false, lang 
     }
     prevProgressRef.current = progress;
   }, [progress]);
-  
+
+  useEffect(() => {
+    if (prevLabelModeRef.current === "initiation" && labelMode === "independence") {
+      setShowGlitch(true);
+      const timer = setTimeout(() => setShowGlitch(false), 2400);
+      return () => clearTimeout(timer);
+    }
+    prevLabelModeRef.current = labelMode;
+  }, [labelMode]);
+
+  const currentLabel = labelMode === "independence"
+    ? (INDEPENDENCE_LABEL[lang] || INDEPENDENCE_LABEL.IT)
+    : (INITIATION_LABEL[lang] || INITIATION_LABEL.IT);
+
   return (
     <div 
       className={`${isDark ? 'relative' : 'fixed bottom-0 left-0 right-0'} z-40 px-4 pt-3 ${isDark ? 'bg-[#0A0A0A] border-t-2 border-[#B87333]/40' : ''}`}
@@ -39,13 +61,54 @@ export function IndependenceBar({ progress, phase, showBackground = false, lang 
         animate={phase === "phase_2" ? { opacity: [0.85, 1, 0.85] } : {}}
         transition={{ duration: 2, repeat: Infinity }}
       >
-        <motion.span 
-          className={`text-[12px] tracking-[5px] font-bold text-[#B87333] ${!isDark && showBackground ? 'bg-[#F5F5F5]/90 px-4 py-1 border border-[#B87333]/20' : ''}`}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-        >
-          {INDEPENDENCE_LABEL[lang] || INDEPENDENCE_LABEL.IT}
-        </motion.span>
+        <div className={`relative ${!isDark && showBackground ? 'bg-[#F5F5F5]/90 px-4 py-1 border border-[#B87333]/20' : ''}`}>
+          <AnimatePresence mode="wait">
+            <motion.span
+              key={labelMode}
+              className="text-[12px] tracking-[5px] font-bold text-[#B87333] block"
+              initial={labelMode === "independence" ? { opacity: 0 } : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              {currentLabel}
+            </motion.span>
+          </AnimatePresence>
+
+          {showGlitch && (
+            <>
+              <motion.div
+                className="absolute inset-0 pointer-events-none overflow-hidden"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0, 1, 0, 1, 0, 0.7, 0, 1, 0] }}
+                transition={{ duration: 1.6, times: [0, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 1] }}
+              >
+                <div className="text-[12px] tracking-[5px] font-bold text-[#00e5ff] absolute inset-0 flex items-center justify-center"
+                  style={{ transform: "translateX(2px)", mixBlendMode: "screen" }}>
+                  {INDEPENDENCE_LABEL[lang] || INDEPENDENCE_LABEL.IT}
+                </div>
+              </motion.div>
+              <motion.div
+                className="absolute inset-0 pointer-events-none overflow-hidden"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0, 0.8, 0, 0.6, 0, 1, 0] }}
+                transition={{ duration: 1.6, times: [0, 0.08, 0.15, 0.25, 0.35, 0.45, 1], delay: 0.1 }}
+              >
+                <div className="text-[12px] tracking-[5px] font-bold text-[#ff4444] absolute inset-0 flex items-center justify-center"
+                  style={{ transform: "translateX(-2px)", mixBlendMode: "screen" }}>
+                  {INDEPENDENCE_LABEL[lang] || INDEPENDENCE_LABEL.IT}
+                </div>
+              </motion.div>
+              <motion.div
+                className="absolute inset-x-0 h-[1px] pointer-events-none"
+                style={{ background: "rgba(184,115,51,0.8)", top: "50%" }}
+                initial={{ scaleX: 0 }}
+                animate={{ scaleX: [0, 1, 0], y: [0, -4, 4, -2, 0] }}
+                transition={{ duration: 1.2, ease: "easeOut" }}
+              />
+            </>
+          )}
+        </div>
         
         <div className="relative w-full">
           {isPulsing && isDark && (

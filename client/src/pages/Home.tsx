@@ -97,7 +97,8 @@ export default function Home() {
   const [currentQuestion, setCurrentQuestion] = useState<QuestionId>(1);
   const [circuitReveal, setCircuitReveal] = useState(() => hasWalletRestore.current ? 100 : 0);
   const [totalSats, setTotalSats] = useState(() => hasWalletRestore.current ? 1000 : 0);
-  const [progress, setProgress] = useState(() => hasWalletRestore.current ? 27 : 0);
+  const [progress, setProgress] = useState(() => hasWalletRestore.current ? 100 : 0);
+  const [labelMode, setLabelMode] = useState<"initiation" | "independence">(() => hasWalletRestore.current ? "independence" : "initiation");
   const [shakeScreen, setShakeScreen] = useState(false);
   const [showError, setShowError] = useState(false);
   const [terminalKey, setTerminalKey] = useState(0);
@@ -119,7 +120,11 @@ export default function Home() {
   });
   const { grantSkill, pendingSkill, dismissPopup } = useGrantSkill();
   const handleSatsUpdate = useCallback((sats: number) => setTotalSats(Math.min(sats, 1000)), []);
-  const handleProgressUpdate = useCallback((p: number) => setProgress(Math.min(p, 27)), []);
+  const handleProgressUpdate = useCallback((p: number) => setProgress(Math.min(p, 100)), []);
+  const handleLabelSwitch = useCallback(() => {
+    setLabelMode("independence");
+    setProgress(11);
+  }, []);
   const isAnsweringRef = useRef(false);
   const mountedRef = useRef(true);
   const pendingTimeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
@@ -471,7 +476,7 @@ export default function Home() {
           </AnimatePresence>
         </div>
 
-        <IndependenceBar progress={progress} phase="phase_1" showBackground={currentQuestion > 1} lang={lang} />
+        <IndependenceBar progress={progress} phase="phase_1" showBackground={currentQuestion > 1} lang={lang} labelMode={labelMode} />
       </motion.div>
     );
   }
@@ -505,7 +510,7 @@ export default function Home() {
           </p>
         </motion.div>
 
-        <IndependenceBar progress={progress} phase="phase_1" showBackground={true} lang={lang} />
+        <IndependenceBar progress={progress} phase="phase_1" showBackground={true} lang={lang} labelMode={labelMode} />
       </div>
     );
   }
@@ -527,11 +532,12 @@ export default function Home() {
             levelUpSkill={pendingSkill}
             onDismissLevelUp={dismissPopup}
             lang={lang}
+            onLabelSwitch={handleLabelSwitch}
           />
         </div>
         
         <div className="flex-shrink-0">
-          <IndependenceBar progress={progress} phase="phase_2" showBackground={false} lang={lang} />
+          <IndependenceBar progress={progress} phase="phase_2" showBackground={false} lang={lang} labelMode={labelMode} />
         </div>
       </div>
     );

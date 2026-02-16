@@ -24,6 +24,7 @@ interface TerminalChatProps {
   levelUpSkill?: SkillKey | null;
   onDismissLevelUp?: () => void;
   lang?: string;
+  onLabelSwitch?: () => void;
 }
 
 const PixelSendIcon = () => (
@@ -284,7 +285,7 @@ function loadTerminalProgress(): { blockIndex: number; sats: number; progress: n
 let msgIdCounter = 0;
 function nextMsgId() { return ++msgIdCounter; }
 
-export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats, skipFirstTypewriter, userStats, userToken, onGrantSkill, levelUpSkill, onDismissLevelUp, lang = "IT" }: TerminalChatProps) {
+export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats, skipFirstTypewriter, userStats, userToken, onGrantSkill, levelUpSkill, onDismissLevelUp, lang = "IT", onLabelSwitch }: TerminalChatProps) {
   const LEARNING_BLOCKS_LOCAL = getLearningBlocks(lang);
   const WALLET_STEPS_LOCAL = getWalletSteps(lang);
   const SATOSHI_WISDOM_LOCAL = getSatoshiWisdom(lang);
@@ -530,6 +531,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
       internalSatsRef.current = saved.sats;
       onSatsUpdateRef.current(saved.sats);
       onProgressUpdateRef.current(saved.progress);
+      if (onLabelSwitch) onLabelSwitch();
       startBlock(saved.blockIndex, true);
     } else {
       startBlock(0, shouldSkip);
@@ -554,8 +556,12 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
       onSatsUpdate(internalSatsRef.current);
       showNotification(block.reward);
       try { playSatsChime(); } catch (_) {}
+
+      if (blockIndex === 0 && onLabelSwitch) {
+        safeTimeout(() => onLabelSwitch(), 1500);
+      }
     }
-    const newProgress = Math.min(block.progress_target, 27);
+    const newProgress = Math.min(block.progress_target, 100);
     onProgressUpdate(newProgress);
 
     if (block.grantSkillKey && onGrantSkill) {
@@ -569,7 +575,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
       sats: internalSatsRef.current,
       progress: newProgress,
     });
-  }, [onSatsUpdate, onProgressUpdate, showNotification, onGrantSkill, safeTimeout]);
+  }, [onSatsUpdate, onProgressUpdate, showNotification, onGrantSkill, safeTimeout, onLabelSwitch]);
 
   const startWalletStep = useCallback((stepId: string) => {
     const step = WALLET_STEPS_LOCAL.find(s => s.id === stepId);
@@ -608,9 +614,10 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
       restoredWalletRef.current = null;
       if (restored.sats) onSatsUpdate(restored.sats);
       if (restored.progress) onProgressUpdate(restored.progress);
+      if (onLabelSwitch) onLabelSwitch();
       startWalletStep(restored.stepId);
     }
-  }, [startWalletStep, onSatsUpdate, onProgressUpdate]);
+  }, [startWalletStep, onSatsUpdate, onProgressUpdate, onLabelSwitch]);
 
   const handleWalletButtonClick = useCallback((button: WalletStepButton) => {
     if (isLockedRef.current || isTyping) return;
