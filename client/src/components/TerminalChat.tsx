@@ -316,6 +316,9 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
   const [walletMode, setWalletMode] = useState(() => savedState.current?.walletMode ?? false);
   const [currentWalletStepId, setCurrentWalletStepId] = useState<string | null>(() => savedState.current?.stepId ?? null);
   const [walletButtons, setWalletButtons] = useState<WalletStepButton[]>([]);
+  const [satsClaimed, setSatsClaimed] = useState(() => {
+    try { return localStorage.getItem("liberta_sats_claimed") === "1"; } catch (_) { return false; }
+  });
   const [showTroubleshooting, setShowTroubleshooting] = useState(false);
   const [flowCompleted, setFlowCompleted] = useState(false);
   const [showCelebration, setShowCelebration] = useState(false);
@@ -595,8 +598,8 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     setCurrentOptions([]);
     isLockedRef.current = true;
 
-    saveWalletState({ walletMode: true, stepId, blockIndex: 7, sats: internalSatsRef.current, progress: 27 });
-    saveTerminalProgress({ blockIndex: 7, sats: internalSatsRef.current, progress: 27, walletMode: true, walletStepId: stepId });
+    saveWalletState({ walletMode: true, stepId, blockIndex: 7, sats: internalSatsRef.current, progress: 11 });
+    saveTerminalProgress({ blockIndex: 7, sats: internalSatsRef.current, progress: 11, walletMode: true, walletStepId: stepId });
 
     try { playTransition(); } catch (_) {}
 
@@ -618,11 +621,10 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     if (restored && restored.walletMode && restored.stepId) {
       restoredWalletRef.current = null;
       if (restored.sats) onSatsUpdate(restored.sats);
-      if (restored.progress) onProgressUpdate(restored.progress);
       if (onLabelSwitch) onLabelSwitch();
       startWalletStep(restored.stepId);
     }
-  }, [startWalletStep, onSatsUpdate, onProgressUpdate, onLabelSwitch]);
+  }, [startWalletStep, onSatsUpdate, onLabelSwitch]);
 
   const handleWalletButtonClick = useCallback((button: WalletStepButton) => {
     if (isLockedRef.current || isTyping) return;
@@ -635,6 +637,8 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
 
     if (button.type === "deeplink" && button.url) {
       isLockedRef.current = true;
+      setSatsClaimed(true);
+      try { localStorage.setItem("liberta_sats_claimed", "1"); } catch (_) {}
       setWalletButtons([]);
       setMessages(prev => [...prev, { id: nextMsgId(), text: button.text, sender: "user" }]);
 
@@ -1100,8 +1104,62 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
           </div>
         )}
 
+        {satsClaimed && walletMode && !flowCompleted && !isTyping && walletButtons.length === 0 && (
+          <div className="flex flex-col gap-2 pt-1">
+            <motion.button
+              type="button"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              disabled
+              className="w-full px-4 py-3 text-left text-[13px] font-mono font-bold tracking-wide
+                       border-2 border-[#FFD700]/30 bg-[#FFD700]/5 text-[#FFD700]/40
+                       cursor-not-allowed opacity-50"
+              data-testid="button-sats-claimed-persistent"
+            >
+              <span className="mr-2 text-[#FFD700]/20">{">>>"}</span>
+              {(uiTexts as any).satsClaimedButton || "SATS CLAIMED"}
+            </motion.button>
+          </div>
+        )}
+
         {flowCompleted && !isTyping && (
           <div className="pt-3 space-y-2">
+            <motion.button
+              type="button"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3 }}
+              onClick={(e) => {
+                e.preventDefault(); e.stopPropagation();
+                const lnurl = "lightning:LNURL1DP68GURN8GHJ7ET4WP5X7UNFVDEKZUNYD9HX2UEJ9EKXUCNFW3EJUCM0D5HHW6T5DPJ8YCTH9ASHQ6F0WCCJ7MRWW4EXCT6P0PZKYUJP8YE8SNPKWQMRVA23DPD8SERCVC2YC4CH";
+                if (!satsClaimed) {
+                  setSatsClaimed(true);
+                  try { localStorage.setItem("liberta_sats_claimed", "1"); } catch (_) {}
+                }
+                try {
+                  const iframe = document.createElement("iframe");
+                  iframe.style.cssText = "position:fixed;top:-9999px;left:-9999px;width:0;height:0;border:none;opacity:0;pointer-events:none;";
+                  document.body.appendChild(iframe);
+                  try { iframe.contentWindow?.location.replace(lnurl); } catch (_) { iframe.src = lnurl; }
+                  setTimeout(() => { try { document.body.removeChild(iframe); } catch (_) {} }, 3000);
+                } catch (_) {}
+              }}
+              disabled={satsClaimed}
+              className={`w-full px-4 py-3 text-left text-[13px] font-mono font-bold tracking-wide
+                       border-2 transition-all duration-200
+                       ${satsClaimed
+                         ? "border-[#FFD700]/30 bg-[#FFD700]/5 text-[#FFD700]/40 cursor-not-allowed opacity-50"
+                         : "border-[#FFD700]/50 bg-[#FFD700]/10 text-[#FFD700] hover:bg-[#FFD700]/20 hover:border-[#FFD700]"
+                       }`}
+              data-testid="button-sats-claim-persistent"
+            >
+              <span className={`mr-2 ${satsClaimed ? "text-[#FFD700]/20" : "text-[#FFD700]/40"}`}>{">>>"}</span>
+              {satsClaimed
+                ? ((uiTexts as any).satsClaimedButton || "SATS CLAIMED")
+                : ((uiTexts as any).receiveAgainButton || "RECEIVE 1000 SATS")
+              }
+            </motion.button>
+
             <motion.button
               type="button"
               initial={{ opacity: 0 }}

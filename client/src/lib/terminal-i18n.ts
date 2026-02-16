@@ -219,6 +219,8 @@ export const UI_TEXTS = {
     installInstructionsFallback: "Add this site to home screen through browser menu",
     founderNostr: "FOUNDER ON NOSTR",
     inputPlaceholder: "Enter answer...",
+    satsClaimedButton: "SATS CLAIMED",
+    receiveAgainButton: "RECEIVE 1000 SATS AGAIN",
   },
   IT: {
     skillNotification: "+SKILL",
@@ -236,6 +238,8 @@ export const UI_TEXTS = {
     installInstructionsFallback: "Aggiungi questo sito alla schermata home attraverso il menu del browser",
     founderNostr: "FOUNDER SU NOSTR",
     inputPlaceholder: "Inserisci risposta...",
+    satsClaimedButton: "SATS RICEVUTI",
+    receiveAgainButton: "RICEVI 1000 SATS DI NUOVO",
   },
 };
 

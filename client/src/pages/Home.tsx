@@ -112,7 +112,12 @@ export default function Home() {
   });
   const { grantSkill, pendingSkill, dismissPopup } = useGrantSkill();
   const handleSatsUpdate = useCallback((sats: number) => setTotalSats(Math.min(sats, 1000)), []);
-  const handleProgressUpdate = useCallback((p: number) => setProgress(Math.min(p, 100)), []);
+  const labelModeRef = useRef(labelMode);
+  labelModeRef.current = labelMode;
+  const handleProgressUpdate = useCallback((p: number) => {
+    if (labelModeRef.current === "independence") return;
+    setProgress(Math.min(p, 100));
+  }, []);
   const handleLabelSwitch = useCallback(() => {
     setLabelMode("independence");
     setProgress(11);

@@ -309,7 +309,9 @@
     "installInstructionsAndroid": "Нажми меню (три точки вверху справа), затем выбери «Установить приложение» или «Добавить на главный экран»",
     "installInstructionsFallback": "Добавь этот сайт на главный экран через меню браузера",
     "founderNostr": "ФАУНДЕР В NOSTR",
-    "inputPlaceholder": "Введи ответ..."
+    "inputPlaceholder": "Введи ответ...",
+    "satsClaimedButton": "SATS ПОЛУЧЕНЫ",
+    "receiveAgainButton": "ПОЛУЧИТЬ 1000 SATS СНОВА"
   },
 
   "satoshi_wisdom": [
