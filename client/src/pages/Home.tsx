@@ -29,7 +29,7 @@ function isInStandaloneMode(): boolean {
   );
 }
 
-type Phase = "boot" | "loading" | "phase_1" | "phase_1_complete" | "phase_2";
+type Phase = "boot" | "loading" | "phase_1" | "phase_1_complete" | "chip_exit" | "phase_2";
 type QuestionId = 1 | 2 | 3 | 4;
 
 const PROGRESS_PER_QUESTION = [5, 10, 15, 20];
@@ -315,7 +315,7 @@ export default function Home() {
       setTotalSats(200);
       try { localStorage.removeItem("liberta_terminal_progress"); } catch (_) {}
       setTerminalKey(prev => prev + 1);
-      setPhase("phase_2");
+      setPhase("chip_exit");
     }
   };
 
@@ -511,6 +511,59 @@ export default function Home() {
         </motion.div>
 
         <IndependenceBar progress={progress} phase="phase_1" showBackground={true} lang={lang} labelMode={labelMode} />
+      </div>
+    );
+  }
+
+  useEffect(() => {
+    if (phase === "chip_exit") {
+      const fallback = setTimeout(() => setPhase("phase_2"), 1200);
+      return () => clearTimeout(fallback);
+    }
+  }, [phase]);
+
+  if (phase === "chip_exit") {
+    return (
+      <div className="fixed inset-0 bg-[#F5F5F5] overflow-hidden flex flex-col items-center justify-center"
+        style={{ perspective: "800px" }}
+      >
+        <div 
+          className="fixed inset-0"
+          style={{
+            background: "linear-gradient(135deg, #F9F9F9 0%, #E6E6E6 50%, #F4F4F4 100%)"
+          }}
+        />
+        <motion.div
+          className="relative z-10"
+          initial={{ scale: 1, rotateX: 0, y: 0, opacity: 1 }}
+          animate={{ 
+            scale: [1, 1.3, 2.5, 4],
+            rotateX: [0, -15, -35, -55],
+            y: [0, -20, 40, 200],
+            opacity: [1, 1, 0.8, 0],
+          }}
+          transition={{ 
+            duration: 0.9,
+            ease: [0.25, 0.1, 0.25, 1],
+            times: [0, 0.3, 0.6, 1],
+          }}
+          onAnimationComplete={() => setPhase("phase_2")}
+          style={{ transformStyle: "preserve-3d" }}
+        >
+          <BiometricCircuit 
+            revealProgress={100}
+            isComplete={true}
+            skipTraceAnimation={true}
+          />
+        </motion.div>
+
+        <motion.div
+          className="fixed inset-0 z-20 pointer-events-none"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 0, 0.6, 1] }}
+          transition={{ duration: 0.9, times: [0, 0.4, 0.7, 1] }}
+          style={{ background: "#0A0A0A" }}
+        />
       </div>
     );
   }

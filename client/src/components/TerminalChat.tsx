@@ -924,8 +924,17 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
                   "drop-shadow(0 0 8px rgba(0,229,255,0.8))",
                   "drop-shadow(0 0 0px transparent)",
                 ],
-              } : {}}
-              transition={iconBlinking ? { duration: 2.4, ease: "easeInOut" } : {}}
+              } : {
+                opacity: [0.5, 0.5, 0.85, 0.5, 0.5],
+                filter: [
+                  "drop-shadow(0 0 0px transparent)",
+                  "drop-shadow(0 0 0px transparent)",
+                  "drop-shadow(0 0 6px rgba(184,115,51,0.7))",
+                  "drop-shadow(0 0 0px transparent)",
+                  "drop-shadow(0 0 0px transparent)",
+                ],
+              }}
+              transition={iconBlinking ? { duration: 2.4, ease: "easeInOut" } : { duration: 4, repeat: Infinity, ease: "easeInOut", times: [0, 0.35, 0.5, 0.65, 1] }}
               data-testid="button-profile-avatar"
             >
               <EyeOff
