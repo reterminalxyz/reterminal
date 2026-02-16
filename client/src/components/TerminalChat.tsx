@@ -531,7 +531,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
       internalSatsRef.current = saved.sats;
       onSatsUpdateRef.current(saved.sats);
       onProgressUpdateRef.current(saved.progress);
-      if (saved.blockIndex > 6 && onLabelSwitch) onLabelSwitch();
+      if (saved.blockIndex > 7 && onLabelSwitch) onLabelSwitch();
       startBlock(saved.blockIndex, true);
     } else {
       startBlock(0, shouldSkip);
@@ -556,13 +556,13 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
       onSatsUpdate(internalSatsRef.current);
       showNotification(block.reward);
       try { playSatsChime(); } catch (_) {}
-
-      if (blockIndex === 6 && onLabelSwitch) {
-        safeTimeout(() => onLabelSwitch(), 1500);
-      }
     }
     const newProgress = Math.min(block.progress_target, 100);
     onProgressUpdate(newProgress);
+
+    if (blockIndex === 7 && onLabelSwitch) {
+      safeTimeout(() => onLabelSwitch(), 1500);
+    }
 
     if (block.grantSkillKey && onGrantSkill) {
       const skillKey = block.grantSkillKey;
