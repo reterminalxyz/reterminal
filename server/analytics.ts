@@ -173,7 +173,7 @@ export function renderLoginHTML(error?: boolean): string {
 </html>`;
 }
 
-export function renderDashboardHTML(): string {
+export function renderDashboardHTML(token: string): string {
   const funnel = getFunnelStats();
   const funnelMap = new Map(funnel.map(f => [f.event_name, f.unique_users]));
   const totalUsers = getTotalUniqueUsers();
@@ -361,7 +361,7 @@ export function renderDashboardHTML(): string {
 <body>
   <div class="header-row">
     <h1>RE_CHAIN Analytics</h1>
-    <a href="/api/stats/logout" class="logout-btn">Logout</a>
+    <a href="/api/stats" class="logout-btn">Logout</a>
   </div>
   <div class="subtitle">Funnel Dashboard \u2014 Unique users per step</div>
 
@@ -418,7 +418,7 @@ export function renderDashboardHTML(): string {
   ` : ''}
 
   <div class="footer">
-    <form method="POST" action="/api/stats/reset" style="display:inline" onsubmit="return confirm('Reset all analytics data?')">
+    <form method="POST" action="/api/stats/reset?t=${token}" style="display:inline" onsubmit="return confirm('Reset all analytics data?')">
       <button type="submit" class="reset-btn">Reset Data</button>
     </form>
   </div>

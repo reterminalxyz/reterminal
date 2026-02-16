@@ -181,12 +181,13 @@ export async function registerRoutes(
     }
   });
 
-  const isStatsAuthed = (req: any): boolean => req.cookies?.stats_auth === "1";
+  const statsToken = randomBytes(16).toString("hex");
+
+  const isStatsAuthed = (req: any): boolean => req.query.t === statsToken;
 
   app.post("/api/stats/login", async (req, res) => {
     if (req.body?.pwd === ANALYTICS_PASSWORD) {
-      res.cookie("stats_auth", "1", { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, sameSite: "strict" });
-      return res.redirect("/api/stats");
+      return res.redirect(`/api/stats?t=${statsToken}`);
     }
     res.type("html").send(renderLoginHTML(true));
   });
@@ -196,7 +197,7 @@ export async function registerRoutes(
       if (!isStatsAuthed(req)) {
         return res.type("html").send(renderLoginHTML());
       }
-      const html = renderDashboardHTML();
+      const html = renderDashboardHTML(statsToken);
       res.type("html").send(html);
     } catch (err: any) {
       console.error("[analytics] stats error:", err.message);
@@ -220,16 +221,11 @@ export async function registerRoutes(
   });
 
   app.post("/api/stats/reset", async (req, res) => {
-    if (!isStatsAuthed(req)) {
+    if (req.query.t !== statsToken) {
       return res.status(401).json({ message: "Unauthorized" });
     }
     resetEvents();
-    res.redirect("/api/stats");
-  });
-
-  app.get("/api/stats/logout", async (_req, res) => {
-    res.clearCookie("stats_auth");
-    res.redirect("/api/stats");
+    res.redirect(`/api/stats?t=${statsToken}`);
   });
 
   return httpServer;
