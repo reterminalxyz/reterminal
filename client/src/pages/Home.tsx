@@ -509,7 +509,7 @@ export default function Home() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1 }}
+          transition={{ delay: 0.3 }}
           className="absolute bottom-36 left-0 right-0 flex justify-center z-10"
         >
           <motion.div
