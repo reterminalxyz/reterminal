@@ -507,13 +507,13 @@ export default function Home() {
         <BackButton onClick={handleBack} isDark={false} />
         
         <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 1, duration: 0.5 }}
-          className="absolute bottom-36 left-1/2 -translate-x-1/2 text-center z-10"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1 }}
+          className="absolute bottom-36 left-0 right-0 flex justify-center z-10"
         >
           <motion.div
-            className="relative px-6 py-3 border-2 border-[#B87333]/40"
+            className="px-6 py-3 border-2 border-[#B87333]/40"
             style={{ background: "rgba(245,245,245,0.92)" }}
             animate={{
               boxShadow: [
@@ -526,7 +526,6 @@ export default function Home() {
                 "rgba(184,115,51,0.8)",
                 "rgba(184,115,51,0.4)",
               ],
-              scale: [1, 1.03, 1],
             }}
             transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
           >
@@ -556,7 +555,7 @@ export default function Home() {
   if (phase === "chip_exit") {
     return (
       <div className="fixed inset-0 bg-[#F5F5F5] overflow-hidden flex flex-col items-center justify-center"
-        style={{ perspective: "1200px" }}
+        style={{ perspective: "800px" }}
       >
         <div 
           className="fixed inset-0"
@@ -565,42 +564,34 @@ export default function Home() {
           }}
         />
         <motion.div
-          className="relative z-10 w-full h-full"
-          initial={{ rotateX: 0, opacity: 1 }}
+          className="relative z-10"
+          initial={{ scale: 1, rotateX: 0, y: 0, opacity: 1 }}
           animate={{ 
-            rotateX: [0, -25, -70, -95],
-            opacity: [1, 1, 0.85, 0],
+            scale: [1, 1.3, 2.5, 4],
+            rotateX: [0, -15, -35, -55],
+            y: [0, -20, 40, 200],
+            opacity: [1, 1, 0.8, 0],
           }}
           transition={{ 
-            duration: 1.1,
-            ease: [0.4, 0.0, 0.2, 1],
-            times: [0, 0.25, 0.65, 1],
+            duration: 0.9,
+            ease: [0.25, 0.1, 0.25, 1],
+            times: [0, 0.3, 0.6, 1],
           }}
           onAnimationComplete={() => setPhase("phase_2")}
-          style={{ transformOrigin: "top center", transformStyle: "preserve-3d" }}
+          style={{ transformStyle: "preserve-3d" }}
         >
           <BiometricCircuit 
             revealProgress={100}
             isComplete={true}
             skipTraceAnimation={true}
           />
-          <motion.div
-            className="absolute bottom-0 left-0 right-0 pointer-events-none"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: [0, 0.3, 0.7] }}
-            transition={{ duration: 1.1, times: [0, 0.4, 1] }}
-            style={{ 
-              height: "60%",
-              background: "linear-gradient(to top, rgba(0,0,0,0.5) 0%, transparent 100%)",
-            }}
-          />
         </motion.div>
 
         <motion.div
           className="fixed inset-0 z-20 pointer-events-none"
           initial={{ opacity: 0 }}
-          animate={{ opacity: [0, 0, 0.5, 1] }}
-          transition={{ duration: 1.1, times: [0, 0.35, 0.7, 1] }}
+          animate={{ opacity: [0, 0, 0.6, 1] }}
+          transition={{ duration: 0.9, times: [0, 0.4, 0.7, 1] }}
           style={{ background: "#0A0A0A" }}
         />
       </div>
