@@ -22,6 +22,18 @@ function getOrCreateToken(): string {
   return token;
 }
 
+function trackEvent(eventName: string): void {
+  try {
+    const sessionId = getOrCreateToken();
+    fetch('/api/track', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ session_id: sessionId, event_name: eventName }),
+      keepalive: true,
+    }).catch(() => {});
+  } catch (_) {}
+}
+
 function isInStandaloneMode(): boolean {
   return (
     ("standalone" in window.navigator && (window.navigator as any).standalone) ||
@@ -148,6 +160,7 @@ export default function Home() {
   }, [phase]);
 
   useEffect(() => {
+    trackEvent('page_view');
     const token = getOrCreateToken();
     fetch('/api/sync-user', {
       method: 'POST',
@@ -245,6 +258,7 @@ export default function Home() {
     
     if (isCorrect) {
       playClick();
+      trackEvent('level_passed');
       setAnsweredQuestions(prev => new Set(prev).add(questionId));
       
       const newProgress = PROGRESS_PER_QUESTION[answeredQuestions.size];
