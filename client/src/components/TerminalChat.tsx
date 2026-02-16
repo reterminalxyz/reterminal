@@ -531,7 +531,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
       internalSatsRef.current = saved.sats;
       onSatsUpdateRef.current(saved.sats);
       onProgressUpdateRef.current(saved.progress);
-      if (onLabelSwitch) onLabelSwitch();
+      if (saved.blockIndex > 6 && onLabelSwitch) onLabelSwitch();
       startBlock(saved.blockIndex, true);
     } else {
       startBlock(0, shouldSkip);
@@ -557,7 +557,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
       showNotification(block.reward);
       try { playSatsChime(); } catch (_) {}
 
-      if (blockIndex === 0 && onLabelSwitch) {
+      if (blockIndex === 6 && onLabelSwitch) {
         safeTimeout(() => onLabelSwitch(), 1500);
       }
     }

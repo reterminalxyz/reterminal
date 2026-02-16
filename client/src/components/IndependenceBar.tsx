@@ -41,7 +41,7 @@ export function IndependenceBar({ progress, phase, showBackground = false, lang 
   useEffect(() => {
     if (prevLabelModeRef.current === "initiation" && labelMode === "independence") {
       setShowGlitch(true);
-      const timer = setTimeout(() => setShowGlitch(false), 2400);
+      const timer = setTimeout(() => setShowGlitch(false), 3500);
       return () => clearTimeout(timer);
     }
     prevLabelModeRef.current = labelMode;
@@ -56,6 +56,31 @@ export function IndependenceBar({ progress, phase, showBackground = false, lang 
       className={`${isDark ? 'relative' : 'fixed bottom-0 left-0 right-0'} z-40 px-4 pt-3 ${isDark ? 'bg-[#0A0A0A] border-t-2 border-[#B87333]/40' : ''}`}
       style={{ paddingBottom: `max(16px, env(safe-area-inset-bottom))` }}
     >
+      {showGlitch && (
+        <motion.div
+          className="fixed inset-0 z-[9999] pointer-events-none"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 0.6, 0, 0.3, 0.8, 0, 0.4, 0] }}
+          transition={{ duration: 2.0, times: [0, 0.05, 0.12, 0.18, 0.25, 0.35, 0.5, 0.7] }}
+        >
+          <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at center, rgba(184,115,51,0.4) 0%, rgba(0,229,255,0.15) 40%, transparent 70%)" }} />
+          {Array.from({ length: 8 }).map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute left-0 right-0"
+              style={{
+                height: "2px",
+                background: i % 2 === 0 ? "rgba(0,229,255,0.6)" : "rgba(184,115,51,0.5)",
+                top: `${10 + i * 12}%`,
+              }}
+              initial={{ scaleX: 0, x: i % 2 === 0 ? "-100%" : "100%" }}
+              animate={{ scaleX: [0, 1, 1, 0], x: i % 2 === 0 ? ["-50%", "0%", "0%", "50%"] : ["50%", "0%", "0%", "-50%"] }}
+              transition={{ duration: 1.5, delay: 0.1 * i, ease: "easeOut" }}
+            />
+          ))}
+        </motion.div>
+      )}
+
       <motion.div 
         className="flex flex-col items-center gap-2 max-w-md mx-auto"
         animate={phase === "phase_2" ? { opacity: [0.85, 1, 0.85] } : {}}
@@ -65,11 +90,15 @@ export function IndependenceBar({ progress, phase, showBackground = false, lang 
           <AnimatePresence mode="wait">
             <motion.span
               key={labelMode}
-              className="text-[12px] tracking-[5px] font-bold text-[#B87333] block"
-              initial={labelMode === "independence" ? { opacity: 0 } : { opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
+              className={`text-[12px] tracking-[5px] font-bold block ${showGlitch && labelMode === "independence" ? 'text-[#00e5ff]' : 'text-[#B87333]'}`}
+              initial={{ opacity: 0, y: labelMode === "independence" ? 8 : 0 }}
+              animate={{ 
+                opacity: 1, 
+                y: 0,
+                color: showGlitch && labelMode === "independence" ? ["#00e5ff", "#ff4444", "#B87333", "#00e5ff", "#B87333"] : "#B87333"
+              }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: showGlitch ? 1.8 : 0.3 }}
             >
               {currentLabel}
             </motion.span>
@@ -78,33 +107,47 @@ export function IndependenceBar({ progress, phase, showBackground = false, lang 
           {showGlitch && (
             <>
               <motion.div
-                className="absolute inset-0 pointer-events-none overflow-hidden"
+                className="absolute pointer-events-none overflow-hidden"
+                style={{ inset: "-8px -20px" }}
                 initial={{ opacity: 0 }}
-                animate={{ opacity: [0, 1, 0, 1, 0, 0.7, 0, 1, 0] }}
-                transition={{ duration: 1.6, times: [0, 0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 1] }}
+                animate={{ opacity: [0, 1, 0, 1, 0, 1, 0, 0.7, 0, 1, 0.5, 0] }}
+                transition={{ duration: 2.5, times: [0, 0.04, 0.08, 0.12, 0.16, 0.22, 0.28, 0.36, 0.44, 0.55, 0.7, 1] }}
               >
-                <div className="text-[12px] tracking-[5px] font-bold text-[#00e5ff] absolute inset-0 flex items-center justify-center"
-                  style={{ transform: "translateX(2px)", mixBlendMode: "screen" }}>
+                <div className="text-[14px] tracking-[5px] font-bold text-[#00e5ff] absolute inset-0 flex items-center justify-center"
+                  style={{ transform: "translateX(4px) translateY(-2px)", mixBlendMode: "screen", textShadow: "0 0 10px rgba(0,229,255,0.8), 0 0 30px rgba(0,229,255,0.4)" }}>
                   {INDEPENDENCE_LABEL[lang] || INDEPENDENCE_LABEL.IT}
                 </div>
               </motion.div>
               <motion.div
-                className="absolute inset-0 pointer-events-none overflow-hidden"
+                className="absolute pointer-events-none overflow-hidden"
+                style={{ inset: "-8px -20px" }}
                 initial={{ opacity: 0 }}
-                animate={{ opacity: [0, 0.8, 0, 0.6, 0, 1, 0] }}
-                transition={{ duration: 1.6, times: [0, 0.08, 0.15, 0.25, 0.35, 0.45, 1], delay: 0.1 }}
+                animate={{ opacity: [0, 0.8, 0, 0.6, 0, 1, 0, 0.9, 0] }}
+                transition={{ duration: 2.5, times: [0, 0.06, 0.12, 0.2, 0.28, 0.38, 0.5, 0.62, 1], delay: 0.08 }}
               >
-                <div className="text-[12px] tracking-[5px] font-bold text-[#ff4444] absolute inset-0 flex items-center justify-center"
-                  style={{ transform: "translateX(-2px)", mixBlendMode: "screen" }}>
+                <div className="text-[14px] tracking-[5px] font-bold text-[#ff4444] absolute inset-0 flex items-center justify-center"
+                  style={{ transform: "translateX(-4px) translateY(2px)", mixBlendMode: "screen", textShadow: "0 0 10px rgba(255,68,68,0.8), 0 0 30px rgba(255,68,68,0.4)" }}>
                   {INDEPENDENCE_LABEL[lang] || INDEPENDENCE_LABEL.IT}
                 </div>
               </motion.div>
               <motion.div
-                className="absolute inset-x-0 h-[1px] pointer-events-none"
-                style={{ background: "rgba(184,115,51,0.8)", top: "50%" }}
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: [0, 1, 0], y: [0, -4, 4, -2, 0] }}
-                transition={{ duration: 1.2, ease: "easeOut" }}
+                className="absolute pointer-events-none overflow-hidden"
+                style={{ inset: "-8px -20px" }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: [0, 0, 0.6, 0, 0.8, 0, 0.5, 0] }}
+                transition={{ duration: 2.5, times: [0, 0.15, 0.25, 0.35, 0.45, 0.6, 0.75, 1], delay: 0.15 }}
+              >
+                <div className="text-[14px] tracking-[5px] font-bold text-[#B87333] absolute inset-0 flex items-center justify-center"
+                  style={{ transform: "translateX(2px) translateY(3px) skewX(-3deg)", mixBlendMode: "screen", textShadow: "0 0 15px rgba(184,115,51,1), 0 0 40px rgba(184,115,51,0.6)" }}>
+                  {INDEPENDENCE_LABEL[lang] || INDEPENDENCE_LABEL.IT}
+                </div>
+              </motion.div>
+              <motion.div
+                className="absolute left-0 right-0 h-[2px] pointer-events-none"
+                style={{ background: "linear-gradient(90deg, transparent, rgba(184,115,51,1), rgba(0,229,255,0.8), rgba(184,115,51,1), transparent)", top: "50%" }}
+                initial={{ scaleX: 0, opacity: 0 }}
+                animate={{ scaleX: [0, 1.2, 0.8, 1, 0], opacity: [0, 1, 1, 1, 0], y: [0, -6, 8, -3, 0] }}
+                transition={{ duration: 2.0, ease: "easeOut" }}
               />
             </>
           )}
