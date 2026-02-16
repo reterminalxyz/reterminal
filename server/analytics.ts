@@ -21,7 +21,7 @@ try {
   db.exec("ALTER TABLE events ADD COLUMN source TEXT NOT NULL DEFAULT 'web'");
 } catch (_) {}
 
-export const ANALYTICS_PASSWORD = "1209";
+export const ANALYTICS_PASSWORD = "2222";
 
 export function trackEvent(sessionId: string, eventName: string, source: string = "web"): void {
   const s = source === "pwa" ? "pwa" : "web";
