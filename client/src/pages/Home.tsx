@@ -229,6 +229,13 @@ export default function Home() {
     });
   }, [phase, sessionRetry]);
 
+  useEffect(() => {
+    if (phase === "chip_exit") {
+      const fallback = setTimeout(() => setPhase("phase_2"), 1200);
+      return () => clearTimeout(fallback);
+    }
+  }, [phase]);
+
   const handleQuestionAnswer = (questionId: QuestionId, isCorrect: boolean) => {
     if (isAnsweringRef.current) return;
     if (answeredQuestions.has(questionId)) return;
@@ -514,13 +521,6 @@ export default function Home() {
       </div>
     );
   }
-
-  useEffect(() => {
-    if (phase === "chip_exit") {
-      const fallback = setTimeout(() => setPhase("phase_2"), 1200);
-      return () => clearTimeout(fallback);
-    }
-  }, [phase]);
 
   if (phase === "chip_exit") {
     return (
