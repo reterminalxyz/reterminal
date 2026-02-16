@@ -5,7 +5,7 @@ import { api } from "@shared/routes";
 import { z } from "zod";
 import { randomBytes } from "crypto";
 import { SKILL_KEYS } from "@shared/schema";
-import { trackEvent, getStats } from "./analytics";
+import { trackEvent, getStats, getFunnelStats, getTotalUniqueUsers, renderDashboardHTML } from "./analytics";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -178,10 +178,22 @@ export async function registerRoutes(
 
   app.get("/api/stats", async (_req, res) => {
     try {
-      const stats = getStats();
-      res.json(stats);
+      const html = renderDashboardHTML();
+      res.type("html").send(html);
     } catch (err: any) {
       console.error("[analytics] stats error:", err.message);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/stats/json", async (_req, res) => {
+    try {
+      const stats = getStats();
+      const funnel = getFunnelStats();
+      const totalUsers = getTotalUniqueUsers();
+      res.json({ totalUsers, funnel, raw: stats });
+    } catch (err: any) {
+      console.error("[analytics] stats json error:", err.message);
       res.status(500).json({ message: "Internal server error" });
     }
   });

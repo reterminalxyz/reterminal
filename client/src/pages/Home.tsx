@@ -12,27 +12,7 @@ import { useCreateSession, useUpdateSession, useSession } from "@/hooks/use-sess
 import { useGrantSkill } from "@/hooks/use-skills";
 import { Loader2 } from "lucide-react";
 import { playClick, playError, playPhaseComplete, playTransition } from "@/lib/sounds";
-
-function getOrCreateToken(): string {
-  let token = localStorage.getItem('liberta_token');
-  if (!token) {
-    token = crypto.randomUUID();
-    localStorage.setItem('liberta_token', token);
-  }
-  return token;
-}
-
-function trackEvent(eventName: string): void {
-  try {
-    const sessionId = getOrCreateToken();
-    fetch('/api/track', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ session_id: sessionId, event_name: eventName }),
-      keepalive: true,
-    }).catch(() => {});
-  } catch (_) {}
-}
+import { trackEvent, getOrCreateSession } from "@/lib/analytics";
 
 function isInStandaloneMode(): boolean {
   return (
@@ -161,7 +141,7 @@ export default function Home() {
 
   useEffect(() => {
     trackEvent('page_view');
-    const token = getOrCreateToken();
+    const token = getOrCreateSession();
     fetch('/api/sync-user', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -244,6 +224,7 @@ export default function Home() {
 
   useEffect(() => {
     if (phase === "chip_exit") {
+      trackEvent('phase_2_started');
       const fallback = setTimeout(() => setPhase("phase_2"), 1200);
       return () => clearTimeout(fallback);
     }
@@ -258,7 +239,7 @@ export default function Home() {
     
     if (isCorrect) {
       playClick();
-      trackEvent('level_passed');
+      trackEvent(`q${questionId}_passed`);
       setAnsweredQuestions(prev => new Set(prev).add(questionId));
       
       const newProgress = PROGRESS_PER_QUESTION[answeredQuestions.size];

@@ -5,6 +5,7 @@ import { playClick, playTypeTick, playSatsChime, playTransition } from "@/lib/so
 import { SKILL_META, type SkillKey } from "@shared/schema";
 import ProfileOverlay from "./ProfileOverlay";
 import { getLearningBlocks, getWalletSteps, getSatoshiWisdom, getUITexts, type LearningBlock, type WalletStep, type WalletStepButton, type BlockOption } from "@/lib/terminal-i18n";
+import { trackEvent } from "@/lib/analytics";
 
 interface Message {
   id: number;
@@ -746,6 +747,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     }
 
     if (option.action === "next_block") {
+      trackEvent(`block_${currentBlockIndex + 1}_completed`);
       if (option.conditional_text) {
         setBlockPhase("typing_conditional");
         safeTimeout(() => {
@@ -833,6 +835,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     }
 
     if (option.action === "create_wallet") {
+      trackEvent('wallet_started');
       setShowCelebration(true);
       safeTimeout(() => setShowCelebration(false), 4000);
       completeBlock(currentBlockIndex);
