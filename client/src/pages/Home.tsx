@@ -162,10 +162,18 @@ export default function Home() {
       .then(data => {
         setUserStats({ level: data.level, xp: data.xp });
         if (data.totalSats > 0 || data.independenceProgress > 0) {
-          const localProgress = localStorage.getItem("liberta_terminal_progress");
-          if (!localProgress) {
+          const localRaw = localStorage.getItem("liberta_terminal_progress");
+          let localProgress: { blockIndex?: number; sats?: number; timestamp?: number } | null = null;
+          try { if (localRaw) localProgress = JSON.parse(localRaw); } catch (_) {}
+
+          const serverBlockIndex = data.currentStepIndex || 0;
+          const localBlockIndex = localProgress?.blockIndex ?? -1;
+          const serverIsAhead = serverBlockIndex > localBlockIndex;
+          const localIsMissing = !localProgress;
+
+          if (localIsMissing || serverIsAhead) {
             localStorage.setItem("liberta_terminal_progress", JSON.stringify({
-              blockIndex: data.currentStepIndex || 0,
+              blockIndex: serverBlockIndex,
               sats: data.totalSats || 0,
               progress: data.independenceProgress || 0,
               walletMode: data.currentModuleId?.startsWith("wallet_") || false,

@@ -800,22 +800,31 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     }
 
     if (option.action === "restart") {
+      const doRestart = () => {
+        internalSatsRef.current = 200;
+        onSatsUpdate(200);
+        onProgressUpdate(20);
+        setCompletedBlockCount(0);
+        setWalletMode(false);
+        setCurrentWalletStepId(null);
+        setWalletButtons([]);
+        clearWalletState();
+        saveTerminalProgress({ blockIndex: 0, sats: 200, progress: 20 });
+        setMessages([]);
+        startBlock(0);
+      };
       if (option.conditional_text) {
         setBlockPhase("typing_conditional");
         safeTimeout(() => {
           typeMessage(option.conditional_text!, "satoshi", () => {
             isLockedRef.current = false;
-            safeTimeout(() => {
-              setMessages([]);
-              startBlock(0);
-            }, 2000);
+            safeTimeout(doRestart, 2000);
           });
         }, 400);
       } else {
         safeTimeout(() => {
           isLockedRef.current = false;
-          setMessages([]);
-          startBlock(0);
+          doRestart();
         }, 500);
       }
       return;
