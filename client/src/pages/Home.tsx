@@ -80,7 +80,13 @@ function isBootDismissed(): boolean {
 
 export default function Home() {
   const hasWalletRestore = useRef(hasSavedWalletState());
-  const [sessionId, setSessionId] = useState<number | null>(null);
+  const [sessionId, setSessionId] = useState<number | null>(() => {
+    try {
+      const stored = localStorage.getItem("liberta_session_id");
+      if (stored) return parseInt(stored, 10) || null;
+    } catch (_) {}
+    return null;
+  });
   const [phase, setPhase] = useState<Phase>(() => {
     if (hasWalletRestore.current) return "loading";
     if (isInStandaloneMode() || isBootDismissed()) return "loading";
@@ -191,23 +197,45 @@ export default function Home() {
     };
   }, []);
 
-  const { data: session, isLoading: isSessionLoading } = useSession(sessionId);
+  const restoredSessionId = useRef(sessionId);
+  const { data: session, isLoading: isSessionLoading, isError: isSessionError } = useSession(sessionId);
   const createSession = useCreateSession();
   const updateSession = useUpdateSession();
 
   const sessionCreatingRef = useRef(false);
   const [sessionRetry, setSessionRetry] = useState(0);
+  const sessionValidatedRef = useRef(false);
 
   useEffect(() => {
     if (phase === "boot") return;
-    if (sessionId) return;
     if (sessionCreatingRef.current) return;
+
+    if (restoredSessionId.current && !sessionValidatedRef.current) {
+      if (isSessionLoading) return;
+      sessionValidatedRef.current = true;
+      if (session) {
+        if (hasWalletRestore.current) {
+          hasWalletRestore.current = false;
+          setPhase("phase_2");
+        } else if (phase === "loading") {
+          setPhase("phase_1");
+        }
+        return;
+      }
+      restoredSessionId.current = null;
+      try { localStorage.removeItem("liberta_session_id"); } catch (_) {}
+      setSessionId(null);
+      return;
+    }
+
+    if (sessionId) return;
 
     sessionCreatingRef.current = true;
     createSession.mutate({ nodeId: "#RE_CHAIN_" + Math.floor(Math.random() * 9999) }, {
       onSuccess: (data) => {
         sessionCreatingRef.current = false;
         setSessionId(data.id);
+        try { localStorage.setItem("liberta_session_id", String(data.id)); } catch (_) {}
         if (hasWalletRestore.current) {
           hasWalletRestore.current = false;
           setPhase("phase_2");
@@ -225,7 +253,7 @@ export default function Home() {
         }
       }
     });
-  }, [phase, sessionRetry]);
+  }, [phase, sessionRetry, isSessionLoading, session]);
 
   useEffect(() => {
     if (phase === "chip_exit") {
