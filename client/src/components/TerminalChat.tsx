@@ -985,7 +985,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
       <div className="flex-shrink-0 px-4 py-1.5 border-b border-[#B87333]/30 bg-[#0D0D0D]">
         <div className="flex items-center justify-center max-w-[400px] mx-auto">
           <span className="text-[8px] tracking-[2px] text-[#B87333]/25 font-bold" data-testid="text-block-indicator">
-            {uiTexts.moduleLabel} {walletMode ? "" : `${currentBlockIndex + 1}/8`}
+            {uiTexts.moduleLabel} {walletMode ? "" : "1/7"}
           </span>
         </div>
       </div>
