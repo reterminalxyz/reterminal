@@ -5,7 +5,8 @@ import { api } from "@shared/routes";
 import { z } from "zod";
 import { randomBytes } from "crypto";
 import { SKILL_KEYS } from "@shared/schema";
-import { trackEvent, getStats, getFunnelStats, getTotalUniqueUsers, renderDashboardHTML } from "./analytics";
+import { trackEvent, getStats, getFunnelStats, getTotalUniqueUsers, renderDashboardHTML, renderLoginHTML, resetEvents, ANALYTICS_PASSWORD } from "./analytics";
+import cookieParser from "cookie-parser";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -176,8 +177,23 @@ export async function registerRoutes(
     }
   });
 
-  app.get("/api/stats", async (_req, res) => {
+  app.use(cookieParser());
+
+  const isStatsAuthed = (req: any): boolean => req.cookies?.stats_auth === "1";
+
+  app.post("/api/stats/login", async (req, res) => {
+    if (req.body?.pwd === ANALYTICS_PASSWORD) {
+      res.cookie("stats_auth", "1", { httpOnly: true, maxAge: 24 * 60 * 60 * 1000, sameSite: "strict" });
+      return res.redirect("/api/stats");
+    }
+    res.type("html").send(renderLoginHTML(true));
+  });
+
+  app.get("/api/stats", async (req, res) => {
     try {
+      if (!isStatsAuthed(req)) {
+        return res.type("html").send(renderLoginHTML());
+      }
       const html = renderDashboardHTML();
       res.type("html").send(html);
     } catch (err: any) {
@@ -186,8 +202,11 @@ export async function registerRoutes(
     }
   });
 
-  app.get("/api/stats/json", async (_req, res) => {
+  app.get("/api/stats/json", async (req, res) => {
     try {
+      if (!isStatsAuthed(req)) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
       const stats = getStats();
       const funnel = getFunnelStats();
       const totalUsers = getTotalUniqueUsers();
@@ -196,6 +215,19 @@ export async function registerRoutes(
       console.error("[analytics] stats json error:", err.message);
       res.status(500).json({ message: "Internal server error" });
     }
+  });
+
+  app.post("/api/stats/reset", async (req, res) => {
+    if (!isStatsAuthed(req)) {
+      return res.status(401).json({ message: "Unauthorized" });
+    }
+    resetEvents();
+    res.redirect("/api/stats");
+  });
+
+  app.get("/api/stats/logout", async (_req, res) => {
+    res.clearCookie("stats_auth");
+    res.redirect("/api/stats");
   });
 
   return httpServer;
