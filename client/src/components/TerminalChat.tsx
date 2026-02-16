@@ -42,31 +42,37 @@ const PixelSendIcon = () => (
   </svg>
 );
 
-const PixelThumbsUp = ({ size = 24, color = "#FFD700" }: { size?: number; color?: string }) => (
-  <svg width={size} height={size} viewBox="0 0 16 16" fill={color} style={{ imageRendering: 'pixelated' }}>
-    <rect x="5" y="1" width="2" height="2" />
-    <rect x="5" y="3" width="2" height="2" />
-    <rect x="5" y="5" width="2" height="2" />
-    <rect x="3" y="7" width="2" height="2" />
-    <rect x="5" y="7" width="2" height="2" />
-    <rect x="7" y="7" width="2" height="2" />
-    <rect x="9" y="7" width="2" height="2" />
-    <rect x="11" y="7" width="2" height="2" />
-    <rect x="3" y="9" width="2" height="2" />
-    <rect x="5" y="9" width="2" height="2" />
-    <rect x="7" y="9" width="2" height="2" />
-    <rect x="9" y="9" width="2" height="2" />
-    <rect x="11" y="9" width="2" height="2" />
-    <rect x="3" y="11" width="2" height="2" />
-    <rect x="5" y="11" width="2" height="2" />
-    <rect x="7" y="11" width="2" height="2" />
-    <rect x="9" y="11" width="2" height="2" />
-    <rect x="11" y="11" width="2" height="2" />
-    <rect x="3" y="13" width="2" height="2" />
-    <rect x="5" y="13" width="2" height="2" />
-    <rect x="7" y="13" width="2" height="2" />
-    <rect x="9" y="13" width="2" height="2" />
-    <rect x="11" y="13" width="2" height="2" />
+const PixelThumbsUp = ({ size = 40, color = "#FFD700" }: { size?: number; color?: string }) => (
+  <svg width={size} height={size} viewBox="0 0 16 16" fill={color} style={{ imageRendering: 'pixelated', shapeRendering: 'crispEdges' }}>
+    <rect x="6" y="0" width="2" height="2" />
+    <rect x="6" y="2" width="2" height="2" />
+    <rect x="6" y="4" width="2" height="2" />
+    <rect x="4" y="6" width="2" height="2" />
+    <rect x="6" y="6" width="2" height="2" />
+    <rect x="8" y="6" width="2" height="2" />
+    <rect x="10" y="6" width="2" height="2" />
+    <rect x="2" y="8" width="2" height="2" />
+    <rect x="4" y="8" width="2" height="2" />
+    <rect x="6" y="8" width="2" height="2" />
+    <rect x="8" y="8" width="2" height="2" />
+    <rect x="10" y="8" width="2" height="2" />
+    <rect x="12" y="8" width="2" height="2" />
+    <rect x="2" y="10" width="2" height="2" />
+    <rect x="4" y="10" width="2" height="2" />
+    <rect x="6" y="10" width="2" height="2" />
+    <rect x="8" y="10" width="2" height="2" />
+    <rect x="10" y="10" width="2" height="2" />
+    <rect x="12" y="10" width="2" height="2" />
+    <rect x="2" y="12" width="2" height="2" />
+    <rect x="4" y="12" width="2" height="2" />
+    <rect x="6" y="12" width="2" height="2" />
+    <rect x="8" y="12" width="2" height="2" />
+    <rect x="10" y="12" width="2" height="2" />
+    <rect x="12" y="12" width="2" height="2" />
+    <rect x="4" y="14" width="2" height="2" />
+    <rect x="6" y="14" width="2" height="2" />
+    <rect x="8" y="14" width="2" height="2" />
+    <rect x="10" y="14" width="2" height="2" />
   </svg>
 );
 
@@ -75,9 +81,9 @@ const CELEBRATION_PARTICLES = Array.from({ length: 20 }, (_, i) => ({
   x: Math.random() * 100,
   delay: Math.random() * 1.5,
   duration: 2 + Math.random() * 2,
-  size: 18 + Math.floor(Math.random() * 18),
+  size: 28 + Math.floor(Math.random() * 24),
   rotation: -30 + Math.random() * 60,
-  color: ["#FFD700", "#B87333", "#4ADE80", "#FFD700", "#E8A317"][i % 5],
+  color: ["#FFD700", "#E8A317", "#B87333", "#FFD700", "#D4943D"][i % 5],
 }));
 
 const CelebrationOverlay = () => (
@@ -594,8 +600,6 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     try { playTransition(); } catch (_) {}
 
     if (stepId === "step_5") {
-      setShowCelebration(true);
-      safeTimeout(() => setShowCelebration(false), 4000);
       clearWalletState();
     }
 
@@ -829,6 +833,8 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     }
 
     if (option.action === "create_wallet") {
+      setShowCelebration(true);
+      safeTimeout(() => setShowCelebration(false), 4000);
       completeBlock(currentBlockIndex);
       setWalletMode(true);
       safeTimeout(() => {

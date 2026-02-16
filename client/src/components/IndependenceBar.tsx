@@ -41,7 +41,7 @@ export function IndependenceBar({ progress, phase, showBackground = false, lang 
   useEffect(() => {
     if (prevLabelModeRef.current === "initiation" && labelMode === "independence") {
       setShowGlitch(true);
-      const timer = setTimeout(() => setShowGlitch(false), 3500);
+      const timer = setTimeout(() => setShowGlitch(false), 7000);
       return () => clearTimeout(timer);
     }
     prevLabelModeRef.current = labelMode;
@@ -60,10 +60,10 @@ export function IndependenceBar({ progress, phase, showBackground = false, lang 
         <motion.div
           className="fixed inset-0 z-[9999] pointer-events-none"
           initial={{ opacity: 0 }}
-          animate={{ opacity: [0, 0.6, 0, 0.3, 0.8, 0, 0.4, 0] }}
-          transition={{ duration: 2.0, times: [0, 0.05, 0.12, 0.18, 0.25, 0.35, 0.5, 0.7] }}
+          animate={{ opacity: [0, 0.8, 0, 0.5, 1, 0, 0.7, 0, 0.6, 0, 0.9, 0, 0.4, 0] }}
+          transition={{ duration: 5.0, times: [0, 0.03, 0.08, 0.12, 0.16, 0.22, 0.3, 0.38, 0.46, 0.52, 0.58, 0.66, 0.78, 1] }}
         >
-          <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at center, rgba(184,115,51,0.4) 0%, rgba(0,229,255,0.15) 40%, transparent 70%)" }} />
+          <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at center, rgba(184,115,51,0.5) 0%, rgba(0,229,255,0.2) 40%, transparent 70%)" }} />
           {Array.from({ length: 8 }).map((_, i) => (
             <motion.div
               key={i}
@@ -74,8 +74,8 @@ export function IndependenceBar({ progress, phase, showBackground = false, lang 
                 top: `${10 + i * 12}%`,
               }}
               initial={{ scaleX: 0, x: i % 2 === 0 ? "-100%" : "100%" }}
-              animate={{ scaleX: [0, 1, 1, 0], x: i % 2 === 0 ? ["-50%", "0%", "0%", "50%"] : ["50%", "0%", "0%", "-50%"] }}
-              transition={{ duration: 1.5, delay: 0.1 * i, ease: "easeOut" }}
+              animate={{ scaleX: [0, 1, 1, 0, 0, 1, 1, 0], x: i % 2 === 0 ? ["-50%", "0%", "0%", "50%", "-50%", "0%", "0%", "50%"] : ["50%", "0%", "0%", "-50%", "50%", "0%", "0%", "-50%"] }}
+              transition={{ duration: 4.0, delay: 0.08 * i, ease: "easeOut" }}
             />
           ))}
         </motion.div>
@@ -93,12 +93,14 @@ export function IndependenceBar({ progress, phase, showBackground = false, lang 
               className={`text-[12px] tracking-[5px] font-bold block ${showGlitch && labelMode === "independence" ? 'text-[#00e5ff]' : 'text-[#B87333]'}`}
               initial={{ opacity: 0, y: labelMode === "independence" ? 8 : 0 }}
               animate={{ 
-                opacity: 1, 
+                opacity: showGlitch && labelMode === "independence" ? [0, 1, 0.3, 1, 0.2, 1, 0.4, 1, 0.1, 1, 0.5, 1] : 1, 
                 y: 0,
-                color: showGlitch && labelMode === "independence" ? ["#00e5ff", "#ff4444", "#B87333", "#00e5ff", "#B87333"] : "#B87333"
+                color: showGlitch && labelMode === "independence" 
+                  ? ["#00e5ff", "#ff4444", "#B87333", "#00e5ff", "#ff4444", "#B87333", "#00e5ff", "#ff4444", "#B87333", "#00e5ff", "#B87333"] 
+                  : "#B87333"
               }}
               exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: showGlitch ? 1.8 : 0.3 }}
+              transition={{ duration: showGlitch ? 5.0 : 0.3 }}
             >
               {currentLabel}
             </motion.span>
@@ -110,11 +112,11 @@ export function IndependenceBar({ progress, phase, showBackground = false, lang 
                 className="absolute pointer-events-none overflow-hidden"
                 style={{ inset: "-8px -20px" }}
                 initial={{ opacity: 0 }}
-                animate={{ opacity: [0, 1, 0, 1, 0, 1, 0, 0.7, 0, 1, 0.5, 0] }}
-                transition={{ duration: 2.5, times: [0, 0.04, 0.08, 0.12, 0.16, 0.22, 0.28, 0.36, 0.44, 0.55, 0.7, 1] }}
+                animate={{ opacity: [0, 1, 0, 1, 0, 1, 0, 0.7, 0, 1, 0, 1, 0, 0.8, 0, 1, 0.5, 0] }}
+                transition={{ duration: 5.0, times: [0, 0.03, 0.06, 0.09, 0.12, 0.16, 0.2, 0.26, 0.32, 0.38, 0.5, 0.53, 0.56, 0.6, 0.66, 0.72, 0.85, 1] }}
               >
                 <div className="text-[14px] tracking-[5px] font-bold text-[#00e5ff] absolute inset-0 flex items-center justify-center"
-                  style={{ transform: "translateX(4px) translateY(-2px)", mixBlendMode: "screen", textShadow: "0 0 10px rgba(0,229,255,0.8), 0 0 30px rgba(0,229,255,0.4)" }}>
+                  style={{ transform: "translateX(4px) translateY(-2px)", mixBlendMode: "screen", textShadow: "0 0 12px rgba(0,229,255,0.9), 0 0 35px rgba(0,229,255,0.5)" }}>
                   {INDEPENDENCE_LABEL[lang] || INDEPENDENCE_LABEL.IT}
                 </div>
               </motion.div>
@@ -122,11 +124,11 @@ export function IndependenceBar({ progress, phase, showBackground = false, lang 
                 className="absolute pointer-events-none overflow-hidden"
                 style={{ inset: "-8px -20px" }}
                 initial={{ opacity: 0 }}
-                animate={{ opacity: [0, 0.8, 0, 0.6, 0, 1, 0, 0.9, 0] }}
-                transition={{ duration: 2.5, times: [0, 0.06, 0.12, 0.2, 0.28, 0.38, 0.5, 0.62, 1], delay: 0.08 }}
+                animate={{ opacity: [0, 0.9, 0, 0.7, 0, 1, 0, 0.9, 0, 0, 0.8, 0, 1, 0, 0.6, 0] }}
+                transition={{ duration: 5.0, times: [0, 0.04, 0.08, 0.14, 0.2, 0.28, 0.36, 0.42, 0.5, 0.52, 0.56, 0.62, 0.7, 0.78, 0.88, 1], delay: 0.06 }}
               >
                 <div className="text-[14px] tracking-[5px] font-bold text-[#ff4444] absolute inset-0 flex items-center justify-center"
-                  style={{ transform: "translateX(-4px) translateY(2px)", mixBlendMode: "screen", textShadow: "0 0 10px rgba(255,68,68,0.8), 0 0 30px rgba(255,68,68,0.4)" }}>
+                  style={{ transform: "translateX(-4px) translateY(2px)", mixBlendMode: "screen", textShadow: "0 0 12px rgba(255,68,68,0.9), 0 0 35px rgba(255,68,68,0.5)" }}>
                   {INDEPENDENCE_LABEL[lang] || INDEPENDENCE_LABEL.IT}
                 </div>
               </motion.div>
@@ -134,11 +136,11 @@ export function IndependenceBar({ progress, phase, showBackground = false, lang 
                 className="absolute pointer-events-none overflow-hidden"
                 style={{ inset: "-8px -20px" }}
                 initial={{ opacity: 0 }}
-                animate={{ opacity: [0, 0, 0.6, 0, 0.8, 0, 0.5, 0] }}
-                transition={{ duration: 2.5, times: [0, 0.15, 0.25, 0.35, 0.45, 0.6, 0.75, 1], delay: 0.15 }}
+                animate={{ opacity: [0, 0, 0.7, 0, 0.9, 0, 0.6, 0, 0, 0.8, 0, 1, 0, 0.5, 0] }}
+                transition={{ duration: 5.0, times: [0, 0.1, 0.18, 0.24, 0.32, 0.42, 0.5, 0.52, 0.58, 0.64, 0.72, 0.8, 0.86, 0.92, 1], delay: 0.12 }}
               >
                 <div className="text-[14px] tracking-[5px] font-bold text-[#B87333] absolute inset-0 flex items-center justify-center"
-                  style={{ transform: "translateX(2px) translateY(3px) skewX(-3deg)", mixBlendMode: "screen", textShadow: "0 0 15px rgba(184,115,51,1), 0 0 40px rgba(184,115,51,0.6)" }}>
+                  style={{ transform: "translateX(2px) translateY(3px) skewX(-3deg)", mixBlendMode: "screen", textShadow: "0 0 18px rgba(184,115,51,1), 0 0 45px rgba(184,115,51,0.7)" }}>
                   {INDEPENDENCE_LABEL[lang] || INDEPENDENCE_LABEL.IT}
                 </div>
               </motion.div>
@@ -146,8 +148,8 @@ export function IndependenceBar({ progress, phase, showBackground = false, lang 
                 className="absolute left-0 right-0 h-[2px] pointer-events-none"
                 style={{ background: "linear-gradient(90deg, transparent, rgba(184,115,51,1), rgba(0,229,255,0.8), rgba(184,115,51,1), transparent)", top: "50%" }}
                 initial={{ scaleX: 0, opacity: 0 }}
-                animate={{ scaleX: [0, 1.2, 0.8, 1, 0], opacity: [0, 1, 1, 1, 0], y: [0, -6, 8, -3, 0] }}
-                transition={{ duration: 2.0, ease: "easeOut" }}
+                animate={{ scaleX: [0, 1.2, 0.8, 1, 0, 0, 1.1, 0.9, 1, 0], opacity: [0, 1, 1, 1, 0, 0, 1, 1, 1, 0], y: [0, -6, 8, -3, 0, 0, -5, 6, -2, 0] }}
+                transition={{ duration: 5.0, ease: "easeOut" }}
               />
             </>
           )}
