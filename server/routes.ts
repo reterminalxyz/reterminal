@@ -5,6 +5,7 @@ import { api } from "@shared/routes";
 import { z } from "zod";
 import { randomBytes } from "crypto";
 import { SKILL_KEYS } from "@shared/schema";
+import { trackEvent, getStats } from "./analytics";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -157,6 +158,30 @@ export async function registerRoutes(
       res.json({ ok: true });
     } catch (err: any) {
       console.error("[api] POST save-progress error:", err.message);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.post("/api/track", async (req, res) => {
+    try {
+      const { session_id, event_name } = req.body;
+      if (!session_id || !event_name) {
+        return res.status(400).json({ message: "session_id and event_name required" });
+      }
+      trackEvent(String(session_id), String(event_name));
+      res.status(200).json({ ok: true });
+    } catch (err: any) {
+      console.error("[analytics] track error:", err.message);
+      res.status(500).json({ message: "Internal server error" });
+    }
+  });
+
+  app.get("/api/stats", async (_req, res) => {
+    try {
+      const stats = getStats();
+      res.json(stats);
+    } catch (err: any) {
+      console.error("[analytics] stats error:", err.message);
       res.status(500).json({ message: "Internal server error" });
     }
   });

@@ -4,3 +4,6 @@ dist
 server/public
 vite.config.ts.*
 *.tar.gz
+analytics.db
+analytics.db-wal
+analytics.db-shm
