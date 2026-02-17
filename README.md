@@ -1,6 +1,15 @@
 # re_terminal
 
-Bitcoin Lightning Network educational onboarding PWA. A two-phase, state-machine driven experience that educates users on Bitcoin through an interactive dialogue with "Satoshi."
+re_terminal – a guerrilla-style gamified educational phygital terminal. It teaches users BTC and anti-authoritarian digital tools through interactive guides and tasks. 
+
+People living under oppressive regimes face a critical gap: they understand their governments suppress freedom, but lack the practical tools to protect themselves digitally. Traditional financial systems are monitored, communications are surveilled, and information access is restricted. Meanwhile, BTC and privacy-preserving technologies remain inaccessible due to technical barriers and lack of localized, youth-friendly education.
+
+The project is building on phygital principles (physical + digital). One of the entry points is a physical medium (NFC card). Users tap their phone → instant site access, can continue in the browser or download the app. The idea is to make a bridge between physical and digital activism. It enables grassroots distribution at conferences, meetups, and street-level engagement.
+
+Month 0-1(done):
+MVP launched, translation on 3 languages (EN/IT/RU), censorship-resistant mobile app, the prototype of educational module 1 (onboarding to financial freedom), fully functional BTC LN onboarding flow (10-15 minutes), live economic engine, analytics and statistics.
+
+"
 
 ---
 
