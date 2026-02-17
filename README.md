@@ -6,10 +6,11 @@ People living under oppressive regimes face a critical gap: they understand thei
 
 The project is building on phygital principles (physical + digital). One of the entry points is a physical medium (NFC card). Users tap their phone → instant site access, can continue in the browser or download the app. The idea is to make a bridge between physical and digital activism. It enables grassroots distribution at conferences, meetups, and street-level engagement.
 
+
 Month 0-1(done):
+
 MVP launched, translation on 3 languages (EN/IT/RU), censorship-resistant mobile app, the prototype of educational module 1 (onboarding to financial freedom), fully functional BTC LN onboarding flow (10-15 minutes), live economic engine, analytics and statistics.
 
-"
 
 ---
 
