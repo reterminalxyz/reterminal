@@ -499,6 +499,9 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     }, 500);
   }, [followUpdatesClicked, isTyping, typeMessage, safeTimeout, uiTexts]);
 
+  const [showInstallInstructions, setShowInstallInstructions] = useState(false);
+  const [installInstructionText, setInstallInstructionText] = useState("");
+
   const handlePWAInstall = useCallback(async () => {
     playClick();
     if (deferredInstallRef.current) {
@@ -511,7 +514,8 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
       let instruction = uiTexts.installInstructionsFallback;
       if (isIOS) instruction = uiTexts.installInstructionsIOS;
       else if (isAndroid) instruction = uiTexts.installInstructionsAndroid;
-      setMessages(prev => [...prev, { id: nextMsgId(), text: instruction, sender: "satoshi" }]);
+      setInstallInstructionText(instruction);
+      setShowInstallInstructions(true);
     }
   }, [uiTexts]);
 
@@ -1157,23 +1161,6 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
           </div>
         )}
 
-        {satsClaimed && walletMode && !flowCompleted && !isTyping && walletButtons.length === 0 && (
-          <div className="flex flex-col gap-2 pt-1">
-            <motion.button
-              type="button"
-              initial={{ opacity: 0, x: -20 }}
-              animate={{ opacity: 1, x: 0 }}
-              disabled
-              className="w-full px-4 py-3 text-left text-[13px] font-mono font-bold tracking-wide
-                       border-2 border-[#FFD700]/30 bg-[#FFD700]/5 text-[#FFD700]/40
-                       cursor-not-allowed opacity-50"
-              data-testid="button-sats-claimed-persistent"
-            >
-              <span className="mr-2 text-[#FFD700]/20">{">>>"}</span>
-              {(uiTexts as any).satsClaimedButton || "SATS CLAIMED"}
-            </motion.button>
-          </div>
-        )}
 
         {flowCompleted && !isTyping && (
           <div className="pt-3 space-y-2">
@@ -1353,6 +1340,41 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
               return { x: r.left + r.width / 2, y: r.top + r.height / 2 };
             })() : null}
           />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showInstallInstructions && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center"
+            style={{ background: "rgba(0,0,0,0.85)" }}
+            onClick={() => setShowInstallInstructions(false)}
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="mx-6 p-6 border-2 border-[#B87333]/60 max-w-sm"
+              style={{ background: "#0D0D0D" }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <p className="text-[13px] font-mono text-[#B87333] leading-relaxed whitespace-pre-line">
+                {installInstructionText}
+              </p>
+              <button
+                type="button"
+                onClick={() => setShowInstallInstructions(false)}
+                className="mt-4 w-full px-4 py-2 text-[12px] font-mono font-bold tracking-[2px]
+                         border border-[#B87333]/40 text-[#B87333] hover:bg-[#B87333]/10 transition-all"
+                data-testid="button-close-install-instructions"
+              >
+                OK
+              </button>
+            </motion.div>
+          </motion.div>
         )}
       </AnimatePresence>
 
