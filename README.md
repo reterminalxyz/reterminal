@@ -1,4 +1,4 @@
-# reterminal.xyz
+# re_terminal
 
 re_terminal – a guerrilla-style gamified educational phygital terminal. It teaches users BTC and anti-authoritarian digital tools through interactive guides and tasks. 
 
