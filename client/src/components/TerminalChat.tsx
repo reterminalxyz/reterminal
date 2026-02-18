@@ -331,6 +331,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
     _setMessages(prev => {
       const next = typeof updater === "function" ? updater(prev) : updater;
       messagesRef.current = next;
+      saveTerminalMessages(next);
       return next;
     });
   }, []);
