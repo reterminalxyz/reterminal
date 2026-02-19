@@ -3,102 +3,99 @@ import { motion, AnimatePresence } from "framer-motion";
 
 function DigitalFogCanvas({ onFirstTouch }: { onFirstTouch: () => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fogCanvasRef = useRef<HTMLCanvasElement>(null);
   const rafRef = useRef<number>(0);
   const lastTimeRef = useRef<number>(0);
   const clearedAreasRef = useRef<Array<{ x: number; y: number; radius: number; opacity: number; time: number }>>([]);
   const [hintVisible, setHintVisible] = useState(true);
   const touchedRef = useRef(false);
-  const noiseOffsetRef = useRef(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const fogCanvas = fogCanvasRef.current;
+    if (!canvas || !fogCanvas) return;
 
-    const ctx = canvas.getContext("2d", { alpha: false });
-    if (!ctx) return;
-
-    let w = window.innerWidth;
-    let h = window.innerHeight;
+    const ctx = canvas.getContext("2d", { willReadFrequently: false });
+    const fogCtx = fogCanvas.getContext("2d", { willReadFrequently: false });
+    if (!ctx || !fogCtx) return;
 
     const resize = () => {
-      w = window.innerWidth;
-      h = window.innerHeight;
-      canvas.width = w;
-      canvas.height = h;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      canvas.style.width = w + "px";
+      canvas.style.height = h + "px";
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      fogCanvas.width = w * dpr;
+      fogCanvas.height = h * dpr;
+      fogCanvas.style.width = w + "px";
+      fogCanvas.style.height = h + "px";
+      fogCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     };
     resize();
     window.addEventListener("resize", resize);
 
-    const noiseCanvas = document.createElement("canvas");
-    const nw = 128;
-    const nh = 128;
-    noiseCanvas.width = nw;
-    noiseCanvas.height = nh;
-    const noiseCtx = noiseCanvas.getContext("2d")!;
-    const noiseImageData = noiseCtx.createImageData(nw, nh);
-    const noiseData = noiseImageData.data;
+    const drawNoise = (time: number) => {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
 
-    const regenerateNoise = () => {
-      for (let i = 0; i < noiseData.length; i += 4) {
-        const v = 26 + Math.random() * 45;
-        noiseData[i] = v;
-        noiseData[i + 1] = v;
-        noiseData[i + 2] = v;
-        noiseData[i + 3] = 255;
+      fogCtx.fillStyle = "#1A1A1A";
+      fogCtx.fillRect(0, 0, w, h);
+
+      const imageData = fogCtx.getImageData(0, 0, fogCanvas.width, fogCanvas.height);
+      const data = imageData.data;
+      const step = 3;
+      for (let i = 0; i < data.length; i += step * 4) {
+        const noise = Math.random() * 55;
+        data[i] = 26 + noise;
+        data[i + 1] = 26 + noise;
+        data[i + 2] = 26 + noise;
       }
-      noiseCtx.putImageData(noiseImageData, 0, 0);
-    };
-    regenerateNoise();
-
-    const draw = (time: number) => {
-      noiseOffsetRef.current = (noiseOffsetRef.current + 7) % nw;
-
-      if (time - lastTimeRef.current > 150) {
-        regenerateNoise();
-        lastTimeRef.current = time;
-      }
-
-      ctx.fillStyle = "#1A1A1A";
-      ctx.fillRect(0, 0, w, h);
-
-      const ox = noiseOffsetRef.current;
-      const pattern = ctx.createPattern(noiseCanvas, "repeat");
-      if (pattern) {
-        ctx.save();
-        ctx.globalAlpha = 0.7;
-        ctx.translate(ox, ox * 0.7);
-        ctx.fillStyle = pattern;
-        ctx.fillRect(-ox, -ox * 0.7, w + nw, h + nh);
-        ctx.restore();
-      }
+      fogCtx.putImageData(imageData, 0, 0);
 
       const areas = clearedAreasRef.current;
       if (areas.length > 0) {
-        ctx.globalCompositeOperation = "destination-out";
+        fogCtx.globalCompositeOperation = "destination-out";
         for (const area of areas) {
           const age = time - area.time;
+          const fadeStart = 4000;
           let alpha = area.opacity;
-          if (age > 3000) {
-            alpha = Math.max(0, area.opacity * (1 - (age - 3000) / 2500));
+          if (age > fadeStart) {
+            alpha = Math.max(0, area.opacity * (1 - (age - fadeStart) / 3000));
           }
           if (alpha <= 0) continue;
-          const gradient = ctx.createRadialGradient(area.x, area.y, 0, area.x, area.y, area.radius);
-          gradient.addColorStop(0, `rgba(0,0,0,${alpha})`);
-          gradient.addColorStop(0.6, `rgba(0,0,0,${alpha * 0.5})`);
-          gradient.addColorStop(1, "rgba(0,0,0,0)");
-          ctx.fillStyle = gradient;
-          ctx.beginPath();
-          ctx.arc(area.x, area.y, area.radius, 0, Math.PI * 2);
-          ctx.fill();
-        }
-        ctx.globalCompositeOperation = "source-over";
 
-        clearedAreasRef.current = areas.filter(a => time - a.time < 5500);
+          const gradient = fogCtx.createRadialGradient(area.x, area.y, 0, area.x, area.y, area.radius);
+          gradient.addColorStop(0, `rgba(0,0,0,${alpha})`);
+          gradient.addColorStop(0.5, `rgba(0,0,0,${alpha * 0.6})`);
+          gradient.addColorStop(1, "rgba(0,0,0,0)");
+          fogCtx.fillStyle = gradient;
+          fogCtx.beginPath();
+          fogCtx.arc(area.x, area.y, area.radius, 0, Math.PI * 2);
+          fogCtx.fill();
+        }
+        fogCtx.globalCompositeOperation = "source-over";
+
+        clearedAreasRef.current = areas.filter(a => {
+          const age = time - a.time;
+          return age < 7000;
+        });
       }
 
-      rafRef.current = requestAnimationFrame(draw);
+      ctx.clearRect(0, 0, w, h);
+      ctx.drawImage(fogCanvas, 0, 0, w, h);
     };
-    rafRef.current = requestAnimationFrame(draw);
+
+    const animate = (time: number) => {
+      if (time - lastTimeRef.current > 50) {
+        drawNoise(time);
+        lastTimeRef.current = time;
+      }
+      rafRef.current = requestAnimationFrame(animate);
+    };
+    rafRef.current = requestAnimationFrame(animate);
 
     return () => {
       cancelAnimationFrame(rafRef.current);
@@ -115,27 +112,42 @@ function DigitalFogCanvas({ onFirstTouch }: { onFirstTouch: () => void }) {
   }, [onFirstTouch]);
 
   const addClearArea = useCallback((clientX: number, clientY: number) => {
+    const now = performance.now();
     clearedAreasRef.current.push({
       x: clientX,
       y: clientY,
       radius: 70,
       opacity: 0.95,
-      time: performance.now(),
+      time: now,
     });
   }, []);
 
+  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+    if (touchedRef.current) {
+      addClearArea(e.clientX, e.clientY);
+    }
+  }, [addClearArea]);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    const touch = e.touches[0];
+    if (touch) {
+      addClearArea(touch.clientX, touch.clientY);
+    }
+  }, [addClearArea]);
+
   return (
     <>
+      <canvas ref={fogCanvasRef} className="hidden" />
       <canvas
         ref={canvasRef}
         className="fixed inset-0 z-10"
         style={{ touchAction: "none" }}
-        onMouseMove={(e) => { if (touchedRef.current) addClearArea(e.clientX, e.clientY); }}
-        onTouchMove={(e) => { const t = e.touches[0]; if (t) addClearArea(t.clientX, t.clientY); }}
+        onMouseMove={handleMouseMove}
+        onTouchMove={handleTouchMove}
         onTouchStart={(e) => {
           triggerFirstTouch();
-          const t = e.touches[0];
-          if (t) addClearArea(t.clientX, t.clientY);
+          const touch = e.touches[0];
+          if (touch) addClearArea(touch.clientX, touch.clientY);
         }}
         onClick={(e) => {
           triggerFirstTouch();
@@ -188,7 +200,7 @@ function ManifestoTypewriter({ started, onComplete }: { started: boolean; onComp
           onComplete?.();
         }
       }
-    }, 19);
+    }, 12);
     return () => clearInterval(interval);
   }, [started, onComplete]);
 
