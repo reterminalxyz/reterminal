@@ -141,7 +141,7 @@ export default function Home() {
   const qt = Q_TRANSLATIONS[lang] || Q_TRANSLATIONS.IT;
   
   useEffect(() => {
-    const bgColor = phase === "boot" || phase === "splash" ? '#0a0a0a' : phase === "phase_2" ? '#0A0A0A' : '#F5F5F5';
+    const bgColor = phase === "boot" ? '#000000' : phase === "phase_2" ? '#0A0A0A' : '#F5F5F5';
     document.documentElement.style.backgroundColor = bgColor;
     document.body.style.backgroundColor = bgColor;
     const root = document.getElementById('root');
