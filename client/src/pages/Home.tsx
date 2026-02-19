@@ -6,6 +6,7 @@ import { IndependenceBar } from "@/components/IndependenceBar";
 import { BackButton } from "@/components/BackButton";
 import { TerminalChat } from "@/components/TerminalChat";
 import { BootScreen, LangToggle } from "@/components/BootScreen";
+import { SplashScreen } from "@/components/SplashScreen";
 import type { Lang } from "@/components/BootScreen";
 import { RU_PHASE1_QUESTIONS } from "@/lib/ru-texts";
 import { useCreateSession, useUpdateSession, useSession } from "@/hooks/use-sessions";
@@ -21,7 +22,7 @@ function isInStandaloneMode(): boolean {
   );
 }
 
-type Phase = "boot" | "loading" | "phase_1" | "phase_1_complete" | "chip_exit" | "phase_2";
+type Phase = "boot" | "loading" | "phase_1" | "phase_1_complete" | "chip_exit" | "splash" | "phase_2";
 type QuestionId = 1 | 2 | 3 | 4;
 
 const PROGRESS_PER_QUESTION = [5, 10, 15, 20];
