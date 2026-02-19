@@ -90,8 +90,7 @@ export default function Home() {
   });
   const [phase, setPhase] = useState<Phase>(() => {
     if (hasWalletRestore.current) return "loading";
-    if (isInStandaloneMode() || isBootDismissed()) return "loading";
-    return "boot";
+    return "splash";
   });
   const [currentQuestion, setCurrentQuestion] = useState<QuestionId>(1);
   const [circuitReveal, setCircuitReveal] = useState(() => hasWalletRestore.current ? 100 : 0);
