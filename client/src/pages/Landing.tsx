@@ -1,5 +1,4 @@
 import { useEffect, useRef, useCallback, useState } from "react";
-import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 
 function DigitalFogCanvas({ onFirstTouch }: { onFirstTouch: () => void }) {
@@ -375,8 +374,6 @@ type LandingPhase = "fog" | "glitch" | "splash";
 export default function Landing() {
   const [typingStarted, setTypingStarted] = useState(false);
   const [landingPhase, setLandingPhase] = useState<LandingPhase>("fog");
-  const [, setLocation] = useLocation();
-
   const handleFirstTouch = useCallback(() => {
     setTypingStarted(true);
   }, []);
@@ -390,10 +387,6 @@ export default function Landing() {
   const handleGlitchComplete = useCallback(() => {
     setLandingPhase("splash");
   }, []);
-
-  const handleContinue = useCallback(() => {
-    setLocation("/activation");
-  }, [setLocation]);
 
   if (landingPhase === "splash") {
     return (
@@ -419,18 +412,6 @@ export default function Landing() {
             <GlitchText />
           </motion.div>
 
-          <motion.button
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8, duration: 0.5 }}
-            onClick={handleContinue}
-            className="mt-10 px-8 py-3 text-[11px] font-mono font-bold tracking-[3px] z-10
-                     border border-[#B87333]/30 bg-[#B87333]/8 text-[#B87333]
-                     hover:bg-[#B87333]/15 active:scale-95 transition-all duration-200"
-            data-testid="button-splash-continue"
-          >
-            ENTER
-          </motion.button>
         </div>
       </div>
     );
