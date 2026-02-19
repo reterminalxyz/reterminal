@@ -14,14 +14,7 @@ import { Loader2 } from "lucide-react";
 import { playClick, playError, playPhaseComplete, playTransition } from "@/lib/sounds";
 import { trackEvent, getOrCreateSession } from "@/lib/analytics";
 
-function isInStandaloneMode(): boolean {
-  return (
-    ("standalone" in window.navigator && (window.navigator as any).standalone) ||
-    window.matchMedia("(display-mode: standalone)").matches
-  );
-}
-
-type Phase = "boot" | "loading" | "phase_1" | "phase_1_complete" | "chip_exit" | "splash" | "phase_2";
+type Phase = "loading" | "phase_1" | "phase_1_complete" | "chip_exit" | "phase_2";
 type QuestionId = 1 | 2 | 3 | 4;
 
 const PROGRESS_PER_QUESTION = [5, 10, 15, 20];
@@ -72,10 +65,6 @@ function hasSavedWalletState(): boolean {
     }
   } catch (_) {}
   return false;
-}
-
-function isBootDismissed(): boolean {
-  try { return localStorage.getItem("liberta_boot_dismissed") === "1"; } catch (_) { return false; }
 }
 
 export default function Home() {
@@ -139,7 +128,7 @@ export default function Home() {
   const qt = Q_TRANSLATIONS[lang] || Q_TRANSLATIONS.IT;
   
   useEffect(() => {
-    const bgColor = phase === "boot" ? '#000000' : phase === "phase_2" ? '#0A0A0A' : '#F5F5F5';
+    const bgColor = phase === "phase_2" ? '#0A0A0A' : '#F5F5F5';
     document.documentElement.style.backgroundColor = bgColor;
     document.body.style.backgroundColor = bgColor;
     const root = document.getElementById('root');
@@ -241,12 +230,11 @@ export default function Home() {
       hasWalletRestore.current = false;
       setPhase("phase_2");
     } else {
-      setPhase(prev => (prev === "boot" || prev === "phase_1" || prev === "phase_2") ? prev : "phase_1");
+      setPhase(prev => (prev === "phase_1" || prev === "phase_2") ? prev : "phase_1");
     }
   }, []);
 
   useEffect(() => {
-    if (phase === "boot") return;
     if (sessionCreatingRef.current) return;
 
     if (restoredSessionId.current && !sessionValidatedRef.current) {

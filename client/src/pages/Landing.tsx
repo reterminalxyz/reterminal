@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback, useState } from "react";
+import { useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 
 function DigitalFogCanvas({ onFirstTouch }: { onFirstTouch: () => void }) {
@@ -374,6 +375,12 @@ type LandingPhase = "fog" | "glitch" | "splash";
 export default function Landing() {
   const [typingStarted, setTypingStarted] = useState(false);
   const [landingPhase, setLandingPhase] = useState<LandingPhase>("fog");
+  const [, setLocation] = useLocation();
+
+  const handleContinue = useCallback(() => {
+    setLocation("/activation");
+  }, [setLocation]);
+
   const handleFirstTouch = useCallback(() => {
     setTypingStarted(true);
   }, []);
@@ -390,7 +397,7 @@ export default function Landing() {
 
   if (landingPhase === "splash") {
     return (
-      <div className="fixed inset-0 bg-[#F5F5F5] overflow-hidden flex flex-col" data-testid="splash-screen">
+      <div className="fixed inset-0 bg-[#F5F5F5] overflow-y-auto flex flex-col" data-testid="splash-screen">
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
@@ -402,7 +409,7 @@ export default function Landing() {
           }}
         />
 
-        <div className="flex-1 flex flex-col items-center justify-center relative">
+        <div className="min-h-full flex flex-col items-center justify-center relative px-6 py-8">
           <motion.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
@@ -412,6 +419,43 @@ export default function Landing() {
             <GlitchText />
           </motion.div>
 
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+            className="z-10 mt-8 w-full max-w-[360px]"
+          >
+            <div
+              className="relative w-full overflow-hidden"
+              style={{
+                paddingBottom: "56.25%",
+                border: "1px solid rgba(184,115,51,0.15)",
+              }}
+              data-testid="video-container"
+            >
+              <iframe
+                className="absolute inset-0 w-full h-full"
+                src="https://www.youtube.com/embed/EXwYrShsnyY?rel=0&modestbranding=1"
+                title="re_terminal"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+                data-testid="video-embed"
+              />
+            </div>
+          </motion.div>
+
+          <motion.button
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8, duration: 0.5 }}
+            onClick={handleContinue}
+            className="mt-8 px-8 py-3 text-[11px] font-mono font-bold tracking-[3px] z-10
+                     border border-[#B87333]/30 bg-[#B87333]/8 text-[#B87333]
+                     hover:bg-[#B87333]/15 active:scale-95 transition-all duration-200"
+            data-testid="button-splash-continue"
+          >
+            ENTER
+          </motion.button>
         </div>
       </div>
     );
