@@ -1,97 +1,88 @@
-import Database from "better-sqlite3";
-import path from "path";
-
-const DB_PATH = path.join(process.cwd(), "analytics.db");
-
-const db = new Database(DB_PATH);
-
-db.pragma("journal_mode = WAL");
-
-db.exec(`
-  CREATE TABLE IF NOT EXISTS events (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    session_id TEXT NOT NULL,
-    event_name TEXT NOT NULL,
-    source TEXT NOT NULL DEFAULT 'web',
-    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
-  )
-`);
-
-try {
-  db.exec("ALTER TABLE events ADD COLUMN source TEXT NOT NULL DEFAULT 'web'");
-} catch (_) {}
+import { pool } from "./db";
 
 export const ANALYTICS_PASSWORD = "2222";
 
-export function trackEvent(sessionId: string, eventName: string, source: string = "web"): void {
+function getPool() {
+  if (!pool) throw new Error("Database pool not available");
+  return pool;
+}
+
+export async function trackEvent(sessionId: string, eventName: string, source: string = "web"): Promise<void> {
   const s = source === "pwa" ? "pwa" : "web";
-  const stmt = db.prepare("INSERT INTO events (session_id, event_name, source) VALUES (?, ?, ?)");
-  stmt.run(sessionId, eventName, s);
+  await getPool().query(
+    "INSERT INTO analytics_events (session_id, event_name, source) VALUES ($1, $2, $3)",
+    [sessionId, eventName, s]
+  );
 }
 
-export function resetEvents(): void {
-  db.exec("DELETE FROM events");
+export async function resetEvents(): Promise<void> {
+  await getPool().query("DELETE FROM analytics_events");
 }
 
-export function getStats(): { event_name: string; count: number }[] {
-  const stmt = db.prepare("SELECT event_name, COUNT(*) as count FROM events GROUP BY event_name ORDER BY count DESC");
-  return stmt.all() as { event_name: string; count: number }[];
+export async function getStats(): Promise<{ event_name: string; count: number }[]> {
+  const res = await getPool().query(
+    "SELECT event_name, COUNT(*)::int as count FROM analytics_events GROUP BY event_name ORDER BY count DESC"
+  );
+  return res.rows;
 }
 
-export function getFunnelStats(): { event_name: string; unique_users: number }[] {
-  const stmt = db.prepare("SELECT event_name, COUNT(DISTINCT session_id) as unique_users FROM events GROUP BY event_name");
-  return stmt.all() as { event_name: string; unique_users: number }[];
+export async function getFunnelStats(): Promise<{ event_name: string; unique_users: number }[]> {
+  const res = await getPool().query(
+    "SELECT event_name, COUNT(DISTINCT session_id)::int as unique_users FROM analytics_events GROUP BY event_name"
+  );
+  return res.rows;
 }
 
-export function getTotalUniqueUsers(): number {
-  const stmt = db.prepare("SELECT COUNT(DISTINCT session_id) as total FROM events");
-  const row = stmt.get() as { total: number };
-  return row.total;
+export async function getTotalUniqueUsers(): Promise<number> {
+  const res = await getPool().query(
+    "SELECT COUNT(DISTINCT session_id)::int as total FROM analytics_events"
+  );
+  return res.rows[0]?.total || 0;
 }
 
-export function getSourceStats(): { source: string; unique_users: number }[] {
-  const stmt = db.prepare(`
-    SELECT source, COUNT(DISTINCT session_id) as unique_users
-    FROM events
+export async function getSourceStats(): Promise<{ source: string; unique_users: number }[]> {
+  const res = await getPool().query(`
+    SELECT source, COUNT(DISTINCT session_id)::int as unique_users
+    FROM analytics_events
     GROUP BY source
   `);
-  return stmt.all() as { source: string; unique_users: number }[];
+  return res.rows;
 }
 
-export function getAvgSessionDuration(): string {
-  const stmt = db.prepare(`
+export async function getAvgSessionDuration(): Promise<string> {
+  const res = await getPool().query(`
     SELECT AVG(duration) as avg_sec FROM (
       SELECT session_id,
-        (julianday(MAX(timestamp)) - julianday(MIN(timestamp))) * 86400 as duration
-      FROM events
+        EXTRACT(EPOCH FROM (MAX(timestamp) - MIN(timestamp))) as duration
+      FROM analytics_events
       GROUP BY session_id
       HAVING COUNT(*) > 1
-    )
+    ) sub
   `);
-  const row = stmt.get() as { avg_sec: number | null };
-  if (!row || row.avg_sec === null || row.avg_sec === 0) return "\u2014";
-  const sec = Math.round(row.avg_sec);
+  const avg_sec = res.rows[0]?.avg_sec;
+  if (!avg_sec || avg_sec === 0) return "\u2014";
+  const sec = Math.round(avg_sec);
   if (sec < 60) return `${sec}s`;
   const min = Math.floor(sec / 60);
   const remSec = sec % 60;
   return `${min}m ${remSec}s`;
 }
 
-export function getSessionDurations(): { session_id: string; duration_sec: number; events_count: number; first_event: string; last_event: string; source: string }[] {
-  const stmt = db.prepare(`
+export async function getSessionDurations(): Promise<{ session_id: string; duration_sec: number; events_count: number; first_event: string; last_event: string; source: string }[]> {
+  const res = await getPool().query(`
     SELECT session_id,
-      CAST((julianday(MAX(timestamp)) - julianday(MIN(timestamp))) * 86400 AS INTEGER) as duration_sec,
-      COUNT(*) as events_count,
-      MIN(timestamp) as first_event,
-      MAX(timestamp) as last_event,
+      EXTRACT(EPOCH FROM (MAX(timestamp) - MIN(timestamp)))::int as duration_sec,
+      COUNT(*)::int as events_count,
+      MIN(timestamp)::text as first_event,
+      MAX(timestamp)::text as last_event,
       MAX(source) as source
-    FROM events
+    FROM analytics_events
     GROUP BY session_id
     HAVING COUNT(*) > 1
-    ORDER BY first_event DESC
+    ORDER BY MIN(timestamp) DESC
     LIMIT 50
   `);
-  return stmt.all() as any[];
+  return res.rows;
 }
 
 const FUNNEL_ORDER = [
@@ -189,13 +180,13 @@ export function renderLoginHTML(error?: boolean): string {
 </html>`;
 }
 
-export function renderDashboardHTML(token: string): string {
-  const funnel = getFunnelStats();
+export async function renderDashboardHTML(token: string): Promise<string> {
+  const funnel = await getFunnelStats();
   const funnelMap = new Map(funnel.map(f => [f.event_name, f.unique_users]));
-  const totalUsers = getTotalUniqueUsers();
-  const avgTime = getAvgSessionDuration();
-  const sessions = getSessionDurations();
-  const sources = getSourceStats();
+  const totalUsers = await getTotalUniqueUsers();
+  const avgTime = await getAvgSessionDuration();
+  const sessions = await getSessionDurations();
+  const sources = await getSourceStats();
   const sourceMap = new Map(sources.map(s => [s.source, s.unique_users]));
   const webUsers = sourceMap.get("web") || 0;
   const pwaUsers = sourceMap.get("pwa") || 0;

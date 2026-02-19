@@ -69,6 +69,13 @@ if (!process.env.DATABASE_URL) {
               skill_key TEXT NOT NULL,
               granted_at TIMESTAMP DEFAULT NOW()
             );
+            CREATE TABLE IF NOT EXISTS analytics_events (
+              id SERIAL PRIMARY KEY,
+              session_id TEXT NOT NULL,
+              event_name TEXT NOT NULL,
+              source TEXT NOT NULL DEFAULT 'web',
+              timestamp TIMESTAMP DEFAULT NOW()
+            );
           `);
           console.log("[db] Tables verified/created successfully");
         } catch (migErr: any) {

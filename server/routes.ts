@@ -173,7 +173,7 @@ export async function registerRoutes(
       if (!session_id || !event_name) {
         return res.status(400).json({ message: "session_id and event_name required" });
       }
-      trackEvent(String(session_id), String(event_name), String(source || "web"));
+      await trackEvent(String(session_id), String(event_name), String(source || "web"));
       res.status(200).json({ ok: true });
     } catch (err: any) {
       console.error("[analytics] track error:", err.message);
@@ -197,7 +197,7 @@ export async function registerRoutes(
       if (!isStatsAuthed(req)) {
         return res.type("html").send(renderLoginHTML());
       }
-      const html = renderDashboardHTML(statsToken);
+      const html = await renderDashboardHTML(statsToken);
       res.type("html").send(html);
     } catch (err: any) {
       console.error("[analytics] stats error:", err.message);
@@ -210,9 +210,9 @@ export async function registerRoutes(
       if (!isStatsAuthed(req)) {
         return res.status(401).json({ message: "Unauthorized" });
       }
-      const stats = getStats();
-      const funnel = getFunnelStats();
-      const totalUsers = getTotalUniqueUsers();
+      const stats = await getStats();
+      const funnel = await getFunnelStats();
+      const totalUsers = await getTotalUniqueUsers();
       res.json({ totalUsers, funnel, raw: stats });
     } catch (err: any) {
       console.error("[analytics] stats json error:", err.message);
@@ -224,7 +224,7 @@ export async function registerRoutes(
     if (req.query.t !== statsToken) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-    resetEvents();
+    await resetEvents();
     res.redirect(`/api/stats?t=${statsToken}`);
   });
 
