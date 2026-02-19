@@ -15,18 +15,20 @@ function GlitchText() {
   const [glitchChars, setGlitchChars] = useState("_");
 
   useEffect(() => {
+    let flickerTimer: ReturnType<typeof setInterval> | null = null;
     const interval = setInterval(() => {
       const willGlitch = Math.random() > 0.5;
       if (willGlitch) {
         setGlitchActive(true);
         const flickers = 2 + Math.floor(Math.random() * 4);
         let count = 0;
-        const flickerInterval = setInterval(() => {
+        flickerTimer = setInterval(() => {
           setGlitchChars(GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)]);
           setShowUnderscore(prev => !prev);
           count++;
           if (count >= flickers) {
-            clearInterval(flickerInterval);
+            if (flickerTimer) clearInterval(flickerTimer);
+            flickerTimer = null;
             setGlitchActive(false);
             setShowUnderscore(prev => !prev);
             setGlitchChars("_");
@@ -37,7 +39,10 @@ function GlitchText() {
       }
     }, 1200 + Math.random() * 2000);
 
-    return () => clearInterval(interval);
+    return () => {
+      clearInterval(interval);
+      if (flickerTimer) clearInterval(flickerTimer);
+    };
   }, []);
 
   return (

@@ -142,7 +142,7 @@ export default function Home() {
   const qt = Q_TRANSLATIONS[lang] || Q_TRANSLATIONS.IT;
   
   useEffect(() => {
-    const bgColor = phase === "boot" ? '#000000' : phase === "phase_2" ? '#0A0A0A' : '#F5F5F5';
+    const bgColor = phase === "boot" || phase === "splash" ? '#0a0a0a' : phase === "phase_2" ? '#0A0A0A' : '#F5F5F5';
     document.documentElement.style.backgroundColor = bgColor;
     document.body.style.backgroundColor = bgColor;
     const root = document.getElementById('root');
@@ -249,7 +249,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (phase === "boot") return;
+    if (phase === "boot" || phase === "splash") return;
     if (sessionCreatingRef.current) return;
 
     if (restoredSessionId.current && !sessionValidatedRef.current) {
@@ -402,10 +402,19 @@ export default function Home() {
       <BootScreen
         onDismiss={() => {
           try { localStorage.setItem("liberta_boot_dismissed", "1"); } catch (_) {}
-          setPhase("loading");
+          setPhase("splash");
         }}
         lang={lang}
         onLangChange={handleLangChange}
+      />
+    );
+  }
+
+  if (phase === "splash") {
+    return (
+      <SplashScreen
+        onContinue={() => setPhase("loading")}
+        lang={lang}
       />
     );
   }
