@@ -5,8 +5,7 @@ import { GridBackground } from "@/components/GridBackground";
 import { IndependenceBar } from "@/components/IndependenceBar";
 import { BackButton } from "@/components/BackButton";
 import { TerminalChat } from "@/components/TerminalChat";
-import { BootScreen, LangToggle } from "@/components/BootScreen";
-import { SplashScreen } from "@/components/SplashScreen";
+import { LangToggle } from "@/components/BootScreen";
 import type { Lang } from "@/components/BootScreen";
 import { RU_PHASE1_QUESTIONS } from "@/lib/ru-texts";
 import { useCreateSession, useUpdateSession, useSession } from "@/hooks/use-sessions";
@@ -89,8 +88,7 @@ export default function Home() {
     return null;
   });
   const [phase, setPhase] = useState<Phase>(() => {
-    if (hasWalletRestore.current) return "loading";
-    return "splash";
+    return "loading";
   });
   const [currentQuestion, setCurrentQuestion] = useState<QuestionId>(1);
   const [circuitReveal, setCircuitReveal] = useState(() => hasWalletRestore.current ? 100 : 0);
@@ -248,7 +246,7 @@ export default function Home() {
   }, []);
 
   useEffect(() => {
-    if (phase === "boot" || phase === "splash") return;
+    if (phase === "boot") return;
     if (sessionCreatingRef.current) return;
 
     if (restoredSessionId.current && !sessionValidatedRef.current) {
@@ -395,28 +393,6 @@ export default function Home() {
   };
 
 
-
-  if (phase === "boot") {
-    return (
-      <BootScreen
-        onDismiss={() => {
-          try { localStorage.setItem("liberta_boot_dismissed", "1"); } catch (_) {}
-          setPhase("splash");
-        }}
-        lang={lang}
-        onLangChange={handleLangChange}
-      />
-    );
-  }
-
-  if (phase === "splash") {
-    return (
-      <SplashScreen
-        onContinue={() => setPhase("loading")}
-        lang={lang}
-      />
-    );
-  }
 
   if (phase === "loading" || !sessionId || isSessionLoading) {
     return (
