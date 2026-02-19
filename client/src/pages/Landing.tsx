@@ -1,4 +1,5 @@
 import { useEffect, useRef, useCallback, useState } from "react";
+import { useLocation } from "wouter";
 
 function DigitalFogCanvas({ onFirstTouch }: { onFirstTouch: () => void }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -182,8 +183,9 @@ const COPPER_START = MANIFESTO_FULL.indexOf("re_terminal");
 const COPPER_END = MANIFESTO_FULL.indexOf("the breach.") + "the breach.".length;
 const BLINK_POS = COPPER_START + 2;
 
-function ManifestoTypewriter({ started }: { started: boolean }) {
+function ManifestoTypewriter({ started, onComplete }: { started: boolean; onComplete?: () => void }) {
   const [charIndex, setCharIndex] = useState(0);
+  const completedRef = useRef(false);
 
   useEffect(() => {
     if (!started) return;
@@ -193,10 +195,14 @@ function ManifestoTypewriter({ started }: { started: boolean }) {
       setCharIndex(i);
       if (i >= MANIFESTO_FULL.length) {
         clearInterval(interval);
+        if (!completedRef.current) {
+          completedRef.current = true;
+          onComplete?.();
+        }
       }
     }, 19);
     return () => clearInterval(interval);
-  }, [started]);
+  }, [started, onComplete]);
 
   if (!started) return null;
 
@@ -243,10 +249,17 @@ function ManifestoTypewriter({ started }: { started: boolean }) {
 
 export default function Landing() {
   const [typingStarted, setTypingStarted] = useState(false);
+  const [, setLocation] = useLocation();
 
   const handleFirstTouch = useCallback(() => {
     setTypingStarted(true);
   }, []);
+
+  const handleManifestoComplete = useCallback(() => {
+    setTimeout(() => {
+      setLocation("/activation");
+    }, 1000);
+  }, [setLocation]);
 
   return (
     <div className="fixed inset-0 overflow-hidden" data-testid="landing-page">
@@ -291,7 +304,7 @@ export default function Landing() {
 
       <div className="fixed inset-0 z-[5] flex items-start justify-center pt-[25vh] px-8">
         <div className="w-full max-w-[400px]">
-          <ManifestoTypewriter started={typingStarted} />
+          <ManifestoTypewriter started={typingStarted} onComplete={handleManifestoComplete} />
         </div>
       </div>
 
