@@ -5,22 +5,22 @@ import { GridBackground } from "@/components/GridBackground";
 import { IndependenceBar } from "@/components/IndependenceBar";
 import { BackButton } from "@/components/BackButton";
 import { TerminalChat } from "@/components/TerminalChat";
-import { LangToggle } from "@/components/BootScreen";
+import { LangToggle, BootScreen } from "@/components/BootScreen";
 import type { Lang } from "@/components/BootScreen";
 import { RU_PHASE1_QUESTIONS } from "@/lib/ru-texts";
 import { useCreateSession, useUpdateSession, useSession } from "@/hooks/use-sessions";
 import { useGrantSkill } from "@/hooks/use-skills";
-import { Loader2 } from "lucide-react";
+import { LoadingScreen } from "@/components/LoadingScreen";
 import { playClick, playError, playPhaseComplete, playTransition } from "@/lib/sounds";
 import { trackEvent, getOrCreateSession } from "@/lib/analytics";
 
-type Phase = "loading" | "phase_1" | "phase_1_complete" | "chip_exit" | "phase_2";
+type Phase = "loading" | "boot" | "phase_1" | "phase_1_complete" | "chip_exit" | "phase_2";
 type QuestionId = 1 | 2 | 3 | 4;
 
 const PROGRESS_PER_QUESTION = [5, 10, 15, 20];
 const SATS_PER_QUESTION = 50;
 
-const Q_TRANSLATIONS: Record<string, { titles: string[]; yes: string; no: string; notYet: string; tryAgain: string }> = {
+const Q_TRANSLATIONS: Record<string, { titles: string[]; yes: string; no: string; notYet: string; tryAgain: string; notForYou: string }> = {
   RU: RU_PHASE1_QUESTIONS,
   EN: {
     titles: [
@@ -33,6 +33,7 @@ const Q_TRANSLATIONS: Record<string, { titles: string[]; yes: string; no: string
     no: "NO",
     notYet: "NOT YET",
     tryAgain: "TRY AGAIN",
+    notForYou: "MAYBE THIS ISN'T FOR YOU",
   },
   IT: {
     titles: [
@@ -45,6 +46,7 @@ const Q_TRANSLATIONS: Record<string, { titles: string[]; yes: string; no: string
     no: "NO",
     notYet: "NON ANCORA",
     tryAgain: "RIPROVA",
+    notForYou: "FORSE NON FA PER TE",
   },
 };
 
@@ -128,7 +130,7 @@ export default function Home() {
   const qt = Q_TRANSLATIONS[lang] || Q_TRANSLATIONS.IT;
   
   useEffect(() => {
-    const bgColor = phase === "phase_2" ? '#0A0A0A' : '#F5F5F5';
+    const bgColor = phase === "phase_2" || phase === "boot" ? '#0A0A0A' : phase === "loading" ? '#FFFFFF' : '#F5F5F5';
     document.documentElement.style.backgroundColor = bgColor;
     document.body.style.backgroundColor = bgColor;
     const root = document.getElementById('root');
@@ -225,12 +227,15 @@ export default function Home() {
   const [sessionRetry, setSessionRetry] = useState(0);
   const sessionValidatedRef = useRef(false);
 
+  const [sessionReady, setSessionReady] = useState(false);
+  const [loadingAnimDone, setLoadingAnimDone] = useState(false);
+
   const advancePhase = useCallback(() => {
     if (hasWalletRestore.current) {
       hasWalletRestore.current = false;
       setPhase("phase_2");
     } else {
-      setPhase(prev => (prev === "phase_1" || prev === "phase_2") ? prev : "phase_1");
+      setSessionReady(true);
     }
   }, []);
 
@@ -266,7 +271,7 @@ export default function Home() {
           const delay = 1000 * Math.pow(2, sessionRetry + 1);
           setTimeout(() => setSessionRetry(prev => prev + 1), delay);
         } else {
-          setPhase("phase_1");
+          setSessionReady(true);
         }
       }
     });
@@ -325,9 +330,18 @@ export default function Home() {
       setShowError(true);
       safeTimeout(() => {
         setShakeScreen(false);
-        isAnsweringRef.current = false;
       }, 500);
-      safeTimeout(() => setShowError(false), 2000);
+      safeTimeout(() => {
+        setShowError(false);
+        setCurrentQuestion(1 as QuestionId);
+        setAnsweredQuestions(new Set());
+        setCircuitReveal(0);
+        setProgress(0);
+        setTotalSats(0);
+        setLangHidden(false);
+        isAnsweringRef.current = false;
+        setPhase("boot");
+      }, 2000);
     }
   };
 
@@ -382,27 +396,34 @@ export default function Home() {
 
 
 
-  if (phase === "loading" || !sessionId || isSessionLoading) {
+  useEffect(() => {
+    if (phase === "loading" && sessionReady && loadingAnimDone) {
+      setPhase("boot");
+    }
+  }, [phase, sessionReady, loadingAnimDone]);
+
+  useEffect(() => {
+    if (phase !== "loading") return;
+    const failsafe = setTimeout(() => {
+      setSessionReady(true);
+      setLoadingAnimDone(true);
+    }, 8000);
+    return () => clearTimeout(failsafe);
+  }, [phase]);
+
+  if (phase === "loading") {
     return (
-      <div className="fixed inset-0 bg-[#F5F5F5] flex items-center justify-center">
-        <GridBackground intensity="high" />
-        <div className="flex flex-col items-center gap-4 z-10">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-          >
-            <Loader2 className="w-8 h-8" style={{ color: "#B87333", filter: "drop-shadow(0 0 6px rgba(184, 115, 51, 0.5))" }} />
-          </motion.div>
-          <motion.div 
-            className="text-xs tracking-[0.3em] font-mono"
-            style={{ color: "#B87333", opacity: 0.8 }}
-            animate={{ opacity: [0.5, 1, 0.5] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
-          >
-            {lang === "RU" ? "ИНИЦИАЛИЗАЦИЯ..." : lang === "EN" ? "INITIALIZING..." : "INIZIALIZZAZIONE..."}
-          </motion.div>
-        </div>
-      </div>
+      <LoadingScreen onComplete={() => setLoadingAnimDone(true)} />
+    );
+  }
+
+  if (phase === "boot") {
+    return (
+      <BootScreen
+        onDismiss={() => setPhase("phase_1")}
+        onLangChange={handleLangChange}
+        lang={lang}
+      />
     );
   }
 
@@ -466,7 +487,7 @@ export default function Home() {
                   boxShadow: "0 0 15px rgba(184, 115, 51, 0.3), 0 0 30px rgba(184, 115, 51, 0.1)",
                   color: "#D4956A",
                 }}>
-                {qt.tryAgain}
+                {qt.notForYou}
               </div>
             </motion.div>
           )}

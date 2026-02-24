@@ -83,3 +83,8 @@ The application features a distinct two-phase visual design:
 - API: POST /api/save-progress, POST /api/sync-user
 - localStorage keys: "liberta_token", "liberta_terminal_progress", "liberta_boot_dismissed"
 - Users table columns: id, token, xp, level, current_module_id, current_step_index, total_sats, independence_progress
+- Loading screen (LoadingScreen.tsx): 3-phase hypnotic animation (data cascade → INITIALIZING FREEDOM → RE_TERMINAL blink), 3s total, white bg, black monospace text
+- App flow: Loading Screen (3s) → Boot Screen (browser/app choice) → Phase 1 → Phase 2
+- Phase 1 "No" answer: shows "наверное это не для тебя" (notForYou) message, then redirects to Boot Screen after 2s
+- PWA install: shared global module (client/src/lib/pwa-install.ts) captures beforeinstallprompt early, used by both BootScreen and TerminalChat
+- Analytics dashboard: shows last 20 sessions (LIMIT 20), password "2222"

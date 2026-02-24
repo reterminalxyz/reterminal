@@ -21,7 +21,8 @@
     "yes": "ДА",
     "no": "НЕТ",
     "notYet": "ПОКА НЕТ",
-    "tryAgain": "ПОПРОБУЙ ЕЩЁ"
+    "tryAgain": "ПОПРОБУЙ ЕЩЁ",
+    "notForYou": "НАВЕРНОЕ ЭТО НЕ ДЛЯ ТЕБЯ"
   },
 
   "terminal_header": "re_terminal",

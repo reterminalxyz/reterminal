@@ -80,7 +80,7 @@ export async function getSessionDurations(): Promise<{ session_id: string; durat
     GROUP BY session_id
     HAVING COUNT(*) > 1
     ORDER BY MIN(timestamp) DESC
-    LIMIT 50
+    LIMIT 20
   `);
   return res.rows;
 }

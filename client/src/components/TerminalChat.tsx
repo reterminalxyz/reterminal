@@ -6,6 +6,7 @@ import { SKILL_META, type SkillKey } from "@shared/schema";
 import ProfileOverlay from "./ProfileOverlay";
 import { getLearningBlocks, getWalletSteps, getSatoshiWisdom, getUITexts, type LearningBlock, type WalletStep, type WalletStepButton, type BlockOption } from "@/lib/terminal-i18n";
 import { trackEvent } from "@/lib/analytics";
+import { triggerInstallPrompt, isPromptAvailable, isIOS as checkIsIOS, isAndroid as checkIsAndroid } from "@/lib/pwa-install";
 
 interface Message {
   id: number;
@@ -354,8 +355,6 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
   const [showCelebration, setShowCelebration] = useState(false);
   const [followUpdatesClicked, setFollowUpdatesClicked] = useState(false);
   const [followUpdatesTyped, setFollowUpdatesTyped] = useState(false);
-  const deferredInstallRef = useRef<any>(null);
-
   const isLockedRef = useRef(false);
   const mountedRef = useRef(true);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -368,15 +367,6 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
   const lastScrollTopRef = useRef(0);
   const pendingTimeoutsRef = useRef<ReturnType<typeof setTimeout>[]>([]);
   const deeplinkCleanupRef = useRef<(() => void) | null>(null);
-
-  useEffect(() => {
-    const handler = (e: Event) => {
-      e.preventDefault();
-      deferredInstallRef.current = e;
-    };
-    window.addEventListener("beforeinstallprompt", handler);
-    return () => window.removeEventListener("beforeinstallprompt", handler);
-  }, []);
 
   const scrollToBottom = useCallback(() => {
     if (!userScrolledRef.current) {
@@ -505,19 +495,15 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
 
   const handlePWAInstall = useCallback(async () => {
     playClick();
-    if (deferredInstallRef.current) {
-      deferredInstallRef.current.prompt();
-      await deferredInstallRef.current.userChoice;
-      deferredInstallRef.current = null;
-    } else {
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-      const isAndroid = /Android/.test(navigator.userAgent);
-      let instruction = uiTexts.installInstructionsFallback;
-      if (isIOS) instruction = uiTexts.installInstructionsIOS;
-      else if (isAndroid) instruction = uiTexts.installInstructionsAndroid;
-      setInstallInstructionText(instruction);
-      setShowInstallInstructions(true);
+    if (isPromptAvailable()) {
+      const outcome = await triggerInstallPrompt();
+      if (outcome === "accepted") return;
     }
+    let instruction = uiTexts.installInstructionsFallback;
+    if (checkIsIOS()) instruction = uiTexts.installInstructionsIOS;
+    else if (checkIsAndroid()) instruction = uiTexts.installInstructionsAndroid;
+    setInstallInstructionText(instruction);
+    setShowInstallInstructions(true);
   }, [uiTexts]);
 
   const startBlock = useCallback((blockIndex: number, skipTyping?: boolean) => {

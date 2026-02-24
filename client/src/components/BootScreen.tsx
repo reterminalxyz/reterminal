@@ -1,7 +1,8 @@
-import { useState, useEffect, useRef } from "react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Share, ArrowDown } from "lucide-react";
 import { RU_BOOT_SCREEN } from "@/lib/ru-texts";
+import { triggerInstallPrompt, isPromptAvailable, isIOS, isAndroid } from "@/lib/pwa-install";
 
 type Lang = "RU" | "EN" | "IT";
 
@@ -33,10 +34,6 @@ interface BootScreenProps {
   onDismiss: () => void;
   onLangChange?: (lang: string) => void;
   lang?: string;
-}
-
-function isIOS(): boolean {
-  return /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
 }
 
 function LangToggle({ lang, onLangChange, variant }: { lang: Lang; onLangChange: (l: Lang) => void; variant: "dark" | "light" }) {
@@ -87,7 +84,6 @@ export type { Lang };
 export function BootScreen({ onDismiss, onLangChange, lang = "IT" }: BootScreenProps) {
   const [showIOSInstructions, setShowIOSInstructions] = useState(false);
   const [shutdownStage, setShutdownStage] = useState<ShutdownStage>("idle");
-  const deferredPromptRef = useRef<any>(null);
 
   const currentLang = (lang as Lang) || "IT";
   const t = TRANSLATIONS[currentLang] || TRANSLATIONS.IT;
@@ -97,31 +93,20 @@ export function BootScreen({ onDismiss, onLangChange, lang = "IT" }: BootScreenP
     onLangChange?.(l);
   };
 
-  useEffect(() => {
-    const handler = (e: Event) => {
-      e.preventDefault();
-      deferredPromptRef.current = e;
-    };
-    window.addEventListener("beforeinstallprompt", handler);
-    return () => window.removeEventListener("beforeinstallprompt", handler);
-  }, []);
-
   const handleInstall = async () => {
     if (isIOS()) {
       setShowIOSInstructions(true);
       return;
     }
 
-    if (deferredPromptRef.current) {
-      deferredPromptRef.current.prompt();
-      const result = await deferredPromptRef.current.userChoice;
-      deferredPromptRef.current = null;
-      if (result.outcome === "accepted") {
+    if (isPromptAvailable()) {
+      const outcome = await triggerInstallPrompt();
+      if (outcome === "accepted") {
         startShutdown();
+        return;
       }
-    } else {
-      startShutdown();
     }
+    setShowIOSInstructions(true);
   };
 
   const startShutdown = () => {
@@ -423,30 +408,47 @@ export function BootScreen({ onDismiss, onLangChange, lang = "IT" }: BootScreenP
                 </button>
 
                 <h3 className="text-[#E8E8E8] font-mono text-[12px] font-bold tracking-wider mb-4">
-                  INSTALL ON iOS
+                  {isIOS() ? "INSTALL ON iOS" : isAndroid() ? "INSTALL ON ANDROID" : "INSTALL APP"}
                 </h3>
 
                 <div className="flex items-center gap-4 bg-[#111] rounded-xl p-4 border border-[#222]">
                   <div className="flex flex-col gap-3 flex-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[#B87333] font-mono text-[11px] font-bold">1.</span>
-                      <span className="text-[#999] font-mono text-[11px]">Tap</span>
-                      <Share className="w-4 h-4 text-[#B87333]" />
-                      <span className="text-[#999] font-mono text-[11px]">below</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-[#B87333] font-mono text-[11px] font-bold">2.</span>
-                      <span className="text-[#999] font-mono text-[11px]">Add to Home Screen</span>
-                    </div>
+                    {isIOS() ? (
+                      <>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[#B87333] font-mono text-[11px] font-bold">1.</span>
+                          <span className="text-[#999] font-mono text-[11px]">Tap</span>
+                          <Share className="w-4 h-4 text-[#B87333]" />
+                          <span className="text-[#999] font-mono text-[11px]">below</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[#B87333] font-mono text-[11px] font-bold">2.</span>
+                          <span className="text-[#999] font-mono text-[11px]">Add to Home Screen</span>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[#B87333] font-mono text-[11px] font-bold">1.</span>
+                          <span className="text-[#999] font-mono text-[11px]">Tap ⋮ menu (top right)</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="text-[#B87333] font-mono text-[11px] font-bold">2.</span>
+                          <span className="text-[#999] font-mono text-[11px]">"Install app" or "Add to home"</span>
+                        </div>
+                      </>
+                    )}
                   </div>
 
-                  <motion.div
-                    animate={{ y: [0, 8, 0] }}
-                    transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-                    className="flex-shrink-0"
-                  >
-                    <ArrowDown className="w-6 h-6 text-[#B87333]" strokeWidth={2.5} />
-                  </motion.div>
+                  {isIOS() && (
+                    <motion.div
+                      animate={{ y: [0, 8, 0] }}
+                      transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
+                      className="flex-shrink-0"
+                    >
+                      <ArrowDown className="w-6 h-6 text-[#B87333]" strokeWidth={2.5} />
+                    </motion.div>
+                  )}
                 </div>
               </div>
             </motion.div>
