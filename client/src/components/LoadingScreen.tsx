@@ -14,8 +14,9 @@ export function LoadingScreen({ onComplete }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
   const completedRef = useRef(false);
-  const phaseRef = useRef<1 | 2>(1);
+  const phaseRef = useRef<1 | 2 | 3>(1);
   const [showTitle, setShowTitle] = useState(false);
+  const [zooming, setZooming] = useState(false);
 
   const colCount = useMemo(() => {
     if (typeof window === "undefined") return 30;
@@ -28,7 +29,7 @@ export function LoadingScreen({ onComplete }: Props) {
 
     const dpr = window.devicePixelRatio || 1;
     const w = window.innerWidth;
-    const h = window.innerHeight;
+    const h = Math.max(window.innerHeight, document.documentElement.clientHeight, screen.height || 0);
     canvas.width = w * dpr;
     canvas.height = h * dpr;
     canvas.style.width = w + "px";
@@ -39,7 +40,7 @@ export function LoadingScreen({ onComplete }: Props) {
     ctx.scale(dpr, dpr);
 
     const fontSize = Math.max(14, Math.floor(w / colCount));
-    const rowsNeeded = Math.ceil(h / fontSize) + 8;
+    const rowsNeeded = Math.ceil(h / fontSize) + 10;
     const colW = w / colCount;
 
     const columns = Array.from({ length: colCount }, () => ({
@@ -50,7 +51,7 @@ export function LoadingScreen({ onComplete }: Props) {
     }));
 
     const startTime = Date.now();
-    const SWITCH_AT = 1800;
+    const SHOW_TITLE_AT = 1800;
 
     const draw = () => {
       const elapsed = Date.now() - startTime;
@@ -82,8 +83,7 @@ export function LoadingScreen({ onComplete }: Props) {
           const cy = baseY + r * fontSize - fontSize;
           if (cy < -fontSize || cy > h + fontSize) continue;
 
-          const vertFade = 1 - Math.abs(cy - h / 2) / (h / 2) * 0.35;
-          const alpha = col.baseOpacity * vertFade * (0.2 + (r / col.chars.length) * 0.8);
+          const alpha = col.baseOpacity * (0.2 + (r / col.chars.length) * 0.8);
           if (alpha < 0.02) continue;
 
           ctx.fillStyle = `rgba(0,0,0,${alpha})`;
@@ -91,7 +91,7 @@ export function LoadingScreen({ onComplete }: Props) {
         }
       }
 
-      if (elapsed >= SWITCH_AT && phaseRef.current === 1) {
+      if (elapsed >= SHOW_TITLE_AT && phaseRef.current === 1) {
         phaseRef.current = 2;
         setShowTitle(true);
       }
@@ -105,26 +105,41 @@ export function LoadingScreen({ onComplete }: Props) {
   }, [colCount]);
 
   useEffect(() => {
-    if (showTitle && !completedRef.current) {
+    if (showTitle && phaseRef.current === 2) {
+      const zoomTimer = setTimeout(() => {
+        phaseRef.current = 3;
+        setZooming(true);
+      }, 700);
+      return () => clearTimeout(zoomTimer);
+    }
+  }, [showTitle]);
+
+  useEffect(() => {
+    if (zooming && !completedRef.current) {
       const t = setTimeout(() => {
         completedRef.current = true;
         onComplete();
-      }, 1200);
+      }, 700);
       return () => clearTimeout(t);
     }
-  }, [showTitle, onComplete]);
+  }, [zooming, onComplete]);
 
   return (
     <div
       className="fixed inset-0 overflow-hidden"
-      style={{ background: "#FFFFFF", zIndex: 9999 }}
+      style={{ background: "#000", zIndex: 9999, height: "100dvh" }}
       data-testid="loading-screen"
     >
-      <canvas
-        ref={canvasRef}
+      <div
         className="absolute inset-0"
-        style={{ width: "100%", height: "100%" }}
-      />
+        style={{ background: "#FFFFFF", height: "calc(100% + 60px)", top: "-30px" }}
+      >
+        <canvas
+          ref={canvasRef}
+          className="absolute"
+          style={{ width: "100%", height: "calc(100% + 60px)", top: "-30px", left: 0 }}
+        />
+      </div>
 
       {showTitle && (
         <div
@@ -132,33 +147,64 @@ export function LoadingScreen({ onComplete }: Props) {
           data-testid="loading-screen-final"
         >
           <div
+            className={zooming ? "ls-zoom-out" : "ls-title-in"}
             style={{
               fontFamily: "'Roboto Mono','Courier New',monospace",
               fontSize: "clamp(22px, 7vw, 36px)",
               fontWeight: 700,
               letterSpacing: "0.3em",
               color: "#000",
-              background: "radial-gradient(ellipse at center, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.7) 50%, transparent 80%)",
+              background: "radial-gradient(ellipse at center, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.75) 45%, transparent 75%)",
               padding: "24px 48px",
-              animation: "lsTitleIn 0.6s ease-out both",
+              transformOrigin: "center center",
             }}
           >
             <span>RE</span>
-            <span style={{ animation: "lsBlink 800ms step-end infinite" }}>_</span>
+            <span className={zooming ? "" : "ls-blink"}>_</span>
             <span>TERMINAL</span>
           </div>
         </div>
       )}
 
+      {zooming && (
+        <div
+          className="absolute inset-0 z-20 pointer-events-none ls-black-fade"
+          style={{ background: "#000" }}
+        />
+      )}
+
       <style>{`
+        .ls-title-in {
+          animation: lsTitleIn 0.5s ease-out both;
+        }
+        .ls-zoom-out {
+          animation: lsZoomExpand 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
+        }
+        .ls-blink {
+          animation: lsBlink 800ms step-end infinite;
+        }
+        .ls-black-fade {
+          animation: lsBlackFade 0.7s cubic-bezier(0.4, 0, 0.2, 1) both;
+        }
         @keyframes lsTitleIn {
-          0% { opacity: 0; transform: scale(0.92); filter: blur(4px); }
-          60% { opacity: 1; transform: scale(1.02); filter: blur(0px); }
+          0% { opacity: 0; transform: scale(0.92); filter: blur(3px); }
+          60% { opacity: 1; transform: scale(1.01); filter: blur(0px); }
           100% { opacity: 1; transform: scale(1); filter: blur(0px); }
+        }
+        @keyframes lsZoomExpand {
+          0% { transform: scale(1); opacity: 1; }
+          40% { transform: scale(3); opacity: 1; }
+          70% { transform: scale(12); opacity: 0.9; }
+          100% { transform: scale(25); opacity: 0; }
         }
         @keyframes lsBlink {
           0%, 100% { opacity: 1; }
           50% { opacity: 0; }
+        }
+        @keyframes lsBlackFade {
+          0% { opacity: 0; }
+          50% { opacity: 0; }
+          100% { opacity: 1; }
         }
       `}</style>
     </div>
