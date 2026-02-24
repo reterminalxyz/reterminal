@@ -11,7 +11,7 @@ import { RU_PHASE1_QUESTIONS } from "@/lib/ru-texts";
 import { useCreateSession, useUpdateSession, useSession } from "@/hooks/use-sessions";
 import { useGrantSkill } from "@/hooks/use-skills";
 import { LoadingScreen } from "@/components/LoadingScreen";
-import { playClick, playError, playPhaseComplete, playTransition } from "@/lib/sounds";
+import { playClick, playError, playPhaseComplete } from "@/lib/sounds";
 import { trackEvent, getOrCreateSession } from "@/lib/analytics";
 
 type Phase = "loading" | "boot" | "phase_1" | "phase_1_complete" | "chip_exit" | "phase_2";
@@ -20,7 +20,7 @@ type QuestionId = 1 | 2 | 3 | 4;
 const PROGRESS_PER_QUESTION = [5, 10, 15, 20];
 const SATS_PER_QUESTION = 50;
 
-const Q_TRANSLATIONS: Record<string, { titles: string[]; yes: string; no: string; notYet: string; tryAgain: string; notForYou: string }> = {
+const Q_TRANSLATIONS: Record<string, { titles: string[]; yes: string; no: string; notYet: string; notForYou: string }> = {
   RU: RU_PHASE1_QUESTIONS,
   EN: {
     titles: [
@@ -32,7 +32,6 @@ const Q_TRANSLATIONS: Record<string, { titles: string[]; yes: string; no: string
     yes: "YES",
     no: "NO",
     notYet: "NOT YET",
-    tryAgain: "TRY AGAIN",
     notForYou: "MAYBE THIS ISN'T FOR YOU",
   },
   IT: {
@@ -45,7 +44,6 @@ const Q_TRANSLATIONS: Record<string, { titles: string[]; yes: string; no: string
     yes: "S\u00cc",
     no: "NO",
     notYet: "NON ANCORA",
-    tryAgain: "RIPROVA",
     notForYou: "FORSE NON FA PER TE",
   },
 };

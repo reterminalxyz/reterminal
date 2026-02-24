@@ -16,7 +16,6 @@ export function LoadingScreen({ onComplete }: Props) {
   const completedRef = useRef(false);
   const phaseRef = useRef<1 | 2>(1);
   const [showTitle, setShowTitle] = useState(false);
-  const titleStartRef = useRef(0);
 
   const colCount = useMemo(() => {
     if (typeof window === "undefined") return 30;
@@ -94,7 +93,6 @@ export function LoadingScreen({ onComplete }: Props) {
 
       if (elapsed >= SWITCH_AT && phaseRef.current === 1) {
         phaseRef.current = 2;
-        titleStartRef.current = Date.now();
         setShowTitle(true);
       }
 
