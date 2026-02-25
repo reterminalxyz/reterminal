@@ -1,0 +1,28 @@
+Act as a Senior Creative Front-End Developer specializing in high-end SVG animations.
+
+I need to add a unique "Pure Minimalist" animation to the first module card located in the `.curriculum-carousel`.
+
+**Target Element:** The first card corresponding to "Financial freedom".
+
+**The Concept (Hover Interaction):**
+The user hovers over the card. A static Dollar sign symbol transforms into a glowing Bitcoin symbol through a technological "glitch" effect.
+
+**Implementation Steps (HTML & CSS only):**
+
+1.  **HTML Modification:** Inside the first `.module-card`, above the title "Financial freedom", insert an `<svg>` container (viewBox="0 0 64 64", width="64", height="64").
+    * Inside the SVG, create two groups (`<g>`):
+        * Group 1 (Class `.icon-dollar`): A minimalist, thin-line path for the dollar sign `$`.
+        * Group 2 (Class `.icon-bitcoin`): A minimalist, thin-line path for the Bitcoin sign `₿`.
+
+2.  **CSS Animation States (Default State):**
+    * The `.module-card` must have `position: relative;` and `overflow: hidden;`.
+    * The SVG container should be centered horizontally above the text.
+    * `.icon-dollar`: Visible (`opacity: 1`), stroke color black.
+    * `.icon-bitcoin`: Hidden (`opacity: 0`), slightly scaled down (`transform: scale(0.8)`), stroke color black.
+
+3.  **CSS Animation States (Hover State):**
+    * When the card is hovered (`.module-card:hover`):
+        * **Dollar Animation:** The `.icon-dollar` triggers a keyframe animation named `glitch-out`. It should vibrate horizontally rapidly, break into segments (using `stroke-dasharray` manipulation if possible, or just rapid opacity flickering), and fade to `opacity: 0` over 0.4s.
+        * **Bitcoin Animation:** The `.icon-bitcoin` triggers a transition to `opacity: 1` and `transform: scale(1)`. It should appear smoothly using `transition-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);` with a slight delay so it appears *after* the dollar starts breaking. Add a subtle white glowing effect (`filter: drop-shadow(0 0 4px rgba(255,255,255,0.8))`) to the Bitcoin sign on hover to make it feel active.
+
+**Style Guide:** Keep strokes thin (1px or 1.5px). The animation must feel precise, digital, and expensive, not cartoonish. Provide the full updated HTML for the card and the necessary CSS block.
