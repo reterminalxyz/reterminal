@@ -323,7 +323,7 @@ function GridGlow() {
 
 function GlitchTitle() {
   const [showSep, setShowSep] = useState(false);
-  const [glyph, setGlyph] = useState("_");
+  const [glyphs, setGlyphs] = useState("_");
 
   useEffect(() => {
     let flickerTimer: ReturnType<typeof setInterval> | null = null;
@@ -332,15 +332,20 @@ function GlitchTitle() {
       const flicks = 2 + Math.floor(Math.random() * 5);
       let count = 0;
       flickerTimer = setInterval(() => {
-        setGlyph(GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)]);
+        const numChars = 2 + Math.floor(Math.random() * 3);
+        let chars = "";
+        for (let i = 0; i < numChars; i++) {
+          chars += GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
+        }
+        setGlyphs(chars);
         count++;
         if (count >= flicks) {
           if (flickerTimer) clearInterval(flickerTimer);
           flickerTimer = null;
-          setTimeout(() => setShowSep(false), 80 + Math.random() * 150);
+          setTimeout(() => { setShowSep(false); setGlyphs("_"); }, 100 + Math.random() * 200);
         }
-      }, 40 + Math.random() * 30);
-    }, 600 + Math.random() * 1200);
+      }, 52 + Math.random() * 40);
+    }, 780 + Math.random() * 1560);
     return () => { clearInterval(interval); if (flickerTimer) clearInterval(flickerTimer); };
   }, []);
 
@@ -358,7 +363,7 @@ function GlitchTitle() {
     >
       <span style={{ color: "#000" }}>re</span>
       {showSep ? (
-        <span style={{ color: "#00e5ff", textShadow: "0 0 6px #00e5ff, 0 0 15px rgba(0,229,255,0.3)" }}>{glyph}</span>
+        <span style={{ color: "#00e5ff", textShadow: "0 0 6px #00e5ff, 0 0 15px rgba(0,229,255,0.3)", fontSize: "0.85em" }}>{glyphs}</span>
       ) : (
         <span className="landing-blink" style={{ color: "#000" }}>_</span>
       )}
