@@ -409,9 +409,7 @@ function HowItWorksSection() {
             </div>
           ))}
           <div ref={costRef} className="tl-cost" data-testid="text-cost-highlight">
-            <div className="tl-cost-inner">
-              <p style={{ fontFamily: FONT_MONO, fontSize: "clamp(18px, 4vw, 32px)", fontWeight: 400 }}>Cost of onboarding: $1.50 per user</p>
-            </div>
+            <p style={{ fontFamily: FONT_MONO, fontSize: "clamp(18px, 4vw, 32px)", fontWeight: 400 }}>Cost of onboarding: $1.50 per user</p>
           </div>
         </div>
       </div>
@@ -517,21 +515,20 @@ export default function Landing() {
         }
         .tl-step.tl-active p { color: #666 !important; }
         .tl-cost {
-          position: relative;
-          margin-left: -3rem;
-          padding-left: 0;
-        }
-        .tl-cost-inner {
-          border: 2px solid #E5E5E5;
-          border-left: none;
+          border: 1px solid #E5E5E5;
           padding: 24px 20px;
           text-align: center;
           color: #000;
-          margin-left: -1px;
-          transition: border-color 0.4s ease;
+          background: transparent;
+          transition: background 0.4s ease, color 0.4s ease, border-color 0.4s ease;
         }
-        .tl-cost.tl-cost-active .tl-cost-inner {
+        .tl-cost.tl-cost-active {
+          background: #000;
+          color: #fff;
           border-color: #000;
+        }
+        .tl-cost.tl-cost-active p {
+          color: #fff;
         }
         .landing-blink { animation: landing-blink-kf 1s step-end infinite; }
         @keyframes landing-blink-kf {
