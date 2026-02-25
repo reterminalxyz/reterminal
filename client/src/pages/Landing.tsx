@@ -136,14 +136,38 @@ function HeroSection() {
 function ProblemSection() {
   const obs = useInView(0.2);
   return (
-    <section style={{ padding: "3vh 0" }} data-testid="section-problem">
-      <div ref={obs.ref} className={`trap-container${obs.visible ? " trap-visible" : ""}`}>
-        <h2 className="trap-header" data-testid="text-problem-stat">&gt; 60 countries actively censor the internet.</h2>
-        <div className="trap-tree">
-          <div className="trap-node" data-testid="text-problem-step2">Total surveillance</div>
-          <div className="trap-node trap-final" data-testid="text-problem-step3">Financial control</div>
+    <section style={{ padding: "4vh 0" }} data-testid="section-problem">
+      <div ref={obs.ref} style={{ maxWidth: 900, margin: "0 auto", padding: "0 5vw" }}>
+        <div style={reveal(obs.visible)}>
+          <p
+            style={{
+              fontFamily: FONT_MONO,
+              fontSize: "clamp(28px, 6vw, 56px)",
+              fontWeight: 400,
+              color: "#000",
+              lineHeight: 1.15,
+              letterSpacing: "-0.02em",
+            }}
+            data-testid="text-problem-stat"
+          >
+            guerrilla-style gamified educational phygital terminal.
+          </p>
         </div>
-        <div className="trap-conclusion" data-testid="text-problem-conclusion">Education must be holistic, not piecemeal.</div>
+        <div style={reveal(obs.visible, 0.3)}>
+          <p
+            style={{
+              fontFamily: FONT_BODY,
+              fontSize: "clamp(14px, 3vw, 20px)",
+              color: "#666",
+              lineHeight: 1.5,
+              marginTop: 24,
+              maxWidth: 600,
+            }}
+            data-testid="text-problem-conclusion"
+          >
+            It teaches users BTC and anti-authoritarian digital tools through interactive guides and tasks.
+          </p>
+        </div>
       </div>
     </section>
   );
@@ -286,11 +310,12 @@ function ModulesSection() {
             </div>
           ))}
         </div>
-        <div
-          className="absolute left-0 top-0 bottom-4 pointer-events-none flex items-center"
-          style={{ width: 60, background: "linear-gradient(to left, transparent, #FFFFFF 70%)", zIndex: 2 }}
-        >
-          <div className="landing-scroll-line-h" style={{ width: 40, height: 1, background: "#000", marginLeft: 12 }} />
+      </div>
+      <div style={{ display: "flex", justifyContent: "center", marginTop: 16, ...reveal(obs.visible, 0.3) }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <div className="landing-scroll-line-h" style={{ width: 32, height: 1, background: "#000" }} />
+          <span style={{ fontFamily: FONT_MONO, fontSize: 11, letterSpacing: "0.15em", color: "#999" }}>SCROLL</span>
+          <div className="landing-scroll-line-h" style={{ width: 32, height: 1, background: "#000" }} />
         </div>
       </div>
     </section>
@@ -662,83 +687,6 @@ export default function Landing() {
           0% { background-position: 0 -200px; }
           100% { background-position: 0 calc(100vh + 200px); }
         }
-        /* Surveillance Trap */
-        .trap-container {
-          max-width: 800px;
-          margin: 0 auto;
-          font-family: 'JetBrains Mono', monospace;
-          color: #000;
-          padding: 0 5vw;
-        }
-        .trap-header {
-          font-size: clamp(22px, 5vw, 2.5rem);
-          font-weight: 400;
-          letter-spacing: -0.02em;
-          line-height: 1.2;
-          margin-bottom: 0;
-          opacity: 0;
-          transform: translateY(16px);
-          transition: opacity 0.6s cubic-bezier(0.2,0.8,0.2,1), transform 0.6s cubic-bezier(0.2,0.8,0.2,1);
-        }
-        .trap-tree {
-          margin-left: 1.5rem;
-          border-left: 2px solid #000;
-          padding: 2rem 0 0 0;
-          display: flex;
-          flex-direction: column;
-          gap: 2.5rem;
-          opacity: 0;
-          transform: scaleY(0);
-          transform-origin: top;
-          transition: opacity 0.4s ease 0.4s, transform 0.5s cubic-bezier(0.2,0.8,0.2,1) 0.4s;
-        }
-        .trap-node {
-          position: relative;
-          font-size: clamp(14px, 3vw, 1.25rem);
-          padding-left: 3rem;
-          opacity: 0;
-          transform: translateX(-8px);
-          transition: opacity 0.2s ease, transform 0.3s cubic-bezier(0.2,0.8,0.2,1);
-        }
-        .trap-node:nth-child(1) { transition-delay: 0.9s; }
-        .trap-node:nth-child(2) { transition-delay: 1.5s; }
-        .trap-node::before {
-          content: "";
-          position: absolute;
-          left: 0;
-          top: 50%;
-          transform: translateY(-50%);
-          width: 2rem;
-          height: 2px;
-          background-color: #000;
-        }
-        .trap-final {
-          padding: 6px 12px 6px 3rem;
-          border: 1px solid transparent;
-          transition: opacity 0.2s ease 1.5s, transform 0.3s cubic-bezier(0.2,0.8,0.2,1) 1.5s, border-color 0.15s ease 2.0s;
-        }
-        .trap-conclusion {
-          font-family: 'Inter', system-ui, sans-serif;
-          font-size: clamp(14px, 3vw, 18px);
-          margin-top: 2rem;
-          border: 1px solid #E5E5E5;
-          padding: 24px;
-          opacity: 0;
-          transform: translateY(12px);
-          transition: opacity 0.6s cubic-bezier(0.2,0.8,0.2,1) 2.4s, transform 0.6s cubic-bezier(0.2,0.8,0.2,1) 2.4s;
-        }
-        .trap-visible .trap-header { opacity: 1; transform: translateY(0); }
-        .trap-visible .trap-tree { opacity: 1; transform: scaleY(1); }
-        .trap-visible .trap-node { opacity: 1; transform: translateX(0); }
-        .trap-visible .trap-final { border-color: #000; animation: trap-flash 0.3s ease 2.0s 1; }
-        .trap-visible .trap-conclusion { opacity: 1; transform: translateY(0); }
-        @keyframes trap-flash {
-          0% { background: transparent; color: #000; }
-          33% { background: #000; color: #fff; }
-          66% { background: #000; color: #fff; }
-          100% { background: transparent; color: #000; }
-        }
-
         .landing-scroll-line-h {
           animation: landing-line-pulse 2.5s ease-in-out infinite;
         }
