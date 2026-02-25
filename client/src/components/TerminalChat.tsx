@@ -1160,7 +1160,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
                   setSatsClaimed(true);
                   try { localStorage.setItem("liberta_sats_claimed", "1"); } catch (_) {}
                 }
-                window.open("https://lovesicklard8.lnbits.com/withdraw/api/v1/lnurl/3wdm6StkGBHTS33RvEDqgM", "_blank");
+                window.open("https://lovesicklard8.lnbits.com/withdraw/7d77shxdb56wPeXf4s8B4o", "_blank");
               }}
               disabled={satsClaimed}
               className={`w-full px-4 py-3 text-left text-[13px] font-mono font-bold tracking-wide
