@@ -139,7 +139,7 @@ function ProblemSection() {
   const s3 = useInView();
   const s4 = useInView();
   return (
-    <section style={{ padding: "8vh 0" }} data-testid="section-problem">
+    <section style={{ padding: "3vh 0" }} data-testid="section-problem">
       <div style={{ maxWidth: 1000, margin: "0 auto", padding: "0 5vw" }}>
         <div ref={s1.ref} style={reveal(s1.visible)}>
           <p style={{ fontFamily: FONT_MONO, fontSize: "clamp(22px, 5vw, 40px)", fontWeight: 400, color: "#000", lineHeight: 1.3, marginBottom: 32 }} data-testid="text-problem-stat">
@@ -165,9 +165,9 @@ function ProblemSection() {
 function ModulesSection() {
   const obs = useInView();
   return (
-    <section style={{ padding: "6vh 0" }} data-testid="section-modules">
-      <div ref={obs.ref} style={{ maxWidth: 1000, margin: "0 auto", padding: "0 5vw", marginBottom: 24, ...reveal(obs.visible) }}>
-        <h2 style={{ fontFamily: FONT_MONO, fontSize: "clamp(28px, 7vw, 48px)", fontWeight: 400, color: "#000", letterSpacing: "0.04em" }} data-testid="text-modules-title">
+    <section style={{ padding: "2vh 0" }} data-testid="section-modules">
+      <div ref={obs.ref} style={{ maxWidth: 1000, margin: "0 auto", padding: "0 5vw", marginBottom: 20, ...reveal(obs.visible) }}>
+        <h2 className="text-center" style={{ fontFamily: FONT_MONO, fontSize: "clamp(28px, 7vw, 48px)", fontWeight: 400, color: "#000", letterSpacing: "0.04em" }} data-testid="text-modules-title">
           Modules<span className="landing-blink" style={{ color: "#B87333" }}>_</span>
         </h2>
       </div>
@@ -176,10 +176,10 @@ function ModulesSection() {
           className="landing-no-scrollbar"
           style={{
             display: "flex",
-            gap: 20,
+            gap: 16,
             overflowX: "auto",
             paddingLeft: "5vw",
-            paddingRight: 40,
+            paddingRight: 80,
             paddingBottom: 16,
             scrollSnapType: "x mandatory",
             scrollbarWidth: "none",
@@ -191,12 +191,10 @@ function ModulesSection() {
               key={mod.title}
               style={{
                 flexShrink: 0,
-                width: "calc((100vw - 10vw - 40px) / 3.5)",
-                minWidth: 200,
-                maxWidth: 280,
+                width: "min(75vw, 400px)",
                 aspectRatio: "1",
                 border: BORDER,
-                padding: 20,
+                padding: 28,
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "space-between",
@@ -209,9 +207,9 @@ function ModulesSection() {
               <span
                 style={{
                   fontFamily: FONT_MONO,
-                  fontSize: 10,
+                  fontSize: 11,
                   letterSpacing: "0.1em",
-                  padding: "4px 8px",
+                  padding: "5px 10px",
                   alignSelf: "flex-start",
                   ...(mod.done ? { background: "#000", color: "#fff" } : { border: BORDER, color: "#999" }),
                 }}
@@ -219,14 +217,16 @@ function ModulesSection() {
               >
                 {mod.badge}
               </span>
-              <p style={{ fontFamily: FONT_MONO, fontSize: 15, fontWeight: 400, color: "#000" }}>{mod.title}</p>
+              <p style={{ fontFamily: FONT_MONO, fontSize: "clamp(16px, 4vw, 22px)", fontWeight: 400, color: "#000" }}>{mod.title}</p>
             </div>
           ))}
         </div>
         <div
-          className="absolute right-0 top-0 bottom-4 pointer-events-none"
-          style={{ width: 60, background: "linear-gradient(to right, transparent, #FFFFFF)" }}
-        />
+          className="absolute right-0 top-0 bottom-4 pointer-events-none flex items-center"
+          style={{ width: 70, background: "linear-gradient(to right, transparent, #FFFFFF 70%)" }}
+        >
+          <span className="landing-scroll-arrow" style={{ fontFamily: FONT_MONO, fontSize: 28, color: "#000", marginLeft: "auto", marginRight: 12 }}>→</span>
+        </div>
       </div>
     </section>
   );
@@ -240,9 +240,9 @@ function HowItWorksSection() {
     { num: "03", title: "Peer-to-Peer Growth", sub: "Share cards → Network expands" },
   ];
   return (
-    <section style={{ padding: "6vh 0" }} data-testid="section-howitworks">
+    <section style={{ padding: "2vh 0" }} data-testid="section-howitworks">
       <div ref={obs.ref} style={{ maxWidth: 1000, margin: "0 auto", padding: "0 5vw" }}>
-        <h2 style={{ fontFamily: FONT_MONO, fontSize: "clamp(20px, 4vw, 32px)", fontWeight: 400, color: "#000", marginBottom: 48, ...reveal(obs.visible) }} data-testid="text-hiw-title">
+        <h2 style={{ fontFamily: FONT_MONO, fontSize: "clamp(20px, 4vw, 32px)", fontWeight: 400, color: "#000", marginBottom: 32, ...reveal(obs.visible) }} data-testid="text-hiw-title">
           Deployment Mechanics
         </h2>
         <div className="landing-steps-grid" style={reveal(obs.visible, 0.15)}>
@@ -254,7 +254,7 @@ function HowItWorksSection() {
             </div>
           ))}
         </div>
-        <div style={{ border: BORDER, padding: "24px 20px", textAlign: "center", marginTop: 48, ...reveal(obs.visible, 0.3) }} data-testid="text-cost-highlight">
+        <div style={{ border: BORDER, padding: "24px 20px", textAlign: "center", marginTop: 32, ...reveal(obs.visible, 0.3) }} data-testid="text-cost-highlight">
           <p style={{ fontFamily: FONT_MONO, fontSize: "clamp(18px, 4vw, 32px)", fontWeight: 400, color: "#000" }}>Cost of onboarding: $1.50 per user</p>
         </div>
       </div>
@@ -265,9 +265,9 @@ function HowItWorksSection() {
 function FooterSection({ onEnter }: { onEnter: () => void }) {
   const obs = useInView();
   return (
-    <footer className="flex flex-col items-center" style={{ padding: "8vh 5vw 6vh" }} data-testid="section-footer">
+    <footer className="flex flex-col items-center" style={{ padding: "3vh 5vw 4vh" }} data-testid="section-footer">
       <div ref={obs.ref} style={reveal(obs.visible)}>
-        <p className="text-center" style={{ fontFamily: FONT_BODY, fontSize: "clamp(14px, 3vw, 18px)", color: "#000", marginBottom: 36 }} data-testid="text-footer-tagline">
+        <p className="text-center" style={{ fontFamily: FONT_BODY, fontSize: "clamp(14px, 3vw, 18px)", color: "#000", marginBottom: 24 }} data-testid="text-footer-tagline">
           Built by an activist, for activists.
         </p>
       </div>
@@ -539,7 +539,16 @@ export default function Landing() {
   const handleFogDone = useCallback(() => setLocation("/activation"), [setLocation]);
 
   return (
-    <div style={{ background: "#FFFFFF", minHeight: "100vh" }} data-testid="landing-page">
+    <div className="relative" style={{ background: "#FFFFFF", minHeight: "100vh" }} data-testid="landing-page">
+      <div
+        className="fixed inset-0 pointer-events-none landing-grid-bg"
+        style={{
+          backgroundImage: "linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px)",
+          backgroundSize: "48px 48px",
+          zIndex: 0,
+        }}
+      />
+      <div className="relative" style={{ zIndex: 1 }}>
       <style>{`
         .landing-no-scrollbar::-webkit-scrollbar { display: none; }
         .landing-no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
@@ -569,6 +578,20 @@ export default function Landing() {
           0%, 100% { opacity: 1; }
           50% { opacity: 0; }
         }
+        .landing-grid-bg {
+          animation: landing-grid-pulse 4s ease-in-out infinite;
+        }
+        @keyframes landing-grid-pulse {
+          0%, 100% { opacity: 0.6; }
+          50% { opacity: 1; }
+        }
+        .landing-scroll-arrow {
+          animation: landing-arrow-bounce 1.5s ease-in-out infinite;
+        }
+        @keyframes landing-arrow-bounce {
+          0%, 100% { transform: translateX(0); opacity: 0.5; }
+          50% { transform: translateX(6px); opacity: 1; }
+        }
       `}</style>
 
       <HeroSection />
@@ -576,6 +599,7 @@ export default function Landing() {
       <ModulesSection />
       <HowItWorksSection />
       <FooterSection onEnter={handleEnter} />
+      </div>
 
       {showFog && <FogOverlay onDone={handleFogDone} />}
     </div>
