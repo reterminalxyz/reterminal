@@ -345,8 +345,8 @@ function HowItWorksSection() {
         if (!section || !fill) return;
         const rect = section.getBoundingClientRect();
         const viewH = window.innerHeight;
-        const start = rect.top - viewH * 0.8;
-        const end = rect.bottom - viewH * 0.3;
+        const start = rect.top - viewH * 0.9;
+        const end = rect.bottom - viewH * 0.6;
         const range = end - start;
         if (range <= 0) return;
         const progress = Math.min(100, Math.max(0, ((0 - start) / range) * 100));
