@@ -189,6 +189,7 @@ function ModulesSection() {
           {MODULES.map((mod, i) => (
             <div
               key={mod.title}
+              className={i === 0 ? "module-card-first" : ""}
               style={{
                 flexShrink: 0,
                 width: "min(75vw, 400px)",
@@ -200,6 +201,8 @@ function ModulesSection() {
                 justifyContent: "space-between",
                 scrollSnapAlign: "start",
                 background: "#fff",
+                position: "relative",
+                overflow: "hidden",
                 ...reveal(obs.visible, 0.06 * i),
               }}
               data-testid={`card-module-${i}`}
@@ -217,6 +220,18 @@ function ModulesSection() {
               >
                 {mod.badge}
               </span>
+              {i === 0 && (
+                <div style={{ display: "flex", justifyContent: "center", alignItems: "center", flex: 1 }}>
+                  <svg viewBox="0 0 64 64" width="64" height="64" style={{ overflow: "visible" }}>
+                    <g className="icon-dollar">
+                      <path d="M32 8v48M24 18c0-4 3.5-7 8-7s8 3 8 7c0 5-8 5.5-8 11h0c0 5.5 8 6 8 11 0 4-3.5 7-8 7s-8-3-8-7" fill="none" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </g>
+                    <g className="icon-bitcoin">
+                      <path d="M22 16h10c5 0 9 2 9 7s-3 6.5-3 6.5S42 31 42 36c0 5-4 8-9 8H22M22 16v28M22 30h10M26 12v4M34 12v4M26 44v4M34 44v4" fill="none" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </g>
+                  </svg>
+                </div>
+              )}
               <p style={{ fontFamily: FONT_MONO, fontSize: "clamp(16px, 4vw, 22px)", fontWeight: 400, color: "#000" }}>{mod.title}</p>
             </div>
           ))}
@@ -591,6 +606,37 @@ export default function Landing() {
         @keyframes landing-arrow-bounce {
           0%, 100% { transform: translateX(0); opacity: 0.5; }
           50% { transform: translateX(6px); opacity: 1; }
+        }
+
+        .icon-dollar {
+          opacity: 1;
+          transition: opacity 0.1s;
+        }
+        .icon-bitcoin {
+          opacity: 0;
+          transform: scale(0.8);
+          transform-origin: center;
+          transition: opacity 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s, transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s, filter 0.35s ease 0.15s;
+        }
+        .module-card-first:hover .icon-dollar {
+          animation: icon-glitch-out 0.4s ease-out forwards;
+        }
+        .module-card-first:hover .icon-bitcoin {
+          opacity: 1;
+          transform: scale(1);
+          filter: drop-shadow(0 0 4px rgba(255,255,255,0.8)) drop-shadow(0 0 8px rgba(0,0,0,0.15));
+        }
+        @keyframes icon-glitch-out {
+          0% { opacity: 1; transform: translateX(0); }
+          10% { opacity: 1; transform: translateX(-3px); }
+          20% { opacity: 0.7; transform: translateX(4px); }
+          30% { opacity: 1; transform: translateX(-2px); }
+          40% { opacity: 0.4; transform: translateX(3px); }
+          50% { opacity: 0.8; transform: translateX(-4px); }
+          60% { opacity: 0.2; transform: translateX(2px); }
+          70% { opacity: 0.5; transform: translateX(-1px); }
+          80% { opacity: 0.1; transform: translateX(3px); }
+          100% { opacity: 0; transform: translateX(0); }
         }
       `}</style>
 
