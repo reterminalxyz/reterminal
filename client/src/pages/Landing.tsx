@@ -238,7 +238,10 @@ function ModulesSection() {
                       <path d="M40 20c0-5-3.5-8-8-8s-8 3-8 8c0 10 16 6 16 16 0 5-3.5 8-8 8s-8-3-8-8" fill="none" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     </g>
                     <g className="icon-bitcoin">
-                      <path d="M24 14v36M28 14v-2M36 14v-2M28 50v2M36 50v2M24 14h10c4.5 0 8 2.5 8 7s-3.5 7-8 7M24 28h12c4.5 0 8 2.5 8 8s-3.5 8-8 8H24M24 28h0" fill="none" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      <line x1="28" y1="10" x2="28" y2="54" stroke="#000" strokeWidth="1.5" strokeLinecap="round" />
+                      <line x1="36" y1="10" x2="36" y2="54" stroke="#000" strokeWidth="1.5" strokeLinecap="round" />
+                      <path d="M24 16h14c4 0 7 3 7 7s-3 7-7 7H24" fill="none" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M24 30h16c4 0 7 3 7 8s-3 8-7 8H24" fill="none" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     </g>
                   </svg>
                 )}
@@ -516,20 +519,21 @@ export default function Landing() {
         }
         .tl-step.tl-active p { color: #666 !important; }
         .tl-cost {
-          border: 1px solid #E5E5E5;
+          border: 2px solid #E5E5E5;
           padding: 24px 20px;
           text-align: center;
-          color: #ccc;
-          transform: translateX(-10px);
-          transition: color 0.6s cubic-bezier(0.2,0.8,0.2,1), transform 0.6s cubic-bezier(0.2,0.8,0.2,1), border-color 0.6s cubic-bezier(0.2,0.8,0.2,1);
+          color: #000;
+          transition: border-color 0.3s ease, background 0.3s ease;
         }
         .tl-cost.tl-cost-active {
-          color: #000 !important;
-          transform: translateX(0);
-          border-color: #000 !important;
+          border-color: #000;
+          animation: tl-cost-pulse 0.6s ease 1;
         }
-        .tl-cost.tl-cost-active p {
-          color: #000 !important;
+        @keyframes tl-cost-pulse {
+          0% { border-color: #E5E5E5; background: transparent; }
+          40% { border-color: #000; background: #000; color: #fff; }
+          70% { border-color: #000; background: #000; color: #fff; }
+          100% { border-color: #000; background: transparent; color: #000; }
         }
         .landing-blink { animation: landing-blink-kf 1s step-end infinite; }
         @keyframes landing-blink-kf {
