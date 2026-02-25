@@ -1,0 +1,55 @@
+Act as an expert Frontend Developer and UI/UX Designer. Create a single-page landing page (HTML, CSS, JS) for "re_terminal" — a stealth phygital gateway for digital resistance. 
+
+Style Guidelines ("Pure Minimalist"):
+- Background: Absolute white (#FFFFFF).
+- Text: Absolute black (#000000) for headings, dark gray (#333333) for body. Accents: extremely subtle light gray (#E0E0E0).
+- Typography: Use a premium sans-serif (e.g., 'Inter' or system-ui) for readability, and a crisp monospace font (e.g., 'JetBrains Mono', 'Courier New') for tech accents, numbers, and the logo.
+- Vibe: Clinical, high-end digital architecture, Dieter Rams meets cypherpunk. No heavy shadows, no colorful gradients. Use precise 1px borders and pure geometry.
+
+Page Structure & Functionality:
+
+1. Hero Section (Full viewport height):
+- Center aligned. 
+- Main Title (Monospace): "re_terminal"
+- Subtitle: "digital resistance starts here."
+- Video Placeholder: A clean 16:9 aspect ratio box with a 1px solid black border and a minimal "PLAY_VIDEO" monospace text in the center.
+- One-liner below video: "Gamified phygital terminal for digital resistance education."
+
+2. The Problem Section (Scroll-triggered animation):
+- Title: "The Surveillance Trap"
+- Animation/Layout: Create a 3-step fade-in sequence as the user scrolls down.
+  - Step 1: "> 60 countries actively censor the internet." (Bold, large font)
+  - Step 2: "→ Total surveillance"
+  - Step 3: "→ Financial control"
+- Conclusion text (accented, perhaps italicized serif or boxed): "Education must be holistic, not piecemeal."
+
+3. The Modules Section (Horizontal Scroll Carousel):
+- Title: "Curriculum_"
+- Layout: A horizontal scrolling container (CSS overflow-x: auto, snap-x mandatory) showing 7 module cards. 
+- Card Style: Clean square cards, 1px gray border.
+- Cards Content:
+  1. Financial freedom (Badge: "MVP DONE" in black box with white text)
+  2. Privacy (Badge: "SOON")
+  3. Surveillance evasion (Badge: "SOON")
+  4. Secure communication (Badge: "SOON")
+  5. Censorship bypass (Badge: "SOON")
+  6. Techno-philosophy (Badge: "SOON")
+  7. Offline survival tools (Badge: "SOON")
+
+4. How It Works Section (3 Animated Steps):
+- Title: "Deployment Mechanics"
+- Layout: 3 columns (or vertical on mobile). Add a CSS line connecting them.
+- Step 1: "Tap Physical Object" (Subtitle: Card/Figure/Sticker). Add a pure CSS animation of a minimal phone icon tapping a card.
+- Step 2: "Learn & Earn" (Subtitle: Gamified modules → Earn Sats). 
+- Step 3: "Peer-to-Peer Growth" (Subtitle: Share cards → Network expands).
+- Highlight Box (Very prominent, bottom of this section): "Cost of onboarding: $1.50 per user" (Large monospace typography).
+
+5. Footer & CTA:
+- Minimalist layout.
+- Text: "Built by an activist, for activists."
+- Button: A solid black button with white monospace text "[ ENTER ]". Hover effect: invert colors (white background, black text, black border). Link it to "/activation".
+
+Technical requirements:
+- Use standard HTML/CSS/JS in a single file or standard Replit structure.
+- Ensure fully responsive design (mobile-first approach).
+- Use Intersection Observer API for smooth fade-in/slide-up animations when elements scroll into view. The easing should be 'cubic-bezier(0.19, 1, 0.22, 1)' to feel expensive and precise.
