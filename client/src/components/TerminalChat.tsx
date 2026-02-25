@@ -1160,7 +1160,11 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
                   setSatsClaimed(true);
                   try { localStorage.setItem("liberta_sats_claimed", "1"); } catch (_) {}
                 }
-                window.open("https://lovesicklard8.lnbits.com/withdraw/7d77shxdb56wPeXf4s8B4o", "_blank");
+                const lnurl = "lightning:LNURL1DP68GURN8GHJ7MR0WEJHX6TRDDKXZUNY8QHXCMNZD968XTNRDAKJ7AMFW35XGUNPWUHKZURF9AMRZTMVDE6HYMP0XDMKGMFK2D6XK36ZFP29XVEN2FMY23R3VAXS0EPX5A";
+                window.location.href = lnurl;
+                setTimeout(() => {
+                  window.open("https://lovesicklard8.lnbits.com/withdraw/7d77shxdb56wPeXf4s8B4o", "_blank");
+                }, 2000);
               }}
               disabled={satsClaimed}
               className={`w-full px-4 py-3 text-left text-[13px] font-mono font-bold tracking-wide
