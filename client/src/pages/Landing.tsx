@@ -222,7 +222,7 @@ function ModulesSection() {
               </span>
               {i === 0 && (
                 <div style={{ display: "flex", justifyContent: "center", alignItems: "center", flex: 1 }}>
-                  <svg viewBox="0 0 64 64" width="64" height="64" style={{ overflow: "visible" }}>
+                  <svg viewBox="0 0 64 64" width="256" height="256" style={{ overflow: "visible" }}>
                     <g className="icon-dollar">
                       <path d="M32 8v48M24 18c0-4 3.5-7 8-7s8 3 8 7c0 5-8 5.5-8 11h0c0 5.5 8 6 8 11 0 4-3.5 7-8 7s-8-3-8-7" fill="none" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     </g>
