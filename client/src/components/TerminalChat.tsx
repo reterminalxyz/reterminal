@@ -1183,7 +1183,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
               }
             `}</style>
             <motion.a
-              href="lightning:LNURL1DP68GURN8GHJ7MR0WEJHX6TRDDKXZUNY8QHXCMNZD968XTNRDAKJ7AMFW35XGUNPWUHKZURF9AMRZTMVDE6HYMP0XDMKGMFK2D6XK36ZFP29XVEN2FMY23R3VAXS0EPX5A"
+              href="lightning:LNURL1DP68GURN8GHJ7MR0WEJHX6TRDDKXZUNY8QHXCMNZD968XTNRDAKJ7AMFW35XGUNPWUHKZURF9AMRZTMVDE6HYMP0GFN9JCMC2DVKVEN5DP5HWJN6VAVX7DR889VS8HF3Z8"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
