@@ -323,9 +323,10 @@ function ModulesSection() {
 }
 
 function HowItWorksSection() {
-  const sectionRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const fillRef = useRef<HTMLDivElement>(null);
   const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const costRef = useRef<HTMLDivElement>(null);
   const obs = useInView();
 
   const steps = [
@@ -334,31 +335,47 @@ function HowItWorksSection() {
     { num: "03", title: "Peer-to-Peer Growth", sub: "Share cards → Network expands" },
   ];
 
-  const thresholds = [20, 50, 80];
-
   useEffect(() => {
     let raf: number;
     const onScroll = () => {
       raf = requestAnimationFrame(() => {
-        const section = sectionRef.current;
+        const container = containerRef.current;
         const fill = fillRef.current;
-        if (!section || !fill) return;
-        const rect = section.getBoundingClientRect();
+        const cost = costRef.current;
+        if (!container || !fill) return;
+
         const viewH = window.innerHeight;
-        const start = rect.top - viewH * 0.9;
-        const end = rect.bottom - viewH * 0.6;
-        const range = end - start;
-        if (range <= 0) return;
-        const progress = Math.min(100, Math.max(0, ((0 - start) / range) * 100));
-        fill.style.height = progress + "%";
-        stepRefs.current.forEach((el, i) => {
+        const trigger = viewH * 0.75;
+
+        const containerRect = container.getBoundingClientRect();
+        const containerTop = containerRect.top;
+        const containerH = containerRect.height;
+
+        if (containerH <= 0) return;
+
+        stepRefs.current.forEach((el) => {
           if (!el) return;
-          if (progress >= thresholds[i]) {
+          const elRect = el.getBoundingClientRect();
+          const elMid = elRect.top + elRect.height / 2;
+          if (elMid < trigger) {
             el.classList.add("tl-active");
           } else {
             el.classList.remove("tl-active");
           }
         });
+
+        const fillProgress = Math.min(100, Math.max(0, ((trigger - containerTop) / containerH) * 100));
+        fill.style.height = fillProgress + "%";
+
+        if (cost) {
+          const costRect = cost.getBoundingClientRect();
+          const costMid = costRect.top + costRect.height / 2;
+          if (costMid < trigger) {
+            cost.classList.add("tl-cost-active");
+          } else {
+            cost.classList.remove("tl-cost-active");
+          }
+        }
       });
     };
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -367,14 +384,14 @@ function HowItWorksSection() {
   }, []);
 
   return (
-    <section ref={sectionRef} style={{ padding: "2vh 0" }} data-testid="section-howitworks">
+    <section style={{ padding: "2vh 0" }} data-testid="section-howitworks">
       <div style={{ maxWidth: 1000, margin: "0 auto", padding: "0 5vw" }}>
         <div ref={obs.ref}>
           <h2 style={{ fontFamily: FONT_MONO, fontSize: "clamp(20px, 4vw, 32px)", fontWeight: 400, color: "#000", marginBottom: 0, ...reveal(obs.visible) }} data-testid="text-hiw-title">
             Deployment Mechanics
           </h2>
         </div>
-        <div className="tl-container">
+        <div ref={containerRef} className="tl-container">
           <div className="tl-track">
             <div ref={fillRef} className="tl-fill" />
           </div>
@@ -392,9 +409,13 @@ function HowItWorksSection() {
               </div>
             </div>
           ))}
-        </div>
-        <div style={{ border: BORDER, padding: "24px 20px", textAlign: "center", marginTop: 32, ...reveal(obs.visible, 0.3) }} data-testid="text-cost-highlight">
-          <p style={{ fontFamily: FONT_MONO, fontSize: "clamp(18px, 4vw, 32px)", fontWeight: 400, color: "#000" }}>Cost of onboarding: $1.50 per user</p>
+          <div
+            ref={costRef}
+            className="tl-cost"
+            data-testid="text-cost-highlight"
+          >
+            <p style={{ fontFamily: FONT_MONO, fontSize: "clamp(18px, 4vw, 32px)", fontWeight: 400 }}>Cost of onboarding: $1.50 per user</p>
+          </div>
         </div>
       </div>
     </section>
@@ -746,6 +767,26 @@ export default function Landing() {
           transform: translateX(0);
         }
         .tl-step.tl-active p { color: #666 !important; }
+        .tl-cost {
+          border: 1px solid #E5E5E5;
+          padding: 24px 20px;
+          text-align: center;
+          color: #ccc;
+          transform: translateX(-10px);
+          transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .tl-cost.tl-cost-active {
+          color: #000;
+          transform: translateX(0);
+          border-color: #000;
+          animation: tl-cost-flash 0.4s ease 0.2s 1;
+        }
+        @keyframes tl-cost-flash {
+          0% { background: transparent; }
+          30% { background: #000; color: #fff; }
+          60% { background: #000; color: #fff; }
+          100% { background: transparent; color: #000; }
+        }
         .landing-blink { animation: landing-blink-kf 1s step-end infinite; }
         @keyframes landing-blink-kf {
           0%, 100% { opacity: 1; }
