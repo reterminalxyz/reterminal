@@ -1152,28 +1152,19 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
         {flowCompleted && !isTyping && (
           <div className="pt-3 space-y-2">
             <motion.button
-              type="button"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
-              onClick={(e) => {
-                e.preventDefault(); e.stopPropagation();
-                const lnurl = "http://lovesicklard8.lnbits.com/withdraw/api/v1/lnurl/3wdm6StkGBHTS33RvEDqgM";
+              onClick={() => {
                 if (!satsClaimed) {
                   setSatsClaimed(true);
                   try { localStorage.setItem("liberta_sats_claimed", "1"); } catch (_) {}
                 }
-                try {
-                  const iframe = document.createElement("iframe");
-                  iframe.style.cssText = "position:fixed;top:-9999px;left:-9999px;width:0;height:0;border:none;opacity:0;pointer-events:none;";
-                  document.body.appendChild(iframe);
-                  try { iframe.contentWindow?.location.replace(lnurl); } catch (_) { iframe.src = lnurl; }
-                  setTimeout(() => { try { document.body.removeChild(iframe); } catch (_) {} }, 3000);
-                } catch (_) {}
+                window.open("https://lovesicklard8.lnbits.com/withdraw/api/v1/lnurl/3wdm6StkGBHTS33RvEDqgM", "_blank");
               }}
               disabled={satsClaimed}
               className={`w-full px-4 py-3 text-left text-[13px] font-mono font-bold tracking-wide
-                       border-2 transition-all duration-200
+                       border-2 transition-all duration-200 cursor-pointer block
                        ${satsClaimed
                          ? "border-[#FFD700]/30 bg-[#FFD700]/5 text-[#FFD700]/40 cursor-not-allowed opacity-50"
                          : "border-[#FFD700]/50 bg-[#FFD700]/10 text-[#FFD700] hover:bg-[#FFD700]/20 hover:border-[#FFD700]"
@@ -1183,7 +1174,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
               <span className={`mr-2 ${satsClaimed ? "text-[#FFD700]/20" : "text-[#FFD700]/40"}`}>{">>>"}</span>
               {satsClaimed
                 ? ((uiTexts as any).satsClaimedButton || "SATS CLAIMED")
-                : ((uiTexts as any).receiveAgainButton || "RECEIVE 1000 SATS")
+                : "[ ПОЛУЧИТЬ_НАГРАДУ ]"
               }
             </motion.button>
 

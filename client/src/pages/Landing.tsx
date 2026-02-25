@@ -519,16 +519,16 @@ export default function Landing() {
           padding: 24px 20px;
           text-align: center;
           color: #000;
-          background: transparent;
-          transition: background 0.4s ease, color 0.4s ease, border-color 0.4s ease;
+          background: #fff;
+          transition: background 0.5s ease, color 0.5s ease, border-color 0.5s ease;
         }
         .tl-cost.tl-cost-active {
-          background: #000;
-          color: #fff;
-          border-color: #000;
+          background: #000 !important;
+          color: #fff !important;
+          border-color: #000 !important;
         }
         .tl-cost.tl-cost-active p {
-          color: #fff;
+          color: #fff !important;
         }
         .landing-blink { animation: landing-blink-kf 1s step-end infinite; }
         @keyframes landing-blink-kf {
