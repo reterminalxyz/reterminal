@@ -234,8 +234,8 @@ function ModulesSection() {
                 {i === 0 && (
                   <svg viewBox="0 0 64 64" width="200" height="200" style={{ overflow: "visible" }}>
                     <g className="icon-dollar">
-                      <line x1="32" y1="10" x2="32" y2="54" stroke="#000" strokeWidth="1.5" strokeLinecap="round" />
-                      <path d="M40 20c0-5-3.5-8-8-8s-8 3-8 8c0 10 16 6 16 16 0 5-3.5 8-8 8s-8-3-8-8" fill="none" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      <line x1="32" y1="8" x2="32" y2="56" stroke="#000" strokeWidth="1.5" strokeLinecap="round" />
+                      <path d="M40 22c0-6-3.5-9-8-9s-8 3-8 9c0 10 16 6 16 16 0 6-3.5 9-8 9s-8-3-8-9" fill="none" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     </g>
                     <g className="icon-bitcoin">
                       <line x1="28" y1="10" x2="28" y2="54" stroke="#000" strokeWidth="1.5" strokeLinecap="round" />
