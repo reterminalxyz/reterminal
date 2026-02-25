@@ -522,19 +522,15 @@ export default function Landing() {
           text-align: center;
           color: #ccc;
           transform: translateX(-10px);
-          transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+          transition: color 0.6s cubic-bezier(0.2,0.8,0.2,1), transform 0.6s cubic-bezier(0.2,0.8,0.2,1), border-color 0.6s cubic-bezier(0.2,0.8,0.2,1);
         }
         .tl-cost.tl-cost-active {
-          color: #000;
+          color: #000 !important;
           transform: translateX(0);
-          border-color: #000;
-          animation: tl-cost-flash 0.4s ease 0.2s 1 forwards;
+          border-color: #000 !important;
         }
-        @keyframes tl-cost-flash {
-          0% { background: transparent; color: #000; }
-          30% { background: #000; color: #fff; }
-          60% { background: #000; color: #fff; }
-          100% { background: transparent; color: #000; }
+        .tl-cost.tl-cost-active p {
+          color: #000 !important;
         }
         .landing-blink { animation: landing-blink-kf 1s step-end infinite; }
         @keyframes landing-blink-kf {
