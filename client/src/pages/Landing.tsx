@@ -137,29 +137,13 @@ function ProblemSection() {
   const obs = useInView(0.2);
   return (
     <section style={{ padding: "3vh 0" }} data-testid="section-problem">
-      <div ref={obs.ref} style={{ maxWidth: 1000, margin: "0 auto", padding: "0 5vw" }}>
-        <div className={`trap-infographic${obs.visible ? " trap-visible" : ""}`}>
-          <div className="trap-header" data-testid="text-problem-stat">
-            <p style={{ fontFamily: FONT_MONO, fontSize: "clamp(22px, 5vw, 40px)", fontWeight: 400, color: "#000", lineHeight: 1.3 }}>
-              &gt; 60 countries actively censor the internet.
-            </p>
-          </div>
-          <div className="trap-tree">
-            <div className="trap-trunk" />
-            <div className="trap-branch trap-branch-1" data-testid="text-problem-step2">
-              <span className="trap-connector">├─</span>
-              <span className="trap-label">Total surveillance</span>
-            </div>
-            <div className="trap-trunk trap-trunk-2" />
-            <div className="trap-branch trap-branch-2" data-testid="text-problem-step3">
-              <span className="trap-connector">└─</span>
-              <span className="trap-label trap-label-box">Financial control</span>
-            </div>
-          </div>
-          <div className="trap-conclusion" data-testid="text-problem-conclusion">
-            <p style={{ fontFamily: FONT_BODY, fontSize: "clamp(14px, 3vw, 18px)", color: "#000" }}>Education must be holistic, not piecemeal.</p>
-          </div>
+      <div ref={obs.ref} className={`trap-container${obs.visible ? " trap-visible" : ""}`}>
+        <h2 className="trap-header" data-testid="text-problem-stat">&gt; 60 countries actively censor the internet.</h2>
+        <div className="trap-tree">
+          <div className="trap-node" data-testid="text-problem-step2">Total surveillance</div>
+          <div className="trap-node trap-final" data-testid="text-problem-step3">Financial control</div>
         </div>
+        <div className="trap-conclusion" data-testid="text-problem-conclusion">Education must be holistic, not piecemeal.</div>
       </div>
     </section>
   );
@@ -171,7 +155,7 @@ function ModulesSection() {
     <section style={{ padding: "2vh 0" }} data-testid="section-modules">
       <div ref={obs.ref} style={{ maxWidth: 1000, margin: "0 auto", padding: "0 5vw", marginBottom: 20, ...reveal(obs.visible) }}>
         <h2 className="text-center" style={{ fontFamily: FONT_MONO, fontSize: "clamp(28px, 7vw, 48px)", fontWeight: 400, color: "#000", letterSpacing: "0.04em" }} data-testid="text-modules-title">
-          Modules<span className="landing-blink" style={{ color: "#B87333" }}>_</span>
+          Modules
         </h2>
       </div>
       <div className="relative">
@@ -303,10 +287,10 @@ function ModulesSection() {
           ))}
         </div>
         <div
-          className="absolute right-0 top-0 bottom-4 pointer-events-none flex items-center"
-          style={{ width: 70, background: "linear-gradient(to right, transparent, #FFFFFF 70%)" }}
+          className="absolute left-0 top-0 bottom-4 pointer-events-none flex items-center"
+          style={{ width: 60, background: "linear-gradient(to left, transparent, #FFFFFF 70%)", zIndex: 2 }}
         >
-          <span className="landing-scroll-arrow" style={{ fontFamily: FONT_MONO, fontSize: 28, color: "#000", marginLeft: "auto", marginRight: 12 }}>→</span>
+          <div className="landing-scroll-line-h" style={{ width: 40, height: 1, background: "#000", marginLeft: 12 }} />
         </div>
       </div>
     </section>
@@ -678,28 +662,76 @@ export default function Landing() {
           0% { background-position: 0 -200px; }
           100% { background-position: 0 calc(100vh + 200px); }
         }
-        /* Trap Infographic */
-        .trap-infographic { position: relative; }
-        .trap-header { opacity: 0; transform: translateY(16px); transition: opacity 0.6s cubic-bezier(0.2,0.8,0.2,1), transform 0.6s cubic-bezier(0.2,0.8,0.2,1); }
-        .trap-tree { padding-left: 20px; position: relative; }
-        .trap-trunk { width: 1px; background: #000; margin-left: 0; height: 0; transition: height 0.4s cubic-bezier(0.2,0.8,0.2,1); }
-        .trap-trunk-2 { transition-delay: 0.8s; }
-        .trap-branch { display: flex; align-items: center; gap: 8px; opacity: 0; transform: translateX(-8px); transition: opacity 0.15s ease, transform 0.25s cubic-bezier(0.2,0.8,0.2,1); font-family: 'JetBrains Mono', monospace; font-size: clamp(14px, 3vw, 20px); color: #000; }
-        .trap-branch-1 { transition-delay: 0.8s; }
-        .trap-branch-2 { transition-delay: 1.6s; }
-        .trap-connector { opacity: 0.4; white-space: pre; }
-        .trap-label { display: inline-block; }
-        .trap-label-box { padding: 4px 12px; border: 1px solid transparent; transition: border-color 0.15s ease 2.0s, background 0.1s ease 2.0s, color 0.1s ease 2.0s; }
-        .trap-conclusion { opacity: 0; transform: translateY(12px); transition: opacity 0.6s cubic-bezier(0.2,0.8,0.2,1) 2.4s, transform 0.6s cubic-bezier(0.2,0.8,0.2,1) 2.4s; margin-top: 32px; border: 1px solid #E5E5E5; padding: 24px; }
-
+        /* Surveillance Trap */
+        .trap-container {
+          max-width: 800px;
+          margin: 0 auto;
+          font-family: 'JetBrains Mono', monospace;
+          color: #000;
+          padding: 0 5vw;
+        }
+        .trap-header {
+          font-size: clamp(22px, 5vw, 2.5rem);
+          font-weight: 400;
+          letter-spacing: -0.02em;
+          line-height: 1.2;
+          margin-bottom: 0;
+          opacity: 0;
+          transform: translateY(16px);
+          transition: opacity 0.6s cubic-bezier(0.2,0.8,0.2,1), transform 0.6s cubic-bezier(0.2,0.8,0.2,1);
+        }
+        .trap-tree {
+          margin-left: 1.5rem;
+          border-left: 2px solid #000;
+          padding: 2rem 0 0 0;
+          display: flex;
+          flex-direction: column;
+          gap: 2.5rem;
+          opacity: 0;
+          transform: scaleY(0);
+          transform-origin: top;
+          transition: opacity 0.4s ease 0.4s, transform 0.5s cubic-bezier(0.2,0.8,0.2,1) 0.4s;
+        }
+        .trap-node {
+          position: relative;
+          font-size: clamp(14px, 3vw, 1.25rem);
+          padding-left: 3rem;
+          opacity: 0;
+          transform: translateX(-8px);
+          transition: opacity 0.2s ease, transform 0.3s cubic-bezier(0.2,0.8,0.2,1);
+        }
+        .trap-node:nth-child(1) { transition-delay: 0.9s; }
+        .trap-node:nth-child(2) { transition-delay: 1.5s; }
+        .trap-node::before {
+          content: "";
+          position: absolute;
+          left: 0;
+          top: 50%;
+          transform: translateY(-50%);
+          width: 2rem;
+          height: 2px;
+          background-color: #000;
+        }
+        .trap-final {
+          padding: 6px 12px 6px 3rem;
+          border: 1px solid transparent;
+          transition: opacity 0.2s ease 1.5s, transform 0.3s cubic-bezier(0.2,0.8,0.2,1) 1.5s, border-color 0.15s ease 2.0s;
+        }
+        .trap-conclusion {
+          font-family: 'Inter', system-ui, sans-serif;
+          font-size: clamp(14px, 3vw, 18px);
+          margin-top: 2rem;
+          border: 1px solid #E5E5E5;
+          padding: 24px;
+          opacity: 0;
+          transform: translateY(12px);
+          transition: opacity 0.6s cubic-bezier(0.2,0.8,0.2,1) 2.4s, transform 0.6s cubic-bezier(0.2,0.8,0.2,1) 2.4s;
+        }
         .trap-visible .trap-header { opacity: 1; transform: translateY(0); }
-        .trap-visible .trap-trunk { height: 32px; transition-delay: 0.4s; }
-        .trap-visible .trap-trunk-2 { height: 32px; transition-delay: 1.2s; }
-        .trap-visible .trap-branch-1 { opacity: 1; transform: translateX(0); }
-        .trap-visible .trap-branch-2 { opacity: 1; transform: translateX(0); }
-        .trap-visible .trap-label-box { border-color: #000; animation: trap-flash 0.3s ease 2.0s 1; }
+        .trap-visible .trap-tree { opacity: 1; transform: scaleY(1); }
+        .trap-visible .trap-node { opacity: 1; transform: translateX(0); }
+        .trap-visible .trap-final { border-color: #000; animation: trap-flash 0.3s ease 2.0s 1; }
         .trap-visible .trap-conclusion { opacity: 1; transform: translateY(0); }
-
         @keyframes trap-flash {
           0% { background: transparent; color: #000; }
           33% { background: #000; color: #fff; }
@@ -707,12 +739,12 @@ export default function Landing() {
           100% { background: transparent; color: #000; }
         }
 
-        .landing-scroll-arrow {
-          animation: landing-arrow-bounce 1.5s ease-in-out infinite;
+        .landing-scroll-line-h {
+          animation: landing-line-pulse 2.5s ease-in-out infinite;
         }
-        @keyframes landing-arrow-bounce {
-          0%, 100% { transform: translateX(0); opacity: 0.5; }
-          50% { transform: translateX(6px); opacity: 1; }
+        @keyframes landing-line-pulse {
+          0%, 100% { opacity: 0.3; transform: scaleX(0.6); transform-origin: left; }
+          50% { opacity: 1; transform: scaleX(1); transform-origin: left; }
         }
 
         /* Card 0: Dollar → Bitcoin */
