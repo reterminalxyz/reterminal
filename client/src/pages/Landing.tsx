@@ -519,21 +519,15 @@ export default function Landing() {
         }
         .tl-step.tl-active p { color: #666 !important; }
         .tl-cost {
-          border: 2px solid #E5E5E5;
+          border-width: 2px;
+          border-style: solid;
+          border-color: #E5E5E5;
           padding: 24px 20px;
           text-align: center;
           color: #000;
-          transition: border-color 0.3s ease, background 0.3s ease;
         }
         .tl-cost.tl-cost-active {
-          border-color: #000;
-          animation: tl-cost-pulse 0.6s ease 1;
-        }
-        @keyframes tl-cost-pulse {
-          0% { border-color: #E5E5E5; background: transparent; }
-          40% { border-color: #000; background: #000; color: #fff; }
-          70% { border-color: #000; background: #000; color: #fff; }
-          100% { border-color: #000; background: transparent; color: #000; }
+          border-color: #000 !important;
         }
         .landing-blink { animation: landing-blink-kf 1s step-end infinite; }
         @keyframes landing-blink-kf {
