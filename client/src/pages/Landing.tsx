@@ -166,11 +166,6 @@ function GridGlow() {
               const intensity = 1 - dist / GLOW_RADIUS;
               const i3 = intensity * intensity * intensity;
 
-              if (intensity > 0.3) {
-                const key = `${col},${row}`;
-                trails.current.set(key, { x: gx, y: row * GRID_SIZE, life: 1 });
-              }
-
               const dotSize = 1 + i3 * 4;
               ctx.beginPath();
               ctx.arc(gx, gy, dotSize, 0, Math.PI * 2);
