@@ -1151,7 +1151,39 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
 
         {flowCompleted && !isTyping && (
           <div className="pt-3 space-y-2">
-            <motion.button
+            <style>{`
+              .btn-claim-mobile {
+                display: inline-block;
+                margin-top: 1.5rem;
+                padding: 12px 24px;
+                font-family: 'JetBrains Mono', monospace;
+                font-size: 1rem;
+                font-weight: bold;
+                color: #FFFFFF;
+                background-color: #000000;
+                border: none;
+                text-decoration: none;
+                text-transform: uppercase;
+                letter-spacing: 0.05em;
+                transition: transform 0.2s ease;
+                width: 100%;
+                text-align: center;
+              }
+              .btn-claim-mobile:active {
+                transform: scale(0.95);
+              }
+              .btn-claim-mobile.claimed {
+                opacity: 0.4;
+                pointer-events: none;
+              }
+              @media (min-width: 1024px) {
+                .btn-claim-mobile {
+                  cursor: default;
+                }
+              }
+            `}</style>
+            <motion.a
+              href="lightning:LNURL1DP68GURN8GHJ7MR0WEJHX6TRDDKXZUNY8QHXCMNZD968XTNRDAKJ7AMFW35XGUNPWUHKZURF9AMRZTMVDE6HYMP0XDMKGMFK2D6XK36ZFP29XVEN2FMY23R3VAXS0EPX5A"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.3 }}
@@ -1160,27 +1192,15 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
                   setSatsClaimed(true);
                   try { localStorage.setItem("liberta_sats_claimed", "1"); } catch (_) {}
                 }
-                const lnurl = "lightning:LNURL1DP68GURN8GHJ7MR0WEJHX6TRDDKXZUNY8QHXCMNZD968XTNRDAKJ7AMFW35XGUNPWUHKZURF9AMRZTMVDE6HYMP0XDMKGMFK2D6XK36ZFP29XVEN2FMY23R3VAXS0EPX5A";
-                window.location.href = lnurl;
-                setTimeout(() => {
-                  window.open("https://lovesicklard8.lnbits.com/withdraw/7d77shxdb56wPeXf4s8B4o", "_blank");
-                }, 2000);
               }}
-              disabled={satsClaimed}
-              className={`w-full px-4 py-3 text-left text-[13px] font-mono font-bold tracking-wide
-                       border-2 transition-all duration-200 cursor-pointer block
-                       ${satsClaimed
-                         ? "border-[#FFD700]/30 bg-[#FFD700]/5 text-[#FFD700]/40 cursor-not-allowed opacity-50"
-                         : "border-[#FFD700]/50 bg-[#FFD700]/10 text-[#FFD700] hover:bg-[#FFD700]/20 hover:border-[#FFD700]"
-                       }`}
+              className={`btn-claim-mobile ${satsClaimed ? "claimed" : ""}`}
               data-testid="button-sats-claim-persistent"
             >
-              <span className={`mr-2 ${satsClaimed ? "text-[#FFD700]/20" : "text-[#FFD700]/40"}`}>{">>>"}</span>
               {satsClaimed
                 ? ((uiTexts as any).satsClaimedButton || "SATS CLAIMED")
-                : "[ ПОЛУЧИТЬ_НАГРАДУ ]"
+                : "[ CLAIM_REWARD: 2100_SATS ]"
               }
-            </motion.button>
+            </motion.a>
 
             <motion.button
               type="button"
