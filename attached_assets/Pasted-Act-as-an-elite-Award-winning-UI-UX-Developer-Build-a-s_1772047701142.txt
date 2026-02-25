@@ -1,0 +1,44 @@
+Act as an elite Award-winning UI/UX Developer. Build a single-page HTML/CSS/JS landing page for "re_terminal".
+The aesthetic is "High-End Clinical Tech" / "Pure Minimalist" (Dieter Rams style). It MUST look extremely expensive, precise, and well-proportioned.
+
+CRITICAL DESIGN RULES (DO NOT IGNORE):
+1. NO STRETCHING: Content must NOT stretch edge-to-edge on desktop. Wrap all main section content in a `.container` with `max-width: 1000px; margin: 0 auto; padding: 0 5vw;`.
+2. FONTS: You MUST import Google Fonts: 'Inter' (400, 500) for body, and 'JetBrains Mono' (400) for all headings, numbers, and UI accents.
+3. COLORS: Background #FFFFFF, Text #000000, Borders #E5E5E5. No shadows, no gradients.
+4. BORDERS: Use crisp `1px solid #E5E5E5` for all structural lines, cards, and video wrappers.
+
+PAGE ARCHITECTURE & INTUITIVE UX:
+
+1. Hero Section (100vh):
+- Flexbox, centered content.
+- Title: "re_terminal" (JetBrains Mono, lowercase, massive font size, slight letter-spacing).
+- Video box: 16:9 aspect ratio, max-width 800px. 1px border. Inside: "PLAY_VIDEO" text.
+- INTUITIVE SCROLL FIX: At the absolute bottom center of this 100vh section, add a vertical line (1px width, 40px height, black) that infinitely animates (scales Y up and down) to intuitively indicate the user must scroll down. Add small text "SCROLL" next to it.
+
+2. The Surveillance Trap (Scroll-triggered):
+- Massive whitespace above and below (e.g., padding: 15vh 0).
+- Stat: "> 60 countries actively censor the internet." (Huge text, JetBrains Mono).
+- Below it, a clean minimal list showing the cascade: "→ Total surveillance" then "→ Financial control".
+- Boxed conclusion: "Education must be holistic, not piecemeal." (1px border, padding 24px).
+
+3. Curriculum Carousel (Horizontal Scroll - INTUITIVE FIX):
+- Do NOT constrain this to the 1000px container. This section must touch the right edge of the screen so the last card is visibly cut off, hinting at horizontal scrolling.
+- CSS: `display: flex; overflow-x: auto; gap: 24px; padding-left: 5vw; padding-right: 20vw; scroll-snap-type: x mandatory;`. Hide the native scrollbar using `::-webkit-scrollbar { display: none; }`.
+- Card Design: Fixed width exactly 300px. Aspect ratio 1:1. Pure white, 1px border.
+- Card Inner Layout: Flex column, justify-content space-between, padding 24px.
+- Cards data: 
+  1. Financial freedom (Badge top-left: black box, white text "MVP DONE"). 
+  2-7. Privacy, Surveillance evasion, Secure communication, Censorship bypass, Techno-philosophy, Offline survival tools (Badge top-left: 1px border, text "SOON").
+
+4. Deployment Mechanics:
+- Container: max-width 1000px.
+- Use a 3-column CSS Grid (`grid-template-columns: repeat(3, 1fr); gap: 40px;`).
+- Step styling: JetBrains Mono for the step numbers "01 /", "02 /", "03 /".
+- Cost Box: Place below the grid. A full-width (within container) box, 1px border, center-aligned. Text: "Cost of onboarding: $1.50 per user" (Very large JetBrains Mono).
+
+5. Footer & CTA:
+- Huge whitespace above.
+- Text: "Built by an activist, for activists."
+- Button: `<a href="/activation" class="btn">`. Style: Solid black background, white JetBrains Mono text "[ ENTER ]". Padding 16px 32px. Hover: background white, text black, 1px black border.
+
+Generate the full, production-ready code in one block.
