@@ -143,51 +143,51 @@ function PixelDevice({ segments, shimmer }: { segments: [boolean, boolean, boole
                 width="10"
                 height="10"
                 rx="1"
-                fill={segments[1] ? (row < 2 ? "#ffaa0020" : "#ffaa0010") : "#151515"}
-                stroke={segments[1] ? "#ffaa0050" : "#222"}
+                fill={segments[1] ? (row < 2 ? "#00e5ff20" : "#00e5ff10") : "#151515"}
+                stroke={segments[1] ? "#00e5ff50" : "#222"}
                 strokeWidth="0.5"
               />
             ))}
           </g>
         ))}
 
-        <circle cx="58" cy="206" r="12" fill="none" stroke={segments[1] ? "#ffaa00" : "#333"} strokeWidth="1">
+        <circle cx="58" cy="206" r="12" fill="none" stroke={segments[1] ? "#00e5ff" : "#333"} strokeWidth="1">
           {segments[1] && <animate attributeName="opacity" values="0.5;1;0.5" dur="2.5s" repeatCount="indefinite" />}
         </circle>
-        <circle cx="58" cy="206" r="6" fill={segments[1] ? "#ffaa0030" : "none"} stroke={segments[1] ? "#ffaa00" : "#333"} strokeWidth="0.5" />
+        <circle cx="58" cy="206" r="6" fill={segments[1] ? "#00e5ff30" : "none"} stroke={segments[1] ? "#00e5ff" : "#333"} strokeWidth="0.5" />
 
-        <circle cx="142" cy="206" r="12" fill="none" stroke={segments[1] ? "#ffaa00" : "#333"} strokeWidth="1">
+        <circle cx="142" cy="206" r="12" fill="none" stroke={segments[1] ? "#00e5ff" : "#333"} strokeWidth="1">
           {segments[1] && <animate attributeName="opacity" values="0.5;1;0.5" dur="3s" repeatCount="indefinite" />}
         </circle>
-        <circle cx="142" cy="206" r="6" fill={segments[1] ? "#ffaa0030" : "none"} stroke={segments[1] ? "#ffaa00" : "#333"} strokeWidth="0.5" />
+        <circle cx="142" cy="206" r="6" fill={segments[1] ? "#00e5ff30" : "none"} stroke={segments[1] ? "#00e5ff" : "#333"} strokeWidth="0.5" />
 
-        <rect x="76" y="198" width="48" height="16" fill={segments[1] ? "#ffaa0010" : "#111"} stroke={segments[1] ? "#ffaa0040" : "#222"} strokeWidth="0.5" />
-        <rect x="80" y="202" width="10" height="3" fill={segments[1] ? "#ffaa00" : "#222"} opacity="0.6" />
-        <rect x="94" y="202" width="10" height="3" fill={segments[1] ? "#ffaa00" : "#222"} opacity="0.6" />
-        <rect x="108" y="202" width="10" height="3" fill={segments[1] ? "#ffaa00" : "#222"} opacity="0.6" />
-        <rect x="80" y="208" width="6" height="2" fill={segments[1] ? "#ffaa00" : "#222"} opacity="0.4" />
+        <rect x="76" y="198" width="48" height="16" fill={segments[1] ? "#00e5ff10" : "#111"} stroke={segments[1] ? "#00e5ff40" : "#222"} strokeWidth="0.5" />
+        <rect x="80" y="202" width="10" height="3" fill={segments[1] ? "#00e5ff" : "#222"} opacity="0.6" />
+        <rect x="94" y="202" width="10" height="3" fill={segments[1] ? "#00e5ff" : "#222"} opacity="0.6" />
+        <rect x="108" y="202" width="10" height="3" fill={segments[1] ? "#00e5ff" : "#222"} opacity="0.6" />
+        <rect x="80" y="208" width="6" height="2" fill={segments[1] ? "#00e5ff" : "#222"} opacity="0.4" />
       </g>
 
       {/* SEGMENT 3: Bottom - Network Drive (GRID_RUNNER) */}
       <g opacity={segments[2] ? 1 : 0.2}>
-        <circle cx="76" cy="268" r="18" fill="none" stroke={segments[2] ? "#b87333" : "#333"} strokeWidth="1">
+        <circle cx="76" cy="268" r="18" fill="none" stroke={segments[2] ? "#00e5ff" : "#333"} strokeWidth="1">
           {segments[2] && <animate attributeName="opacity" values="0.5;1;0.5" dur="2s" repeatCount="indefinite" />}
         </circle>
-        <circle cx="76" cy="268" r="10" fill={segments[2] ? "#b8733320" : "none"} stroke={segments[2] ? "#b87333" : "#333"} strokeWidth="0.5" />
-        <line x1="76" y1="256" x2="76" y2="250" stroke={segments[2] ? "#b87333" : "#333"} strokeWidth="0.5" />
-        <line x1="86" y1="258" x2="92" y2="252" stroke={segments[2] ? "#b87333" : "#333"} strokeWidth="0.5" />
-        <line x1="66" y1="258" x2="60" y2="252" stroke={segments[2] ? "#b87333" : "#333"} strokeWidth="0.5" />
+        <circle cx="76" cy="268" r="10" fill={segments[2] ? "#00e5ff20" : "none"} stroke={segments[2] ? "#00e5ff" : "#333"} strokeWidth="0.5" />
+        <line x1="76" y1="256" x2="76" y2="250" stroke={segments[2] ? "#00e5ff" : "#333"} strokeWidth="0.5" />
+        <line x1="86" y1="258" x2="92" y2="252" stroke={segments[2] ? "#00e5ff" : "#333"} strokeWidth="0.5" />
+        <line x1="66" y1="258" x2="60" y2="252" stroke={segments[2] ? "#00e5ff" : "#333"} strokeWidth="0.5" />
 
-        <circle cx="124" cy="268" r="18" fill="none" stroke={segments[2] ? "#b87333" : "#333"} strokeWidth="1">
+        <circle cx="124" cy="268" r="18" fill="none" stroke={segments[2] ? "#00e5ff" : "#333"} strokeWidth="1">
           {segments[2] && <animate attributeName="opacity" values="0.6;1;0.6" dur="2.5s" repeatCount="indefinite" />}
         </circle>
-        <circle cx="124" cy="268" r="10" fill={segments[2] ? "#b8733320" : "none"} stroke={segments[2] ? "#b87333" : "#333"} strokeWidth="0.5" />
+        <circle cx="124" cy="268" r="10" fill={segments[2] ? "#00e5ff20" : "none"} stroke={segments[2] ? "#00e5ff" : "#333"} strokeWidth="0.5" />
 
-        <rect x="56" y="294" width="88" height="18" fill={segments[2] ? "#b8733310" : "#111"} stroke={segments[2] ? "#b8733350" : "#222"} strokeWidth="0.5" />
-        <rect x="60" y="298" width="20" height="6" fill={segments[2] ? "#b87333" : "#222"} opacity="0.5" />
-        <rect x="84" y="298" width="20" height="6" fill={segments[2] ? "#b87333" : "#222"} opacity="0.4" />
-        <rect x="108" y="298" width="20" height="6" fill={segments[2] ? "#b87333" : "#222"} opacity="0.3" />
-        <rect x="60" y="306" width="12" height="2" fill={segments[2] ? "#b87333" : "#222"} opacity="0.3" />
+        <rect x="56" y="294" width="88" height="18" fill={segments[2] ? "#00e5ff10" : "#111"} stroke={segments[2] ? "#00e5ff50" : "#222"} strokeWidth="0.5" />
+        <rect x="60" y="298" width="20" height="6" fill={segments[2] ? "#00e5ff" : "#222"} opacity="0.5" />
+        <rect x="84" y="298" width="20" height="6" fill={segments[2] ? "#00e5ff" : "#222"} opacity="0.4" />
+        <rect x="108" y="298" width="20" height="6" fill={segments[2] ? "#00e5ff" : "#222"} opacity="0.3" />
+        <rect x="60" y="306" width="12" height="2" fill={segments[2] ? "#00e5ff" : "#222"} opacity="0.3" />
       </g>
 
       {/* Connectors on sides */}

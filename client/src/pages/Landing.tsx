@@ -233,18 +233,46 @@ function GridGlow() {
       const dt = 1 / 60;
       const scrollY2 = window.scrollY;
       trails.current.forEach((trail, key) => {
-        trail.life -= dt * 0.4;
+        trail.life -= dt * 0.18;
         if (trail.life <= 0) {
           trails.current.delete(key);
           return;
         }
         const ty = trail.y - scrollY2;
-        const a = trail.life * trail.life * 0.3;
-        const sz = 1.5 * trail.life;
+        const l = trail.life;
+        const a = l * l * 0.45;
+        const stubLen = GRID_SIZE * 0.4 * l;
+
+        ctx.save();
+        ctx.shadowColor = `rgba(0, 229, 255, ${a * 0.5})`;
+        ctx.shadowBlur = 6;
+
         ctx.beginPath();
-        ctx.arc(trail.x, ty, sz, 0, Math.PI * 2);
+        ctx.moveTo(trail.x - stubLen, ty);
+        ctx.lineTo(trail.x + stubLen, ty);
+        ctx.strokeStyle = `rgba(0, 229, 255, ${a * 0.6})`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(trail.x, ty - stubLen);
+        ctx.lineTo(trail.x, ty + stubLen);
+        ctx.stroke();
+
+        const dotSz = 2.5 * l;
+        ctx.beginPath();
+        ctx.arc(trail.x, ty, dotSz, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(0, 229, 255, ${a})`;
         ctx.fill();
+
+        if (l > 0.5) {
+          ctx.beginPath();
+          ctx.arc(trail.x, ty, dotSz * 0.5, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(255, 255, 255, ${a * 0.4})`;
+          ctx.fill();
+        }
+
+        ctx.restore();
       });
 
       sparks.current = sparks.current.filter(s => {

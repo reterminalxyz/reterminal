@@ -222,17 +222,17 @@ function SkillNotificationBanner({ onClose, iconRect, skillText = "+SKILL" }: { 
       data-testid="popup-level-up"
     >
       <motion.div
-        className="flex items-center gap-3 px-5 py-2 border-2 border-[#B87333]"
+        className="flex items-center gap-3 px-5 py-2 border-2 border-[#00e5ff]"
         style={{
           imageRendering: 'pixelated',
           background: '#0A0A0A',
-          boxShadow: '0 0 20px rgba(184,115,51,0.5), 0 0 40px rgba(255,215,0,0.2)',
+          boxShadow: '0 0 20px rgba(0,229,255,0.5), 0 0 40px rgba(0,229,255,0.2)',
         }}
         animate={{
           boxShadow: [
-            "0 0 10px rgba(184,115,51,0.3), 0 0 20px rgba(255,215,0,0.1)",
-            "0 0 30px rgba(184,115,51,0.7), 0 0 50px rgba(255,215,0,0.4)",
-            "0 0 10px rgba(184,115,51,0.3), 0 0 20px rgba(255,215,0,0.1)"
+            "0 0 10px rgba(0,229,255,0.3), 0 0 20px rgba(0,229,255,0.1)",
+            "0 0 30px rgba(0,229,255,0.7), 0 0 50px rgba(0,229,255,0.4)",
+            "0 0 10px rgba(0,229,255,0.3), 0 0 20px rgba(0,229,255,0.1)"
           ]
         }}
         transition={{ duration: 0.6, repeat: 2 }}
@@ -241,8 +241,8 @@ function SkillNotificationBanner({ onClose, iconRect, skillText = "+SKILL" }: { 
         <span
           className="text-[13px] tracking-[3px] font-mono font-bold uppercase"
           style={{
-            color: '#FFD700',
-            textShadow: '0 0 8px #FFD700, 0 0 16px #B87333',
+            color: '#00e5ff',
+            textShadow: '0 0 8px #00e5ff, 0 0 16px rgba(0,229,255,0.5)',
           }}
         >
           {skillText}
