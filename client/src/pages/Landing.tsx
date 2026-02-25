@@ -60,6 +60,7 @@ function GridGlow() {
   const sparks = useRef<Spark[]>([]);
   const lastSpawn = useRef(0);
   const prevMouse = useRef({ x: -9999, y: -9999 });
+  const trails = useRef<Map<string, { x: number; y: number; life: number }>>(new Map());
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -158,6 +159,11 @@ function GridGlow() {
               const intensity = 1 - dist / GLOW_RADIUS;
               const i3 = intensity * intensity * intensity;
 
+              if (intensity > 0.3) {
+                const key = `${col},${row}`;
+                trails.current.set(key, { x: gx, y: row * GRID_SIZE, life: 1 });
+              }
+
               const dotSize = 1 + i3 * 4;
               ctx.beginPath();
               ctx.arc(gx, gy, dotSize, 0, Math.PI * 2);
@@ -225,6 +231,22 @@ function GridGlow() {
       }
 
       const dt = 1 / 60;
+      const scrollY2 = window.scrollY;
+      trails.current.forEach((trail, key) => {
+        trail.life -= dt * 0.4;
+        if (trail.life <= 0) {
+          trails.current.delete(key);
+          return;
+        }
+        const ty = trail.y - scrollY2;
+        const a = trail.life * trail.life * 0.3;
+        const sz = 1.5 * trail.life;
+        ctx.beginPath();
+        ctx.arc(trail.x, ty, sz, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0, 229, 255, ${a})`;
+        ctx.fill();
+      });
+
       sparks.current = sparks.current.filter(s => {
         s.life -= dt / s.maxLife;
         s.x += s.vx * dt;
