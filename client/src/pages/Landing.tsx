@@ -40,6 +40,163 @@ const MODULES = [
 
 const GLITCH_CHARS = "!@#$%^&*_+-=[]{}|;:',.<>?/\\~`01";
 
+const GRID_SIZE = 48;
+const GLOW_COLOR = "#00e5ff";
+const GLOW_RADIUS = 180;
+
+interface Spark {
+  x: number;
+  y: number;
+  life: number;
+  maxLife: number;
+  size: number;
+  vx: number;
+  vy: number;
+}
+
+function GridGlow() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const mouse = useRef({ x: -9999, y: -9999 });
+  const sparks = useRef<Spark[]>([]);
+  const lastSpawn = useRef(0);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    let raf: number;
+    const dpr = window.devicePixelRatio || 1;
+
+    const resize = () => {
+      canvas.width = window.innerWidth * dpr;
+      canvas.height = window.innerHeight * dpr;
+      canvas.style.width = window.innerWidth + "px";
+      canvas.style.height = window.innerHeight + "px";
+    };
+    resize();
+    window.addEventListener("resize", resize);
+
+    const onMove = (e: MouseEvent) => {
+      mouse.current.x = e.clientX;
+      mouse.current.y = e.clientY;
+    };
+    const onTouch = (e: TouchEvent) => {
+      if (e.touches.length > 0) {
+        mouse.current.x = e.touches[0].clientX;
+        mouse.current.y = e.touches[0].clientY;
+      }
+    };
+    const onLeave = () => {
+      mouse.current.x = -9999;
+      mouse.current.y = -9999;
+    };
+    window.addEventListener("mousemove", onMove, { passive: true });
+    window.addEventListener("touchmove", onTouch, { passive: true });
+    window.addEventListener("mouseleave", onLeave);
+
+    const draw = (now: number) => {
+      const ctx = canvas.getContext("2d");
+      if (!ctx) { raf = requestAnimationFrame(draw); return; }
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      const mx = mouse.current.x;
+      const my = mouse.current.y;
+
+      if (mx > -999) {
+        const scrollY = window.scrollY;
+        const absY = my + scrollY;
+
+        const startCol = Math.floor((mx - GLOW_RADIUS) / GRID_SIZE);
+        const endCol = Math.ceil((mx + GLOW_RADIUS) / GRID_SIZE);
+        const startRow = Math.floor((absY - GLOW_RADIUS) / GRID_SIZE);
+        const endRow = Math.ceil((absY + GLOW_RADIUS) / GRID_SIZE);
+
+        for (let row = startRow; row <= endRow; row++) {
+          for (let col = startCol; col <= endCol; col++) {
+            const gx = col * GRID_SIZE;
+            const gy = row * GRID_SIZE - scrollY;
+            const dx = gx - mx;
+            const dy = gy - my;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < GLOW_RADIUS) {
+              const intensity = 1 - dist / GLOW_RADIUS;
+              const alpha = intensity * intensity * 0.7;
+              const size = 1.5 + intensity * 3;
+
+              ctx.beginPath();
+              ctx.arc(gx, gy, size, 0, Math.PI * 2);
+              ctx.fillStyle = `rgba(0, 229, 255, ${alpha})`;
+              ctx.fill();
+
+              if (intensity > 0.6) {
+                ctx.beginPath();
+                ctx.arc(gx, gy, size + 4, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(0, 229, 255, ${alpha * 0.2})`;
+                ctx.fill();
+              }
+            }
+          }
+        }
+
+        if (now - lastSpawn.current > 60) {
+          lastSpawn.current = now;
+          const nearCol = Math.round(mx / GRID_SIZE);
+          const nearRow = Math.round(absY / GRID_SIZE);
+          const sx = nearCol * GRID_SIZE;
+          const sy = nearRow * GRID_SIZE - scrollY;
+          const d = Math.sqrt((sx - mx) ** 2 + (sy - my) ** 2);
+          if (d < GLOW_RADIUS * 0.5 && sparks.current.length < 30) {
+            sparks.current.push({
+              x: sx, y: sy,
+              life: 1, maxLife: 0.4 + Math.random() * 0.4,
+              size: 1 + Math.random() * 2,
+              vx: (Math.random() - 0.5) * 20,
+              vy: (Math.random() - 0.5) * 20,
+            });
+          }
+        }
+      }
+
+      const dt = 1 / 60;
+      sparks.current = sparks.current.filter(s => {
+        s.life -= dt / s.maxLife;
+        s.x += s.vx * dt;
+        s.y += s.vy * dt;
+        s.vx *= 0.96;
+        s.vy *= 0.96;
+        if (s.life <= 0) return false;
+        const a = s.life * 0.8;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.size * s.life, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0, 229, 255, ${a})`;
+        ctx.fill();
+        return true;
+      });
+
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      raf = requestAnimationFrame(draw);
+    };
+    raf = requestAnimationFrame(draw);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", resize);
+      window.removeEventListener("mousemove", onMove);
+      window.removeEventListener("touchmove", onTouch);
+      window.removeEventListener("mouseleave", onLeave);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 pointer-events-none"
+      style={{ zIndex: 2 }}
+    />
+  );
+}
+
 function GlitchTitle() {
   const [showSep, setShowSep] = useState(false);
   const [glyph, setGlyph] = useState("_");
@@ -455,6 +612,7 @@ export default function Landing() {
           zIndex: 0,
         }}
       />
+      <GridGlow />
       <div className="relative" style={{ zIndex: 1 }}>
       <style>{`
         .landing-no-scrollbar::-webkit-scrollbar { display: none; }
