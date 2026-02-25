@@ -405,8 +405,8 @@ function HeroSection() {
         </div>
       </div>
       <div
-        className="absolute bottom-6 left-1/2 flex flex-col items-center"
-        style={{ transform: "translateX(-50%)", ...reveal(obs.visible, 0.6) }}
+        className="absolute bottom-6 left-0 right-0 flex flex-col items-center"
+        style={{ ...reveal(obs.visible, 0.6) }}
         data-testid="scroll-indicator"
       >
         <span style={{ fontFamily: FONT_MONO, fontSize: 12, letterSpacing: "0.25em", color: "#000", marginBottom: 10, fontWeight: 500 }}>
