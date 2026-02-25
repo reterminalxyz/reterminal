@@ -41,7 +41,7 @@ const MODULES = [
 const GLITCH_CHARS = "!@#$%^&*_+-=[]{}|;:',.<>?/\\~`01";
 
 const GRID_SIZE = 48;
-const GLOW_RADIUS = 220;
+const GLOW_RADIUS = 130;
 
 interface Spark {
   x: number;
@@ -233,7 +233,7 @@ function GridGlow() {
       const dt = 1 / 60;
       const scrollY2 = window.scrollY;
       trails.current.forEach((trail, key) => {
-        trail.life -= dt * 0.18;
+        trail.life -= dt * 0.5;
         if (trail.life <= 0) {
           trails.current.delete(key);
           return;
