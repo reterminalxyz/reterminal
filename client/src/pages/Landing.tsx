@@ -329,9 +329,9 @@ function HowItWorksSection() {
   const obs = useInView();
 
   const steps = [
-    { num: "01", title: "Tap Physical Object", sub: "Card / Figure / Sticker" },
-    { num: "02", title: "Learn & Earn", sub: "Gamified modules → Earn Sats" },
-    { num: "03", title: "Peer-to-Peer Growth", sub: "Share cards → Network expands" },
+    { num: "01", title: "Tap physical object", sub: "Card / Figure / Sticker" },
+    { num: "02", title: "Learn and earn", sub: "Gamified modules → Earn $SATS" },
+    { num: "03", title: "Peer-to-peer growth", sub: "Share cards → Network expands" },
   ];
 
   useEffect(() => {
@@ -530,10 +530,10 @@ export default function Landing() {
           color: #000;
           transform: translateX(0);
           border-color: #000;
-          animation: tl-cost-flash 0.4s ease 0.2s 1;
+          animation: tl-cost-flash 0.4s ease 0.2s 1 forwards;
         }
         @keyframes tl-cost-flash {
-          0% { background: transparent; }
+          0% { background: transparent; color: #000; }
           30% { background: #000; color: #fff; }
           60% { background: #000; color: #fff; }
           100% { background: transparent; color: #000; }

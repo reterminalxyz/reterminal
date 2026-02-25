@@ -1158,7 +1158,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
               transition={{ delay: 0.3 }}
               onClick={(e) => {
                 e.preventDefault(); e.stopPropagation();
-                const lnurl = "lightning:LNURL1DP68GURN8GHJ7ET4WP5X7UNFVDEKZUNYD9HX2UEJ9EKXUCNFW3EJUCM0D5HHW6T5DPJ8YCTH9ASHQ6F0WCCJ7MRWW4EXCT6P0PZKYUJP8YE8SNPKWQMRVA23DPD8SERCVC2YC4CH";
+                const lnurl = "http://lovesicklard8.lnbits.com/withdraw/api/v1/lnurl/3wdm6StkGBHTS33RvEDqgM";
                 if (!satsClaimed) {
                   setSatsClaimed(true);
                   try { localStorage.setItem("liberta_sats_claimed", "1"); } catch (_) {}
