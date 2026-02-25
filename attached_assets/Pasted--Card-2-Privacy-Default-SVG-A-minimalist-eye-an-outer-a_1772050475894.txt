@@ -1,0 +1,23 @@
+**Card 2: Privacy**
+- *Default SVG:* A minimalist eye (an outer almond shape and an inner dot/pupil).
+- *Hover Animation:* The outer eye shape "erases" itself smoothly (using `stroke-dasharray` and `stroke-dashoffset` transitioning to 0 over 0.5s). The inner dot simultaneously scales down to a tiny, barely visible point (`transform: scale(0.2)`). Concept: Total stealth.
+
+**Card 3: Surveillance evasion**
+- *Default SVG:* A minimalist security camera in the top-left, projecting a triangular cone of vision downwards. A small dot (the user) sits inside the cone.
+- *Hover Animation:* The dot swiftly translates outside the cone (`transform: translateX(20px)`). The camera and cone instantly drop to `opacity: 0.2` and perform a rapid, subtle horizontal jitter (CSS keyframes glitch) to simulate the system losing track of the target.
+
+**Card 4: Secure communication**
+- *Default SVG:* Two dots (Node A and B) on opposite sides. A dashed line connects them (`stroke-dasharray: 4 4`).
+- *Hover Animation:* The dashed line instantly becomes a solid, slightly thicker line. A small black rectangle (encrypted packet) shoots rapidly from Node A to Node B along the line.
+
+**Card 5: Censorship bypass**
+- *Default SVG:* A thick vertical line (the firewall) on the right. A minimal arrow pointing right on the left side.
+- *Hover Animation:* The arrow accelerates towards the wall. As it hits, a gap instantly opens in the middle of the vertical line (the wall "breaks"), and the arrow slides through the gap to the other side.
+
+**Card 6: Techno-philosophy**
+- *Default SVG:* Four abstract dots floating disconnected in space.
+- *Hover Animation:* Clean, straight lines "draw" themselves between the dots simultaneously (using stroke animation), locking them into a stable, complex geometric constellation or pyramid shape. Concept: Forming structure from chaos.
+
+**Card 7: Offline survival tools**
+- *Default SVG:* A classic Wi-Fi symbol with a diagonal slash through it (No connection).
+- *Hover Animation:* The Wi-Fi symbol quickly drops down and fades out (`opacity: 0; transform: translateY(10px)`). A minimal, solid rectangular shape (representing an NFC card/hardware) sharply rises from the bottom and snaps into the absolute center with a hard, precise stop.

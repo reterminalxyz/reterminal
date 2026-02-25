@@ -189,7 +189,7 @@ function ModulesSection() {
           {MODULES.map((mod, i) => (
             <div
               key={mod.title}
-              className={i === 0 ? "module-card-first" : ""}
+              className={`module-card module-card-${i}`}
               style={{
                 flexShrink: 0,
                 width: "min(75vw, 400px)",
@@ -220,18 +220,81 @@ function ModulesSection() {
               >
                 {mod.badge}
               </span>
-              {i === 0 && (
-                <div style={{ display: "flex", justifyContent: "center", alignItems: "center", flex: 1 }}>
-                  <svg viewBox="0 0 64 64" width="256" height="256" style={{ overflow: "visible" }}>
+              <div className={`module-icon module-icon-${i}`} style={{ display: "flex", justifyContent: "center", alignItems: "center", flex: 1 }}>
+                {i === 0 && (
+                  <svg viewBox="0 0 64 64" width="200" height="200" style={{ overflow: "visible" }}>
                     <g className="icon-dollar">
-                      <path d="M32 8v48M24 18c0-4 3.5-7 8-7s8 3 8 7c0 5-8 5.5-8 11h0c0 5.5 8 6 8 11 0 4-3.5 7-8 7s-8-3-8-7" fill="none" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      <line x1="32" y1="10" x2="32" y2="54" stroke="#000" strokeWidth="1.5" strokeLinecap="round" />
+                      <path d="M40 20c0-5-3.5-8-8-8s-8 3-8 8c0 10 16 6 16 16 0 5-3.5 8-8 8s-8-3-8-8" fill="none" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     </g>
                     <g className="icon-bitcoin">
-                      <path d="M22 16h10c5 0 9 2 9 7s-3 6.5-3 6.5S42 31 42 36c0 5-4 8-9 8H22M22 16v28M22 30h10M26 12v4M34 12v4M26 44v4M34 44v4" fill="none" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M24 14v36M28 14v-2M36 14v-2M28 50v2M36 50v2M24 14h10c4.5 0 8 2.5 8 7s-3.5 7-8 7M24 28h12c4.5 0 8 2.5 8 8s-3.5 8-8 8H24M24 28h0" fill="none" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                     </g>
                   </svg>
-                </div>
-              )}
+                )}
+                {i === 1 && (
+                  <svg viewBox="0 0 64 64" width="200" height="200" style={{ overflow: "visible" }}>
+                    <g className="icon-eye-outer">
+                      <path d="M4 32s12-18 28-18 28 18 28 18-12 18-28 18S4 32 4 32z" fill="none" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </g>
+                    <circle className="icon-eye-pupil" cx="32" cy="32" r="6" fill="none" stroke="#000" strokeWidth="1.5" />
+                  </svg>
+                )}
+                {i === 2 && (
+                  <svg viewBox="0 0 64 64" width="200" height="200" style={{ overflow: "visible" }}>
+                    <g className="icon-camera">
+                      <rect x="6" y="8" width="14" height="10" rx="2" fill="none" stroke="#000" strokeWidth="1.5" />
+                      <path d="M20 14L44 40M20 14L44 8" fill="none" stroke="#000" strokeWidth="1.5" strokeLinecap="round" opacity="0.4" />
+                    </g>
+                    <circle className="icon-target-dot" cx="34" cy="30" r="3" fill="#000" />
+                  </svg>
+                )}
+                {i === 3 && (
+                  <svg viewBox="0 0 64 64" width="200" height="200" style={{ overflow: "visible" }}>
+                    <circle className="icon-node-a" cx="10" cy="32" r="4" fill="#000" />
+                    <circle className="icon-node-b" cx="54" cy="32" r="4" fill="#000" />
+                    <line className="icon-dashed-line" x1="14" y1="32" x2="50" y2="32" stroke="#000" strokeWidth="1.5" strokeDasharray="4 4" />
+                    <rect className="icon-packet" x="14" y="29" width="8" height="6" fill="#000" opacity="0" />
+                  </svg>
+                )}
+                {i === 4 && (
+                  <svg viewBox="0 0 64 64" width="200" height="200" style={{ overflow: "visible" }}>
+                    <line className="icon-wall" x1="44" y1="8" x2="44" y2="56" stroke="#000" strokeWidth="3" strokeLinecap="round" />
+                    <g className="icon-arrow-group">
+                      <line x1="8" y1="32" x2="28" y2="32" stroke="#000" strokeWidth="1.5" />
+                      <path d="M24 26l8 6-8 6" fill="none" stroke="#000" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </g>
+                  </svg>
+                )}
+                {i === 5 && (
+                  <svg viewBox="0 0 64 64" width="200" height="200" style={{ overflow: "visible" }}>
+                    <circle className="icon-dot-1" cx="16" cy="16" r="3" fill="#000" />
+                    <circle className="icon-dot-2" cx="48" cy="16" r="3" fill="#000" />
+                    <circle className="icon-dot-3" cx="48" cy="48" r="3" fill="#000" />
+                    <circle className="icon-dot-4" cx="16" cy="48" r="3" fill="#000" />
+                    <line className="icon-line-a" x1="16" y1="16" x2="48" y2="16" stroke="#000" strokeWidth="1.5" />
+                    <line className="icon-line-b" x1="48" y1="16" x2="48" y2="48" stroke="#000" strokeWidth="1.5" />
+                    <line className="icon-line-c" x1="48" y1="48" x2="16" y2="48" stroke="#000" strokeWidth="1.5" />
+                    <line className="icon-line-d" x1="16" y1="48" x2="16" y2="16" stroke="#000" strokeWidth="1.5" />
+                    <line className="icon-line-e" x1="16" y1="16" x2="48" y2="48" stroke="#000" strokeWidth="1.5" />
+                    <line className="icon-line-f" x1="48" y1="16" x2="16" y2="48" stroke="#000" strokeWidth="1.5" />
+                  </svg>
+                )}
+                {i === 6 && (
+                  <svg viewBox="0 0 64 64" width="200" height="200" style={{ overflow: "visible" }}>
+                    <g className="icon-wifi">
+                      <path d="M12 24c5.5-5.5 14.5-5.5 20 0" fill="none" stroke="#000" strokeWidth="1.5" strokeLinecap="round" />
+                      <path d="M16 30c3.3-3.3 8.7-3.3 12 0" fill="none" stroke="#000" strokeWidth="1.5" strokeLinecap="round" />
+                      <circle cx="22" cy="36" r="2" fill="#000" />
+                      <line x1="12" y1="20" x2="32" y2="40" stroke="#000" strokeWidth="1.5" strokeLinecap="round" />
+                    </g>
+                    <g className="icon-nfc-card">
+                      <rect x="26" y="28" width="20" height="14" rx="2" fill="none" stroke="#000" strokeWidth="1.5" />
+                      <rect x="30" y="32" width="6" height="4" rx="1" fill="none" stroke="#000" strokeWidth="1" />
+                    </g>
+                  </svg>
+                )}
+              </div>
               <p style={{ fontFamily: FONT_MONO, fontSize: "clamp(16px, 4vw, 22px)", fontWeight: 400, color: "#000" }}>{mod.title}</p>
             </div>
           ))}
@@ -574,7 +637,7 @@ export default function Landing() {
           background: #fff; color: #000;
         }
         .landing-enter-btn:active { transform: scale(0.97); }
-        .landing-hero-height { min-height: 100vh; min-height: 100dvh; }
+        .landing-hero-height { min-height: 70vh; min-height: 70dvh; }
         .landing-scroll-line {
           width: 2px; height: 60px; background: #000;
           animation: landing-scroll-pulse 2s ease-in-out infinite;
@@ -608,24 +671,11 @@ export default function Landing() {
           50% { transform: translateX(6px); opacity: 1; }
         }
 
-        .icon-dollar {
-          opacity: 1;
-          transition: opacity 0.1s;
-        }
-        .icon-bitcoin {
-          opacity: 0;
-          transform: scale(0.8);
-          transform-origin: center;
-          transition: opacity 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s, transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) 0.15s, filter 0.35s ease 0.15s;
-        }
-        .module-card-first:hover .icon-dollar {
-          animation: icon-glitch-out 0.4s ease-out forwards;
-        }
-        .module-card-first:hover .icon-bitcoin {
-          opacity: 1;
-          transform: scale(1);
-          filter: drop-shadow(0 0 4px rgba(255,255,255,0.8)) drop-shadow(0 0 8px rgba(0,0,0,0.15));
-        }
+        /* Card 0: Dollar → Bitcoin */
+        .icon-dollar { opacity: 1; transition: opacity 0.1s; }
+        .icon-bitcoin { opacity: 0; transform: scale(0.8); transform-origin: center; transition: opacity 0.35s cubic-bezier(0.2,0.8,0.2,1) 0.15s, transform 0.35s cubic-bezier(0.2,0.8,0.2,1) 0.15s, filter 0.35s ease 0.15s; }
+        .module-card-0:hover .icon-dollar { animation: icon-glitch-out 0.4s ease-out forwards; }
+        .module-card-0:hover .icon-bitcoin { opacity: 1; transform: scale(1); filter: drop-shadow(0 0 4px rgba(255,255,255,0.8)) drop-shadow(0 0 8px rgba(0,0,0,0.15)); }
         @keyframes icon-glitch-out {
           0% { opacity: 1; transform: translateX(0); }
           10% { opacity: 1; transform: translateX(-3px); }
@@ -638,6 +688,50 @@ export default function Landing() {
           80% { opacity: 0.1; transform: translateX(3px); }
           100% { opacity: 0; transform: translateX(0); }
         }
+
+        /* Card 1: Eye → Stealth (erase eye) */
+        .icon-eye-outer path { stroke-dasharray: 200; stroke-dashoffset: 0; transition: stroke-dashoffset 0.5s ease-out; }
+        .icon-eye-pupil { transform-origin: center; transition: transform 0.5s ease-out, opacity 0.5s ease-out; }
+        .module-card-1:hover .icon-eye-outer path { stroke-dashoffset: 200; }
+        .module-card-1:hover .icon-eye-pupil { transform: scale(0.15); opacity: 0.2; }
+
+        /* Card 2: Camera → Dot escapes */
+        .icon-camera { transition: opacity 0.3s ease; }
+        .icon-target-dot { transition: transform 0.35s cubic-bezier(0.2,0.8,0.2,1); }
+        .module-card-2:hover .icon-camera { opacity: 0.15; animation: icon-jitter 0.15s linear 3; }
+        .module-card-2:hover .icon-target-dot { transform: translate(20px, 15px); }
+        @keyframes icon-jitter {
+          0%, 100% { transform: translateX(0); }
+          25% { transform: translateX(-2px); }
+          75% { transform: translateX(2px); }
+        }
+
+        /* Card 3: Dashed → Solid + Packet */
+        .icon-dashed-line { transition: stroke-dasharray 0.15s ease, stroke-width 0.15s ease; }
+        .icon-packet { transition: transform 0.4s cubic-bezier(0.2,0.8,0.2,1) 0.1s, opacity 0.1s ease; }
+        .module-card-3:hover .icon-dashed-line { stroke-dasharray: 100; stroke-width: 2; }
+        .module-card-3:hover .icon-packet { opacity: 1; transform: translateX(28px); }
+
+        /* Card 4: Arrow breaks wall */
+        .icon-arrow-group { transition: transform 0.3s cubic-bezier(0.2,0.8,0.2,1); }
+        .icon-wall { stroke-dasharray: none; transition: stroke-dasharray 0.15s ease 0.2s, stroke-dashoffset 0.15s ease 0.2s; }
+        .module-card-4:hover .icon-arrow-group { transform: translateX(24px); }
+        .module-card-4:hover .icon-wall { stroke-dasharray: 16 10 16; stroke-dashoffset: -14; }
+
+        /* Card 5: Dots → Constellation */
+        .module-icon-5 line { stroke-dasharray: 50; stroke-dashoffset: 50; transition: stroke-dashoffset 0.5s cubic-bezier(0.2,0.8,0.2,1); }
+        .icon-line-b { transition-delay: 0.05s !important; }
+        .icon-line-c { transition-delay: 0.1s !important; }
+        .icon-line-d { transition-delay: 0.15s !important; }
+        .icon-line-e { transition-delay: 0.2s !important; }
+        .icon-line-f { transition-delay: 0.25s !important; }
+        .module-card-5:hover .module-icon-5 line { stroke-dashoffset: 0; }
+
+        /* Card 6: WiFi → NFC card */
+        .icon-wifi { transition: opacity 0.25s ease, transform 0.25s ease; }
+        .icon-nfc-card { opacity: 0; transform: translateY(16px); transition: opacity 0.3s cubic-bezier(0.2,0.8,0.2,1) 0.15s, transform 0.3s cubic-bezier(0.2,0.8,0.2,1) 0.15s; }
+        .module-card-6:hover .icon-wifi { opacity: 0; transform: translateY(10px); }
+        .module-card-6:hover .icon-nfc-card { opacity: 1; transform: translateY(0); }
       `}</style>
 
       <HeroSection />
