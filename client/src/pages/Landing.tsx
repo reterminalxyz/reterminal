@@ -57,7 +57,7 @@ interface Spark {
 interface SprayDot {
   x: number;
   y: number;
-  r: number;
+  ch: string;
   life: number;
 }
 
@@ -235,34 +235,32 @@ function GridGlow() {
       const dt = 1 / 60;
 
       if (mx > -999) {
-        const sprayR = 24;
-        const drops = 3 + Math.floor(Math.random() * 3);
+        const sprayR = 30;
         const scrollY3 = window.scrollY;
-        for (let i = 0; i < drops; i++) {
+        if (sprayDots.current.length < 200) {
           const angle = Math.random() * Math.PI * 2;
           const dist = Math.random() * sprayR;
-          if (sprayDots.current.length < 300) {
-            sprayDots.current.push({
-              x: mx + Math.cos(angle) * dist,
-              y: my + scrollY3 + Math.sin(angle) * dist,
-              r: 4 + Math.random() * 10,
-              life: 1,
-            });
-          }
+          sprayDots.current.push({
+            x: mx + Math.cos(angle) * dist,
+            y: my + scrollY3 + Math.sin(angle) * dist,
+            ch: GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)],
+            life: 1,
+          });
         }
       }
 
       const scrollY4 = window.scrollY;
+      ctx.font = "7px 'JetBrains Mono', monospace";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
       sprayDots.current = sprayDots.current.filter(d => {
-        d.life -= dt * 0.25;
+        d.life -= dt * 0.35;
         if (d.life <= 0) return false;
         const sy = d.y - scrollY4;
         if (sy < -50 || sy > window.innerHeight + 50) return true;
-        const a = d.life * d.life * 0.18;
-        ctx.beginPath();
-        ctx.arc(d.x, sy, d.r * d.life, 0, Math.PI * 2);
+        const a = d.life * d.life * 0.35;
         ctx.fillStyle = `rgba(0, 229, 255, ${a})`;
-        ctx.fill();
+        ctx.fillText(d.ch, d.x, sy);
         return true;
       });
 
@@ -724,14 +722,6 @@ export default function Landing() {
 
   return (
     <div className="relative" style={{ background: "#FFFFFF", minHeight: "100vh" }} data-testid="landing-page">
-      <div
-        className="fixed inset-0 pointer-events-none landing-grid-bg"
-        style={{
-          backgroundImage: "linear-gradient(rgba(0,0,0,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.07) 1px, transparent 1px)",
-          backgroundSize: "48px 48px",
-          zIndex: 0,
-        }}
-      />
       <GridGlow />
       <div className="relative" style={{ zIndex: 1 }}>
       <style>{`
@@ -812,25 +802,6 @@ export default function Landing() {
         @keyframes landing-blink-kf {
           0%, 100% { opacity: 1; }
           50% { opacity: 0; }
-        }
-        .landing-grid-bg {
-          animation: landing-grid-pulse 6s ease-in-out infinite;
-        }
-        @keyframes landing-grid-pulse {
-          0%, 100% { opacity: 0.5; }
-          50% { opacity: 1; }
-        }
-        .landing-grid-bg::after {
-          content: '';
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.03) 50%, transparent 100%);
-          background-size: 100% 200px;
-          animation: landing-grid-scan 8s linear infinite;
-        }
-        @keyframes landing-grid-scan {
-          0% { background-position: 0 -200px; }
-          100% { background-position: 0 calc(100vh + 200px); }
         }
         .landing-scroll-line-h {
           animation: landing-line-pulse 2.5s ease-in-out infinite;
