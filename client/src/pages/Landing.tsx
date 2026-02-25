@@ -54,33 +54,32 @@ interface Spark {
   bright: boolean;
 }
 
+interface SprayDot {
+  x: number;
+  y: number;
+  r: number;
+  life: number;
+}
+
 function GridGlow() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const sprayRef = useRef<HTMLCanvasElement>(null);
   const mouse = useRef({ x: -9999, y: -9999 });
   const sparks = useRef<Spark[]>([]);
   const lastSpawn = useRef(0);
   const prevMouse = useRef({ x: -9999, y: -9999 });
-  const lastSpray = useRef(0);
+  const sprayDots = useRef<SprayDot[]>([]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const spray = sprayRef.current;
-    if (!canvas || !spray) return;
+    if (!canvas) return;
     let raf: number;
     const dpr = window.devicePixelRatio || 1;
 
     const resize = () => {
-      const w = window.innerWidth;
-      const h = document.documentElement.scrollHeight;
-      canvas.width = w * dpr;
+      canvas.width = window.innerWidth * dpr;
       canvas.height = window.innerHeight * dpr;
-      canvas.style.width = w + "px";
+      canvas.style.width = window.innerWidth + "px";
       canvas.style.height = window.innerHeight + "px";
-      spray.width = w * dpr;
-      spray.height = h * dpr;
-      spray.style.width = w + "px";
-      spray.style.height = h + "px";
     };
     resize();
     window.addEventListener("resize", resize);
@@ -240,50 +239,37 @@ function GridGlow() {
 
       const dt = 1 / 60;
 
-      const sCtxFade = spray.getContext("2d");
-      if (sCtxFade) {
-        sCtxFade.save();
-        sCtxFade.globalCompositeOperation = "destination-out";
-        sCtxFade.fillStyle = "rgba(0,0,0,0.008)";
-        sCtxFade.fillRect(0, 0, spray.width, spray.height);
-        sCtxFade.restore();
-      }
-
-      if (mx > -999 && now - lastSpray.current > 16) {
-        lastSpray.current = now;
-        const sCtx = spray.getContext("2d");
-        if (sCtx) {
-          const scrollY3 = window.scrollY;
-          sCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-          const sprayR = 28 + Math.random() * 18;
-          const drops = 6 + Math.floor(Math.random() * 6);
-          for (let i = 0; i < drops; i++) {
-            const angle = Math.random() * Math.PI * 2;
-            const dist = Math.random() * sprayR;
-            const sx = mx + Math.cos(angle) * dist;
-            const sy = my + scrollY3 + Math.sin(angle) * dist;
-            const r = 2 + Math.random() * 6;
-            const grad = sCtx.createRadialGradient(sx, sy, 0, sx, sy, r);
-            grad.addColorStop(0, "rgba(0, 229, 255, 0.12)");
-            grad.addColorStop(0.5, "rgba(0, 229, 255, 0.06)");
-            grad.addColorStop(1, "rgba(0, 229, 255, 0)");
-            sCtx.beginPath();
-            sCtx.arc(sx, sy, r, 0, Math.PI * 2);
-            sCtx.fillStyle = grad;
-            sCtx.fill();
+      if (mx > -999) {
+        const sprayR = 24;
+        const drops = 3 + Math.floor(Math.random() * 3);
+        const scrollY3 = window.scrollY;
+        for (let i = 0; i < drops; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const dist = Math.random() * sprayR;
+          if (sprayDots.current.length < 300) {
+            sprayDots.current.push({
+              x: mx + Math.cos(angle) * dist,
+              y: my + scrollY3 + Math.sin(angle) * dist,
+              r: 4 + Math.random() * 10,
+              life: 1,
+            });
           }
-          const bigR = 15 + Math.random() * 20;
-          const bigGrad = sCtx.createRadialGradient(mx, my + scrollY3, 0, mx, my + scrollY3, bigR);
-          bigGrad.addColorStop(0, "rgba(0, 229, 255, 0.07)");
-          bigGrad.addColorStop(0.6, "rgba(0, 229, 255, 0.03)");
-          bigGrad.addColorStop(1, "rgba(0, 229, 255, 0)");
-          sCtx.beginPath();
-          sCtx.arc(mx, my + scrollY3, bigR, 0, Math.PI * 2);
-          sCtx.fillStyle = bigGrad;
-          sCtx.fill();
-          sCtx.setTransform(1, 0, 0, 1, 0, 0);
         }
       }
+
+      const scrollY4 = window.scrollY;
+      sprayDots.current = sprayDots.current.filter(d => {
+        d.life -= dt * 0.25;
+        if (d.life <= 0) return false;
+        const sy = d.y - scrollY4;
+        if (sy < -50 || sy > window.innerHeight + 50) return true;
+        const a = d.life * d.life * 0.18;
+        ctx.beginPath();
+        ctx.arc(d.x, sy, d.r * d.life, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0, 229, 255, ${a})`;
+        ctx.fill();
+        return true;
+      });
 
       sparks.current = sparks.current.filter(s => {
         s.life -= dt / s.maxLife;
@@ -323,18 +309,11 @@ function GridGlow() {
   }, []);
 
   return (
-    <>
-      <canvas
-        ref={sprayRef}
-        className="absolute top-0 left-0 pointer-events-none"
-        style={{ zIndex: 0 }}
-      />
-      <canvas
-        ref={canvasRef}
-        className="fixed inset-0 pointer-events-none"
-        style={{ zIndex: 0 }}
-      />
-    </>
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 pointer-events-none"
+      style={{ zIndex: 0 }}
+    />
   );
 }
 
