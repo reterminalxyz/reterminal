@@ -77,7 +77,7 @@ function HeroSection() {
         >
           <iframe
             className="absolute inset-0 w-full h-full"
-            src="https://www.youtube.com/embed/EXwYrShsnyY?rel=0&modestbranding=1"
+            src="https://www.youtube.com/embed/05LWu5BJUTA?rel=0&modestbranding=1"
             title="re_terminal"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
