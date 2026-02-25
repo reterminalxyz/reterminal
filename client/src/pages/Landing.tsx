@@ -366,13 +366,11 @@ function HowItWorksSection() {
         const fillProgress = Math.min(100, Math.max(0, ((trigger - containerTop) / containerH) * 100));
         fill.style.height = fillProgress + "%";
 
-        if (cost) {
+        if (cost && !cost.classList.contains("tl-cost-active")) {
           const costRect = cost.getBoundingClientRect();
           const costMid = costRect.top + costRect.height / 2;
           if (costMid < trigger) {
             cost.classList.add("tl-cost-active");
-          } else {
-            cost.classList.remove("tl-cost-active");
           }
         }
       });
