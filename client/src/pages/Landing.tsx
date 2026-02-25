@@ -368,8 +368,9 @@ function HowItWorksSection() {
 
         if (cost && !cost.classList.contains("tl-cost-active")) {
           const costRect = cost.getBoundingClientRect();
-          const costMid = costRect.top + costRect.height / 2;
-          if (costMid < trigger) {
+          const costTop = costRect.top - containerTop;
+          const costThreshold = (costTop / containerH) * 100;
+          if (fillProgress >= costThreshold) {
             cost.classList.add("tl-cost-active");
           }
         }
