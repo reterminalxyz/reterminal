@@ -56,23 +56,31 @@ interface Spark {
 
 function GridGlow() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const sprayRef = useRef<HTMLCanvasElement>(null);
   const mouse = useRef({ x: -9999, y: -9999 });
   const sparks = useRef<Spark[]>([]);
   const lastSpawn = useRef(0);
   const prevMouse = useRef({ x: -9999, y: -9999 });
-  const trails = useRef<Map<string, { x: number; y: number; life: number }>>(new Map());
+  const lastSpray = useRef(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    const spray = sprayRef.current;
+    if (!canvas || !spray) return;
     let raf: number;
     const dpr = window.devicePixelRatio || 1;
 
     const resize = () => {
-      canvas.width = window.innerWidth * dpr;
+      const w = window.innerWidth;
+      const h = document.documentElement.scrollHeight;
+      canvas.width = w * dpr;
       canvas.height = window.innerHeight * dpr;
-      canvas.style.width = window.innerWidth + "px";
+      canvas.style.width = w + "px";
       canvas.style.height = window.innerHeight + "px";
+      spray.width = w * dpr;
+      spray.height = h * dpr;
+      spray.style.width = w + "px";
+      spray.style.height = h + "px";
     };
     resize();
     window.addEventListener("resize", resize);
@@ -231,49 +239,51 @@ function GridGlow() {
       }
 
       const dt = 1 / 60;
-      const scrollY2 = window.scrollY;
-      trails.current.forEach((trail, key) => {
-        trail.life -= dt * 0.5;
-        if (trail.life <= 0) {
-          trails.current.delete(key);
-          return;
+
+      const sCtxFade = spray.getContext("2d");
+      if (sCtxFade) {
+        sCtxFade.save();
+        sCtxFade.globalCompositeOperation = "destination-out";
+        sCtxFade.fillStyle = "rgba(0,0,0,0.008)";
+        sCtxFade.fillRect(0, 0, spray.width, spray.height);
+        sCtxFade.restore();
+      }
+
+      if (mx > -999 && now - lastSpray.current > 16) {
+        lastSpray.current = now;
+        const sCtx = spray.getContext("2d");
+        if (sCtx) {
+          const scrollY3 = window.scrollY;
+          sCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+          const sprayR = 28 + Math.random() * 18;
+          const drops = 6 + Math.floor(Math.random() * 6);
+          for (let i = 0; i < drops; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const dist = Math.random() * sprayR;
+            const sx = mx + Math.cos(angle) * dist;
+            const sy = my + scrollY3 + Math.sin(angle) * dist;
+            const r = 2 + Math.random() * 6;
+            const grad = sCtx.createRadialGradient(sx, sy, 0, sx, sy, r);
+            grad.addColorStop(0, "rgba(0, 229, 255, 0.12)");
+            grad.addColorStop(0.5, "rgba(0, 229, 255, 0.06)");
+            grad.addColorStop(1, "rgba(0, 229, 255, 0)");
+            sCtx.beginPath();
+            sCtx.arc(sx, sy, r, 0, Math.PI * 2);
+            sCtx.fillStyle = grad;
+            sCtx.fill();
+          }
+          const bigR = 15 + Math.random() * 20;
+          const bigGrad = sCtx.createRadialGradient(mx, my + scrollY3, 0, mx, my + scrollY3, bigR);
+          bigGrad.addColorStop(0, "rgba(0, 229, 255, 0.07)");
+          bigGrad.addColorStop(0.6, "rgba(0, 229, 255, 0.03)");
+          bigGrad.addColorStop(1, "rgba(0, 229, 255, 0)");
+          sCtx.beginPath();
+          sCtx.arc(mx, my + scrollY3, bigR, 0, Math.PI * 2);
+          sCtx.fillStyle = bigGrad;
+          sCtx.fill();
+          sCtx.setTransform(1, 0, 0, 1, 0, 0);
         }
-        const ty = trail.y - scrollY2;
-        const l = trail.life;
-        const a = l * l * 0.45;
-        const stubLen = GRID_SIZE * 0.4 * l;
-
-        ctx.save();
-        ctx.shadowColor = `rgba(0, 229, 255, ${a * 0.5})`;
-        ctx.shadowBlur = 6;
-
-        ctx.beginPath();
-        ctx.moveTo(trail.x - stubLen, ty);
-        ctx.lineTo(trail.x + stubLen, ty);
-        ctx.strokeStyle = `rgba(0, 229, 255, ${a * 0.6})`;
-        ctx.lineWidth = 1;
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.moveTo(trail.x, ty - stubLen);
-        ctx.lineTo(trail.x, ty + stubLen);
-        ctx.stroke();
-
-        const dotSz = 2.5 * l;
-        ctx.beginPath();
-        ctx.arc(trail.x, ty, dotSz, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(0, 229, 255, ${a})`;
-        ctx.fill();
-
-        if (l > 0.5) {
-          ctx.beginPath();
-          ctx.arc(trail.x, ty, dotSz * 0.5, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255, 255, 255, ${a * 0.4})`;
-          ctx.fill();
-        }
-
-        ctx.restore();
-      });
+      }
 
       sparks.current = sparks.current.filter(s => {
         s.life -= dt / s.maxLife;
@@ -313,11 +323,18 @@ function GridGlow() {
   }, []);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="fixed inset-0 pointer-events-none"
-      style={{ zIndex: 0 }}
-    />
+    <>
+      <canvas
+        ref={sprayRef}
+        className="absolute top-0 left-0 pointer-events-none"
+        style={{ zIndex: 0 }}
+      />
+      <canvas
+        ref={canvasRef}
+        className="fixed inset-0 pointer-events-none"
+        style={{ zIndex: 0 }}
+      />
+    </>
   );
 }
 
