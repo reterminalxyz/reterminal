@@ -323,24 +323,73 @@ function ModulesSection() {
 }
 
 function HowItWorksSection() {
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const fillRef = useRef<HTMLDivElement>(null);
+  const stepRefs = useRef<(HTMLDivElement | null)[]>([]);
   const obs = useInView();
+
   const steps = [
     { num: "01", title: "Tap Physical Object", sub: "Card / Figure / Sticker" },
     { num: "02", title: "Learn & Earn", sub: "Gamified modules → Earn Sats" },
     { num: "03", title: "Peer-to-Peer Growth", sub: "Share cards → Network expands" },
   ];
+
+  const thresholds = [20, 50, 80];
+
+  useEffect(() => {
+    let raf: number;
+    const onScroll = () => {
+      raf = requestAnimationFrame(() => {
+        const section = sectionRef.current;
+        const fill = fillRef.current;
+        if (!section || !fill) return;
+        const rect = section.getBoundingClientRect();
+        const viewH = window.innerHeight;
+        const start = rect.top - viewH * 0.8;
+        const end = rect.bottom - viewH * 0.3;
+        const range = end - start;
+        if (range <= 0) return;
+        const progress = Math.min(100, Math.max(0, ((0 - start) / range) * 100));
+        fill.style.height = progress + "%";
+        stepRefs.current.forEach((el, i) => {
+          if (!el) return;
+          if (progress >= thresholds[i]) {
+            el.classList.add("tl-active");
+          } else {
+            el.classList.remove("tl-active");
+          }
+        });
+      });
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => { window.removeEventListener("scroll", onScroll); cancelAnimationFrame(raf); };
+  }, []);
+
   return (
-    <section style={{ padding: "2vh 0" }} data-testid="section-howitworks">
-      <div ref={obs.ref} style={{ maxWidth: 1000, margin: "0 auto", padding: "0 5vw" }}>
-        <h2 style={{ fontFamily: FONT_MONO, fontSize: "clamp(20px, 4vw, 32px)", fontWeight: 400, color: "#000", marginBottom: 32, ...reveal(obs.visible) }} data-testid="text-hiw-title">
-          Deployment Mechanics
-        </h2>
-        <div className="landing-steps-grid" style={reveal(obs.visible, 0.15)}>
+    <section ref={sectionRef} style={{ padding: "2vh 0" }} data-testid="section-howitworks">
+      <div style={{ maxWidth: 1000, margin: "0 auto", padding: "0 5vw" }}>
+        <div ref={obs.ref}>
+          <h2 style={{ fontFamily: FONT_MONO, fontSize: "clamp(20px, 4vw, 32px)", fontWeight: 400, color: "#000", marginBottom: 0, ...reveal(obs.visible) }} data-testid="text-hiw-title">
+            Deployment Mechanics
+          </h2>
+        </div>
+        <div className="tl-container">
+          <div className="tl-track">
+            <div ref={fillRef} className="tl-fill" />
+          </div>
           {steps.map((step, i) => (
-            <div key={step.num} data-testid={`step-hiw-${i}`}>
-              <p style={{ fontFamily: FONT_MONO, fontSize: "clamp(28px, 5vw, 48px)", fontWeight: 400, color: "#E5E5E5", marginBottom: 12 }}>{step.num} /</p>
-              <h3 style={{ fontFamily: FONT_MONO, fontSize: "clamp(14px, 2.5vw, 18px)", fontWeight: 400, color: "#000", marginBottom: 6 }}>{step.title}</h3>
-              <p style={{ fontFamily: FONT_BODY, fontSize: "clamp(12px, 2vw, 14px)", color: "#666" }}>{step.sub}</p>
+            <div
+              key={step.num}
+              ref={(el) => { stepRefs.current[i] = el; }}
+              className="tl-step"
+              data-testid={`step-hiw-${i}`}
+            >
+              <div style={{ fontFamily: FONT_MONO, fontSize: "clamp(28px, 5vw, 2rem)", fontWeight: 400, color: "inherit", opacity: 0.3 }}>{step.num} /</div>
+              <div>
+                <h3 style={{ fontFamily: FONT_BODY, fontSize: "clamp(14px, 2.5vw, 18px)", fontWeight: 500, color: "inherit", marginBottom: 4 }}>{step.title}</h3>
+                <p style={{ fontFamily: FONT_BODY, fontSize: "clamp(12px, 2vw, 14px)", color: "#999", transition: "color 0.6s ease" }}>{step.sub}</p>
+              </div>
             </div>
           ))}
         </div>
@@ -659,10 +708,44 @@ export default function Landing() {
           0%, 100% { transform: scaleY(0.3); opacity: 0.3; }
           50% { transform: scaleY(1); opacity: 1; }
         }
-        .landing-steps-grid { display: grid; grid-template-columns: 1fr; gap: 32px; }
-        @media (min-width: 640px) {
-          .landing-steps-grid { grid-template-columns: repeat(3, 1fr); }
+        .tl-container {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          gap: 4rem;
+          padding-left: 3rem;
+          margin: 3rem 0 2rem;
         }
+        .tl-track {
+          position: absolute;
+          left: 0;
+          top: 0;
+          bottom: 0;
+          width: 1px;
+          background: #E5E5E5;
+        }
+        .tl-fill {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 0%;
+          background: #000;
+          transition: height 0.1s linear;
+        }
+        .tl-step {
+          display: flex;
+          gap: 2rem;
+          align-items: flex-start;
+          color: #ccc;
+          transform: translateX(-10px);
+          transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .tl-step.tl-active {
+          color: #000;
+          transform: translateX(0);
+        }
+        .tl-step.tl-active p { color: #666 !important; }
         .landing-blink { animation: landing-blink-kf 1s step-end infinite; }
         @keyframes landing-blink-kf {
           0%, 100% { opacity: 1; }
