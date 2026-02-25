@@ -254,6 +254,50 @@ function GridGlow() {
   );
 }
 
+function LazyYouTube({ videoId, visible }: { videoId: string; visible: boolean }) {
+  const [loaded, setLoaded] = useState(false);
+  return (
+    <div className="mt-8 w-full" style={{ maxWidth: 800, ...reveal(visible, 0.3) }}>
+      <div
+        className="relative w-full cursor-pointer"
+        style={{ paddingBottom: "56.25%", border: BORDER, background: "#000" }}
+        onClick={() => setLoaded(true)}
+        data-testid="video-container"
+      >
+        {loaded ? (
+          <iframe
+            className="absolute inset-0 w-full h-full"
+            src={`https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&autoplay=1`}
+            title="re_terminal"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            data-testid="video-embed"
+          />
+        ) : (
+          <>
+            <img
+              className="absolute inset-0 w-full h-full object-cover"
+              src={`https://img.youtube.com/vi/${videoId}/hqdefault.jpg`}
+              alt="Play video"
+              loading="lazy"
+            />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div style={{
+                width: 64, height: 44, background: "rgba(0,0,0,0.75)", borderRadius: 8,
+                display: "flex", alignItems: "center", justifyContent: "center",
+              }}>
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="white">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              </div>
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
 function GlitchTitle() {
   const [showSep, setShowSep] = useState(false);
   const [glyphs, setGlyphs] = useState("_");
@@ -323,18 +367,7 @@ function HeroSection() {
               digital resistance starts here.
             </p>
           </div>
-          <div className="mt-8 w-full" style={{ maxWidth: 800, ...reveal(obs.visible, 0.3) }}>
-            <div className="relative w-full" style={{ paddingBottom: "56.25%", border: BORDER }} data-testid="video-container">
-              <iframe
-                className="absolute inset-0 w-full h-full"
-                src="https://www.youtube.com/embed/05LWu5BJUTA?rel=0&modestbranding=1"
-                title="re_terminal"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-                data-testid="video-embed"
-              />
-            </div>
-          </div>
+          <LazyYouTube videoId="05LWu5BJUTA" visible={obs.visible} />
         </div>
       </div>
       <div
