@@ -1,0 +1,30 @@
+Act as a Senior Motion UI Designer. We need to upgrade the "Surveillance Trap" section from static text into a dynamic, semantic infographic animation using HTML and CSS.
+
+**Target Section:** The block containing "> 60 countries actively censor the internet." and the two arrows below it.
+
+**The Concept ("The Terminal Cascade"):**
+Visually represent how censorship leads to a trap. We will use a drawing timeline/tree structure that cascades downwards, culminating in "Financial control" being locked inside a box.
+
+**Implementation Instructions:**
+
+1. **HTML Restructuring:**
+- Wrap this specific text block in a new container: `<div class="trap-infographic">`.
+- Wrap the main stat `> 60 countries...` in a `div.trap-header`.
+- Wrap the next two lines in a `div.trap-tree`. 
+- Structure the tree lines so they have a visual connecting line (like a terminal directory tree `├─`).
+
+2. **CSS Drawing Animation (Triggered by .is-visible from IntersectionObserver):**
+- **Step 1 (0.0s):** `.trap-header` (`> 60 countries...`) fades in and slides up slightly.
+- **Step 2 (0.4s):** A thin 1px vertical black line starts "growing" downwards from the header to the first arrow.
+- **Step 3 (0.8s):** The line branches right (`├─`), and `→ Total surveillance` instantly snaps into visibility with a slight horizontal translation.
+- **Step 4 (1.2s):** The vertical line continues growing down to the second arrow.
+- **Step 5 (1.6s):** It branches right (`└─`), and `→ Financial control` snaps into visibility.
+- **Step 6 (2.0s - The Trap):** Instantly, a stark 1px black border draws itself around the words "Financial control". Add a micro-interaction where the background of this specific box quickly flashes black and text flashes white for 100ms, then returns to white background/black text, symbolizing the trap closing.
+
+**Technical Constraints:**
+- Use CSS `::before` and `::after` pseudo-elements to create and animate the growing vertical and horizontal lines.
+- Use `transition` and `animation` with the custom easing `cubic-bezier(0.2, 0.8, 0.2, 1)`.
+- Ensure this animation only fires once when the section scrolls into view (use the existing `.reveal-on-scroll` / `.is-visible` logic).
+- Maintain the "Pure Minimalist" typography: JetBrains Mono, huge font for the stat, strictly black and white.
+
+Provide the exact HTML replacement for this section and the necessary CSS.

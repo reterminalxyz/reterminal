@@ -134,26 +134,29 @@ function HeroSection() {
 }
 
 function ProblemSection() {
-  const s1 = useInView();
-  const s2 = useInView();
-  const s3 = useInView();
-  const s4 = useInView();
+  const obs = useInView(0.2);
   return (
     <section style={{ padding: "3vh 0" }} data-testid="section-problem">
-      <div style={{ maxWidth: 1000, margin: "0 auto", padding: "0 5vw" }}>
-        <div ref={s1.ref} style={reveal(s1.visible)}>
-          <p style={{ fontFamily: FONT_MONO, fontSize: "clamp(22px, 5vw, 40px)", fontWeight: 400, color: "#000", lineHeight: 1.3, marginBottom: 32 }} data-testid="text-problem-stat">
-            &gt; 60 countries actively censor the internet.
-          </p>
-        </div>
-        <div ref={s2.ref} className="mb-3" style={reveal(s2.visible)}>
-          <p style={{ fontFamily: FONT_MONO, fontSize: "clamp(14px, 3vw, 20px)", color: "#000", paddingLeft: 16 }} data-testid="text-problem-step2">→ Total surveillance</p>
-        </div>
-        <div ref={s3.ref} className="mb-8" style={reveal(s3.visible)}>
-          <p style={{ fontFamily: FONT_MONO, fontSize: "clamp(14px, 3vw, 20px)", color: "#000", paddingLeft: 16 }} data-testid="text-problem-step3">→ Financial control</p>
-        </div>
-        <div ref={s4.ref} style={reveal(s4.visible)}>
-          <div style={{ border: BORDER, padding: 24 }} data-testid="text-problem-conclusion">
+      <div ref={obs.ref} style={{ maxWidth: 1000, margin: "0 auto", padding: "0 5vw" }}>
+        <div className={`trap-infographic${obs.visible ? " trap-visible" : ""}`}>
+          <div className="trap-header" data-testid="text-problem-stat">
+            <p style={{ fontFamily: FONT_MONO, fontSize: "clamp(22px, 5vw, 40px)", fontWeight: 400, color: "#000", lineHeight: 1.3 }}>
+              &gt; 60 countries actively censor the internet.
+            </p>
+          </div>
+          <div className="trap-tree">
+            <div className="trap-trunk" />
+            <div className="trap-branch trap-branch-1" data-testid="text-problem-step2">
+              <span className="trap-connector">├─</span>
+              <span className="trap-label">Total surveillance</span>
+            </div>
+            <div className="trap-trunk trap-trunk-2" />
+            <div className="trap-branch trap-branch-2" data-testid="text-problem-step3">
+              <span className="trap-connector">└─</span>
+              <span className="trap-label trap-label-box">Financial control</span>
+            </div>
+          </div>
+          <div className="trap-conclusion" data-testid="text-problem-conclusion">
             <p style={{ fontFamily: FONT_BODY, fontSize: "clamp(14px, 3vw, 18px)", color: "#000" }}>Education must be holistic, not piecemeal.</p>
           </div>
         </div>
@@ -621,7 +624,7 @@ export default function Landing() {
       <div
         className="fixed inset-0 pointer-events-none landing-grid-bg"
         style={{
-          backgroundImage: "linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px)",
+          backgroundImage: "linear-gradient(rgba(0,0,0,0.07) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,0.07) 1px, transparent 1px)",
           backgroundSize: "48px 48px",
           zIndex: 0,
         }}
@@ -657,12 +660,53 @@ export default function Landing() {
           50% { opacity: 0; }
         }
         .landing-grid-bg {
-          animation: landing-grid-pulse 4s ease-in-out infinite;
+          animation: landing-grid-pulse 6s ease-in-out infinite;
         }
         @keyframes landing-grid-pulse {
-          0%, 100% { opacity: 0.6; }
+          0%, 100% { opacity: 0.5; }
           50% { opacity: 1; }
         }
+        .landing-grid-bg::after {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(180deg, transparent 0%, rgba(0,0,0,0.03) 50%, transparent 100%);
+          background-size: 100% 200px;
+          animation: landing-grid-scan 8s linear infinite;
+        }
+        @keyframes landing-grid-scan {
+          0% { background-position: 0 -200px; }
+          100% { background-position: 0 calc(100vh + 200px); }
+        }
+        /* Trap Infographic */
+        .trap-infographic { position: relative; }
+        .trap-header { opacity: 0; transform: translateY(16px); transition: opacity 0.6s cubic-bezier(0.2,0.8,0.2,1), transform 0.6s cubic-bezier(0.2,0.8,0.2,1); }
+        .trap-tree { padding-left: 20px; position: relative; }
+        .trap-trunk { width: 1px; background: #000; margin-left: 0; height: 0; transition: height 0.4s cubic-bezier(0.2,0.8,0.2,1); }
+        .trap-trunk-2 { transition-delay: 0.8s; }
+        .trap-branch { display: flex; align-items: center; gap: 8px; opacity: 0; transform: translateX(-8px); transition: opacity 0.15s ease, transform 0.25s cubic-bezier(0.2,0.8,0.2,1); font-family: 'JetBrains Mono', monospace; font-size: clamp(14px, 3vw, 20px); color: #000; }
+        .trap-branch-1 { transition-delay: 0.8s; }
+        .trap-branch-2 { transition-delay: 1.6s; }
+        .trap-connector { opacity: 0.4; white-space: pre; }
+        .trap-label { display: inline-block; }
+        .trap-label-box { padding: 4px 12px; border: 1px solid transparent; transition: border-color 0.15s ease 2.0s, background 0.1s ease 2.0s, color 0.1s ease 2.0s; }
+        .trap-conclusion { opacity: 0; transform: translateY(12px); transition: opacity 0.6s cubic-bezier(0.2,0.8,0.2,1) 2.4s, transform 0.6s cubic-bezier(0.2,0.8,0.2,1) 2.4s; margin-top: 32px; border: 1px solid #E5E5E5; padding: 24px; }
+
+        .trap-visible .trap-header { opacity: 1; transform: translateY(0); }
+        .trap-visible .trap-trunk { height: 32px; transition-delay: 0.4s; }
+        .trap-visible .trap-trunk-2 { height: 32px; transition-delay: 1.2s; }
+        .trap-visible .trap-branch-1 { opacity: 1; transform: translateX(0); }
+        .trap-visible .trap-branch-2 { opacity: 1; transform: translateX(0); }
+        .trap-visible .trap-label-box { border-color: #000; animation: trap-flash 0.3s ease 2.0s 1; }
+        .trap-visible .trap-conclusion { opacity: 1; transform: translateY(0); }
+
+        @keyframes trap-flash {
+          0% { background: transparent; color: #000; }
+          33% { background: #000; color: #fff; }
+          66% { background: #000; color: #fff; }
+          100% { background: transparent; color: #000; }
+        }
+
         .landing-scroll-arrow {
           animation: landing-arrow-bounce 1.5s ease-in-out infinite;
         }
