@@ -43,31 +43,19 @@ const GLITCH_CHARS = "!@#$%^&*_+-=[]{}|;:',.<>?/\\~`01";
 const GRID_SIZE = 48;
 const GLOW_RADIUS = 130;
 
-interface Spark {
-  x: number;
-  y: number;
+interface TrailNode {
+  gx: number;
+  gy: number;
   life: number;
-  maxLife: number;
-  size: number;
-  vx: number;
-  vy: number;
-  bright: boolean;
-}
-
-interface SprayDot {
-  x: number;
-  y: number;
   ch: string;
-  life: number;
 }
 
 function GridGlow() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouse = useRef({ x: -9999, y: -9999 });
-  const sparks = useRef<Spark[]>([]);
-  const lastSpawn = useRef(0);
+  const trailNodes = useRef<TrailNode[]>([]);
+  const trailSet = useRef<Set<string>>(new Set());
   const prevMouse = useRef({ x: -9999, y: -9999 });
-  const sprayDots = useRef<SprayDot[]>([]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -165,127 +153,83 @@ function GridGlow() {
             if (dist < GLOW_RADIUS) {
               const intensity = 1 - dist / GLOW_RADIUS;
               const i3 = intensity * intensity * intensity;
-
-              const dotSize = 1 + i3 * 4;
+              const dotSize = 1 + i3 * 3;
               ctx.beginPath();
               ctx.arc(gx, gy, dotSize, 0, Math.PI * 2);
-              ctx.fillStyle = `rgba(0, 229, 255, ${i3 * 0.9})`;
+              ctx.fillStyle = `rgba(0, 229, 255, ${i3 * 0.8})`;
               ctx.fill();
-
-              if (intensity > 0.4) {
-                ctx.beginPath();
-                ctx.arc(gx, gy, dotSize + 6, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(0, 229, 255, ${i3 * 0.15})`;
-                ctx.fill();
-              }
-
-              if (intensity > 0.7) {
-                ctx.save();
-                ctx.shadowColor = "rgba(0, 229, 255, 0.8)";
-                ctx.shadowBlur = 12;
-                ctx.beginPath();
-                ctx.arc(gx, gy, dotSize * 0.6, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255, 255, 255, ${i3 * 0.6})`;
-                ctx.fill();
-                ctx.restore();
-
-                const crossLen = 4 + i3 * 8;
-                ctx.beginPath();
-                ctx.moveTo(gx - crossLen, gy);
-                ctx.lineTo(gx + crossLen, gy);
-                ctx.moveTo(gx, gy - crossLen);
-                ctx.lineTo(gx, gy + crossLen);
-                ctx.strokeStyle = `rgba(0, 229, 255, ${i3 * 0.25})`;
-                ctx.lineWidth = 0.5;
-                ctx.stroke();
-              }
-            }
-          }
-        }
-
-        const speed = Math.sqrt(
-          (mx - prevMouse.current.x) ** 2 + (my - prevMouse.current.y) ** 2
-        );
-        const spawnRate = Math.max(20, 80 - speed * 2);
-
-        if (now - lastSpawn.current > spawnRate) {
-          lastSpawn.current = now;
-          const count = speed > 8 ? 3 : 1;
-          for (let i = 0; i < count; i++) {
-            const nearCol = Math.round(mx / GRID_SIZE) + Math.floor(Math.random() * 3 - 1);
-            const nearRow = Math.round(absY / GRID_SIZE) + Math.floor(Math.random() * 3 - 1);
-            const sx = nearCol * GRID_SIZE;
-            const sy = nearRow * GRID_SIZE - scrollY;
-            const d = Math.sqrt((sx - mx) ** 2 + (sy - my) ** 2);
-            if (d < GLOW_RADIUS * 0.7 && sparks.current.length < 50) {
-              sparks.current.push({
-                x: sx, y: sy,
-                life: 1,
-                maxLife: 0.3 + Math.random() * 0.5,
-                size: 1.5 + Math.random() * 2.5,
-                vx: (Math.random() - 0.5) * 40,
-                vy: (Math.random() - 0.5) * 40 - 10,
-                bright: Math.random() > 0.6,
-              });
             }
           }
         }
       }
 
       const dt = 1 / 60;
+      const STUB = GRID_SIZE * 0.4;
 
       if (mx > -999) {
-        const sprayR = 30;
         const scrollY3 = window.scrollY;
-        if (sprayDots.current.length < 200) {
-          const angle = Math.random() * Math.PI * 2;
-          const dist = Math.random() * sprayR;
-          sprayDots.current.push({
-            x: mx + Math.cos(angle) * dist,
-            y: my + scrollY3 + Math.sin(angle) * dist,
-            ch: GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)],
-            life: 1,
-          });
+        const absY3 = my + scrollY3;
+        const nearCol = Math.round(mx / GRID_SIZE);
+        const nearRow = Math.round(absY3 / GRID_SIZE);
+        for (let dr = -1; dr <= 1; dr++) {
+          for (let dc = -1; dc <= 1; dc++) {
+            const c = nearCol + dc;
+            const r = nearRow + dr;
+            const key = `${c},${r}`;
+            if (!trailSet.current.has(key)) {
+              const gx = c * GRID_SIZE;
+              const gy = r * GRID_SIZE;
+              const dx = gx - mx;
+              const dy = (gy - scrollY3) - my;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+              if (dist < GLOW_RADIUS * 0.8) {
+                trailSet.current.add(key);
+                trailNodes.current.push({
+                  gx, gy, life: 1,
+                  ch: GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)],
+                });
+              }
+            }
+          }
         }
       }
 
       const scrollY4 = window.scrollY;
-      ctx.font = "7px 'JetBrains Mono', monospace";
+      ctx.font = "8px 'JetBrains Mono', monospace";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
-      sprayDots.current = sprayDots.current.filter(d => {
-        d.life -= dt * 0.35;
-        if (d.life <= 0) return false;
-        const sy = d.y - scrollY4;
-        if (sy < -50 || sy > window.innerHeight + 50) return true;
-        const a = d.life * d.life * 0.35;
-        ctx.fillStyle = `rgba(0, 229, 255, ${a})`;
-        ctx.fillText(d.ch, d.x, sy);
+      trailNodes.current = trailNodes.current.filter(n => {
+        n.life -= dt * 0.2;
+        if (n.life <= 0) {
+          trailSet.current.delete(`${Math.round(n.gx / GRID_SIZE)},${Math.round(n.gy / GRID_SIZE)}`);
+          return false;
+        }
+        const sy = n.gy - scrollY4;
+        if (sy < -60 || sy > window.innerHeight + 60) return true;
+        const a = n.life * n.life * 0.5;
+
+        ctx.strokeStyle = `rgba(0, 229, 255, ${a * 0.4})`;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(n.gx - STUB, sy);
+        ctx.lineTo(n.gx + STUB, sy);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(n.gx, sy - STUB);
+        ctx.lineTo(n.gx, sy + STUB);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(n.gx, sy, 2, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0, 229, 255, ${a * 0.7})`;
+        ctx.fill();
+
+        ctx.fillStyle = `rgba(0, 229, 255, ${a * 0.4})`;
+        ctx.fillText(n.ch, n.gx + 6, sy - 6);
         return true;
       });
 
-      sparks.current = sparks.current.filter(s => {
-        s.life -= dt / s.maxLife;
-        s.x += s.vx * dt;
-        s.y += s.vy * dt;
-        s.vx *= 0.94;
-        s.vy *= 0.94;
-        if (s.life <= 0) return false;
-        const a = s.life * s.life;
-        ctx.save();
-        if (s.bright) {
-          ctx.shadowColor = "rgba(0, 229, 255, 0.6)";
-          ctx.shadowBlur = 8;
-        }
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.size * s.life, 0, Math.PI * 2);
-        ctx.fillStyle = s.bright
-          ? `rgba(255, 255, 255, ${a * 0.9})`
-          : `rgba(0, 229, 255, ${a * 0.8})`;
-        ctx.fill();
-        ctx.restore();
-        return true;
-      });
+      
 
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       raf = requestAnimationFrame(draw);
