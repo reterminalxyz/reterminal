@@ -75,13 +75,13 @@ function GlitchTitle() {
       }}
       data-testid="text-hero-title"
     >
-      <span style={{ color: "#B87333" }}>re</span>
+      <span style={{ color: "#000" }}>re</span>
       {showSep ? (
         <span style={{ color: "#00e5ff", textShadow: "0 0 6px #00e5ff, 0 0 15px rgba(0,229,255,0.3)" }}>{glyph}</span>
       ) : (
-        <span className="landing-blink" style={{ color: "#B87333" }}>_</span>
+        <span className="landing-blink" style={{ color: "#000" }}>_</span>
       )}
-      <span style={{ color: "#B87333" }}>terminal</span>
+      <span style={{ color: "#000" }}>terminal</span>
     </h1>
   );
 }
