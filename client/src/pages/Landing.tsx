@@ -469,7 +469,7 @@ function HeroSection() {
     <section
       ref={obs.ref}
       className="flex flex-col items-center justify-center"
-      style={{ minHeight: "100vh", paddingTop: "14vh", paddingBottom: "4vh" }}
+      style={{ minHeight: "100vh", paddingTop: "3vh", paddingBottom: "4vh" }}
       data-testid="section-hero"
     >
       <div className="w-full" style={{ maxWidth: 1000, margin: "0 auto", padding: "0 5vw" }}>
