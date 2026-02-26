@@ -226,7 +226,7 @@ export default function Home() {
   const sessionValidatedRef = useRef(false);
 
   const [sessionReady, setSessionReady] = useState(false);
-  const [loadingAnimDone, setLoadingAnimDone] = useState(false);
+  const [loadingAnimDone, setLoadingAnimDone] = useState(true);
 
   const advancePhase = useCallback(() => {
     if (hasWalletRestore.current) {
@@ -411,7 +411,7 @@ export default function Home() {
 
   if (phase === "loading") {
     return (
-      <LoadingScreen onComplete={() => setLoadingAnimDone(true)} />
+      <div className="fixed inset-0" style={{ background: "#FFF", zIndex: 9999 }} />
     );
   }
 

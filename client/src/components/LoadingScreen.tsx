@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-const CH = "⟨⟩∆∇◊○●□■▪▫▬▮▯░▒▓╳╲╱⊕⊗⊙⊚≡∞∑Ω";
+const CH = "!@#$%^&*_+-=[]{}|;:',.<>?/\\~`01";
 
 interface Props {
   onComplete: () => void;
