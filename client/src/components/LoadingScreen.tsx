@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 const CH = "!@#$%^&*_+-=[]{}|;:',.<>?/\\~`01";
 
@@ -10,8 +10,6 @@ export function LoadingScreen({ onComplete }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
   const doneRef = useRef(false);
-  const titleRef = useRef(false);
-  const [showTitle, setShowTitle] = useState(false);
 
   useEffect(() => {
     const cvs = canvasRef.current;
@@ -74,9 +72,9 @@ export function LoadingScreen({ onComplete }: Props) {
       }
       ctx.globalAlpha = 1;
 
-      if (t >= 2.5 && !titleRef.current) {
-        titleRef.current = true;
-        setShowTitle(true);
+      if (t >= 3 && !doneRef.current) {
+        doneRef.current = true;
+        onComplete();
       }
 
       animRef.current = requestAnimationFrame(draw);
@@ -84,37 +82,11 @@ export function LoadingScreen({ onComplete }: Props) {
 
     animRef.current = requestAnimationFrame(draw);
     return () => cancelAnimationFrame(animRef.current);
-  }, []);
-
-  useEffect(() => {
-    if (showTitle && !doneRef.current) {
-      const tm = setTimeout(() => { doneRef.current = true; onComplete(); }, 1200);
-      return () => clearTimeout(tm);
-    }
-  }, [showTitle, onComplete]);
+  }, [onComplete]);
 
   return (
     <div className="fixed inset-0 overflow-hidden" style={{ background: "#FFF", zIndex: 9999 }} data-testid="loading-screen">
       <canvas ref={canvasRef} className="absolute inset-0" style={{ width: "100%", height: "100%" }} />
-      {showTitle && (
-        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none" data-testid="loading-screen-final">
-          <div style={{
-            fontFamily: "'JetBrains Mono',monospace",
-            fontSize: "clamp(22px,7vw,36px)",
-            fontWeight: 400,
-            letterSpacing: "0.06em",
-            color: "#000",
-            background: "rgba(255,255,255,0.85)",
-            padding: "24px 48px",
-            animation: "lsTitleIn .6s ease-out both",
-          }}>
-            <span>re</span>
-            <span style={{ color: "#00e5ff", textShadow: "0 0 8px #00e5ff" }}>_</span>
-            <span>terminal</span>
-          </div>
-        </div>
-      )}
-      <style>{`@keyframes lsTitleIn{0%{opacity:0;transform:scale(.92);filter:blur(4px)}60%{opacity:1;transform:scale(1.02);filter:blur(0)}to{opacity:1;transform:scale(1);filter:blur(0)}}`}</style>
     </div>
   );
 }
