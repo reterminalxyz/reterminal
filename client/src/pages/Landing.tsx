@@ -50,12 +50,31 @@ interface TrailNode {
   ch: string;
 }
 
+interface Drip {
+  x: number;
+  y: number;
+  vy: number;
+  r: number;
+  life: number;
+}
+
+interface Spark {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  life: number;
+  size: number;
+}
+
 function GridGlow() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const mouse = useRef({ x: -9999, y: -9999 });
   const trailNodes = useRef<TrailNode[]>([]);
   const trailSet = useRef<Set<string>>(new Set());
   const prevMouse = useRef({ x: -9999, y: -9999 });
+  const drips = useRef<Drip[]>([]);
+  const sparks = useRef<Spark[]>([]);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -94,7 +113,7 @@ function GridGlow() {
     window.addEventListener("touchmove", onTouch, { passive: true });
     window.addEventListener("mouseleave", onLeave);
 
-    const draw = (now: number) => {
+    const draw = (_now: number) => {
       const ctx = canvas.getContext("2d");
       if (!ctx) { raf = requestAnimationFrame(draw); return; }
       ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -119,7 +138,7 @@ function GridGlow() {
           const dx = Math.abs(gx - mx);
           if (dx > GLOW_RADIUS) continue;
           const intensity = 1 - dx / GLOW_RADIUS;
-          const lineAlpha = intensity * intensity * 0.35;
+          const lineAlpha = intensity * intensity * 0.45;
           ctx.beginPath();
           ctx.moveTo(gx, Math.max(0, my - GLOW_RADIUS));
           ctx.lineTo(gx, Math.min(h, my + GLOW_RADIUS));
@@ -133,7 +152,7 @@ function GridGlow() {
           const dy = Math.abs(gy - my);
           if (dy > GLOW_RADIUS) continue;
           const intensity = 1 - dy / GLOW_RADIUS;
-          const lineAlpha = intensity * intensity * 0.35;
+          const lineAlpha = intensity * intensity * 0.45;
           ctx.beginPath();
           ctx.moveTo(Math.max(0, mx - GLOW_RADIUS), gy);
           ctx.lineTo(Math.min(w, mx + GLOW_RADIUS), gy);
@@ -153,13 +172,41 @@ function GridGlow() {
             if (dist < GLOW_RADIUS) {
               const intensity = 1 - dist / GLOW_RADIUS;
               const i3 = intensity * intensity * intensity;
-              const dotSize = 1 + i3 * 3;
+              const dotSize = 1.5 + i3 * 4;
               ctx.beginPath();
               ctx.arc(gx, gy, dotSize, 0, Math.PI * 2);
-              ctx.fillStyle = `rgba(0, 229, 255, ${i3 * 0.8})`;
+              ctx.fillStyle = `rgba(0, 229, 255, ${i3 * 0.9})`;
               ctx.fill();
             }
           }
+        }
+
+        const speed = Math.sqrt(
+          (mx - prevMouse.current.x) ** 2 + (my - prevMouse.current.y) ** 2
+        );
+
+        if (speed > 2 && drips.current.length < 60) {
+          const count = Math.min(3, Math.floor(speed / 8) + 1);
+          for (let i = 0; i < count; i++) {
+            drips.current.push({
+              x: mx + (Math.random() - 0.5) * 24,
+              y: my + (Math.random() - 0.5) * 16,
+              vy: 15 + Math.random() * 40,
+              r: 1.5 + Math.random() * 4,
+              life: 1,
+            });
+          }
+        }
+
+        if (speed > 4 && sparks.current.length < 20) {
+          sparks.current.push({
+            x: mx + (Math.random() - 0.5) * 10,
+            y: my + (Math.random() - 0.5) * 10,
+            vx: (Math.random() - 0.5) * 80,
+            vy: (Math.random() - 0.5) * 80 - 20,
+            life: 1,
+            size: 1 + Math.random() * 2,
+          });
         }
       }
 
@@ -195,20 +242,21 @@ function GridGlow() {
       }
 
       const scrollY4 = window.scrollY;
-      ctx.font = "8px 'JetBrains Mono', monospace";
+
+      ctx.font = "9px 'JetBrains Mono', monospace";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       trailNodes.current = trailNodes.current.filter(n => {
-        n.life -= dt * 0.2;
+        n.life -= dt * 0.18;
         if (n.life <= 0) {
           trailSet.current.delete(`${Math.round(n.gx / GRID_SIZE)},${Math.round(n.gy / GRID_SIZE)}`);
           return false;
         }
         const sy = n.gy - scrollY4;
         if (sy < -60 || sy > window.innerHeight + 60) return true;
-        const a = n.life * n.life * 0.5;
+        const a = n.life * n.life;
 
-        ctx.strokeStyle = `rgba(0, 229, 255, ${a * 0.4})`;
+        ctx.strokeStyle = `rgba(0, 229, 255, ${a * 0.6})`;
         ctx.lineWidth = 1;
         ctx.beginPath();
         ctx.moveTo(n.gx - STUB, sy);
@@ -220,16 +268,49 @@ function GridGlow() {
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.arc(n.gx, sy, 2, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(0, 229, 255, ${a * 0.7})`;
+        ctx.arc(n.gx, sy, 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0, 229, 255, ${a * 0.8})`;
         ctx.fill();
 
-        ctx.fillStyle = `rgba(0, 229, 255, ${a * 0.4})`;
-        ctx.fillText(n.ch, n.gx + 6, sy - 6);
+        ctx.fillStyle = `rgba(0, 229, 255, ${a * 0.5})`;
+        ctx.fillText(n.ch, n.gx + 7, sy - 7);
         return true;
       });
 
-      
+      drips.current = drips.current.filter(d => {
+        d.life -= dt * 0.25;
+        d.y += d.vy * dt;
+        d.vy += 30 * dt;
+        d.r *= 0.997;
+        if (d.life <= 0 || d.r < 0.3) return false;
+        const a = d.life * d.life * 0.6;
+        ctx.beginPath();
+        ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0, 229, 255, ${a})`;
+        ctx.fill();
+        if (d.r > 2) {
+          ctx.beginPath();
+          ctx.arc(d.x, d.y + d.r * 1.5, d.r * 0.5, 0, Math.PI * 2);
+          ctx.fillStyle = `rgba(0, 229, 255, ${a * 0.4})`;
+          ctx.fill();
+        }
+        return true;
+      });
+
+      sparks.current = sparks.current.filter(s => {
+        s.life -= dt * 1.5;
+        s.x += s.vx * dt;
+        s.y += s.vy * dt;
+        s.vx *= 0.95;
+        s.vy *= 0.95;
+        if (s.life <= 0) return false;
+        const a = s.life * s.life;
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.size * s.life, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0, 229, 255, ${a * 0.9})`;
+        ctx.fill();
+        return true;
+      });
 
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       raf = requestAnimationFrame(draw);
@@ -354,7 +435,8 @@ function HeroSection() {
   return (
     <section
       ref={obs.ref}
-      className="relative flex flex-col items-center justify-center landing-hero-height"
+      className="flex flex-col items-center justify-center"
+      style={{ minHeight: "100vh", paddingTop: "8vh", paddingBottom: "4vh" }}
       data-testid="section-hero"
     >
       <div className="w-full" style={{ maxWidth: 1000, margin: "0 auto", padding: "0 5vw" }}>
@@ -364,14 +446,14 @@ function HeroSection() {
           </div>
           <div style={reveal(obs.visible, 0.15)}>
             <p className="mt-3 text-center" style={{ fontFamily: FONT_BODY, fontSize: "clamp(13px, 3vw, 17px)", color: "#333" }} data-testid="text-hero-subtitle">
-              digital resistance starts here.
+              digital resistance starts here
             </p>
           </div>
           <LazyYouTube videoId="05LWu5BJUTA" visible={obs.visible} />
         </div>
       </div>
       <div
-        className="absolute bottom-6 left-0 right-0 flex flex-col items-center"
+        className="flex flex-col items-center mt-8"
         style={{ ...reveal(obs.visible, 0.6) }}
         data-testid="scroll-indicator"
       >
@@ -401,7 +483,7 @@ function ProblemSection() {
             }}
             data-testid="text-problem-stat"
           >
-            guerrilla-style gamified educational phygital terminal.
+            guerrilla-style gamified educational phygital terminal
           </p>
         </div>
         <div style={reveal(obs.visible, 0.3)}>
@@ -416,7 +498,7 @@ function ProblemSection() {
             }}
             data-testid="text-problem-conclusion"
           >
-            It teaches users BTC and anti-authoritarian digital tools through interactive guides and tasks.
+            It teaches users BTC and anti-authoritarian digital tools through interactive guides and tasks
           </p>
         </div>
       </div>
@@ -467,6 +549,9 @@ function ModulesSection() {
                 overflow: "hidden",
                 ...reveal(obs.visible, 0.06 * i),
               }}
+              onTouchStart={(e) => { (e.currentTarget as HTMLElement).classList.add("touched"); }}
+              onTouchEnd={(e) => { const el = e.currentTarget as HTMLElement; setTimeout(() => el?.classList.remove("touched"), 600); }}
+              onTouchCancel={(e) => { (e.currentTarget as HTMLElement).classList.remove("touched"); }}
               data-testid={`card-module-${i}`}
             >
               <span
@@ -675,7 +760,7 @@ function FooterSection({ onEnter }: { onEnter: () => void }) {
     <footer className="flex flex-col items-center" style={{ padding: "3vh 5vw 4vh" }} data-testid="section-footer">
       <div ref={obs.ref} style={reveal(obs.visible)}>
         <p className="text-center" style={{ fontFamily: FONT_BODY, fontSize: "clamp(14px, 3vw, 18px)", color: "#000", marginBottom: 24 }} data-testid="text-footer-tagline">
-          Built by an activist, for activists.
+          Built by an activist, for activists
         </p>
       </div>
       <div style={reveal(obs.visible, 0.15)}>
@@ -791,8 +876,8 @@ export default function Landing() {
         /* Card 0: Dollar → Bitcoin */
         .icon-dollar { opacity: 1; transition: opacity 0.1s; }
         .icon-bitcoin { opacity: 0; transform: scale(0.8); transform-origin: center; transition: opacity 0.35s cubic-bezier(0.2,0.8,0.2,1) 0.15s, transform 0.35s cubic-bezier(0.2,0.8,0.2,1) 0.15s, filter 0.35s ease 0.15s; }
-        .module-card-0:hover .icon-dollar { animation: icon-glitch-out 0.4s ease-out forwards; }
-        .module-card-0:hover .icon-bitcoin { opacity: 1; transform: scale(1); filter: drop-shadow(0 0 4px rgba(255,255,255,0.8)) drop-shadow(0 0 8px rgba(0,0,0,0.15)); }
+        .module-card-0:hover .icon-dollar, .module-card-0.touched .icon-dollar { animation: icon-glitch-out 0.4s ease-out forwards; }
+        .module-card-0:hover .icon-bitcoin, .module-card-0.touched .icon-bitcoin { opacity: 1; transform: scale(1); filter: drop-shadow(0 0 4px rgba(255,255,255,0.8)) drop-shadow(0 0 8px rgba(0,0,0,0.15)); }
         @keyframes icon-glitch-out {
           0% { opacity: 1; transform: translateX(0); }
           10% { opacity: 1; transform: translateX(-3px); }
@@ -809,14 +894,14 @@ export default function Landing() {
         /* Card 1: Eye → Stealth (erase eye) */
         .icon-eye-outer path { stroke-dasharray: 200; stroke-dashoffset: 0; transition: stroke-dashoffset 0.5s ease-out; }
         .icon-eye-pupil { transform-origin: center; transition: transform 0.5s ease-out, opacity 0.5s ease-out; }
-        .module-card-1:hover .icon-eye-outer path { stroke-dashoffset: 200; }
-        .module-card-1:hover .icon-eye-pupil { transform: scale(0.15); opacity: 0.2; }
+        .module-card-1:hover .icon-eye-outer path, .module-card-1.touched .icon-eye-outer path { stroke-dashoffset: 200; }
+        .module-card-1:hover .icon-eye-pupil, .module-card-1.touched .icon-eye-pupil { transform: scale(0.15); opacity: 0.2; }
 
         /* Card 2: Camera → Dot escapes */
         .icon-camera { transition: opacity 0.3s ease; }
         .icon-target-dot { transition: transform 0.35s cubic-bezier(0.2,0.8,0.2,1); }
-        .module-card-2:hover .icon-camera { opacity: 0.15; animation: icon-jitter 0.15s linear 3; }
-        .module-card-2:hover .icon-target-dot { transform: translate(20px, 15px); }
+        .module-card-2:hover .icon-camera, .module-card-2.touched .icon-camera { opacity: 0.15; animation: icon-jitter 0.15s linear 3; }
+        .module-card-2:hover .icon-target-dot, .module-card-2.touched .icon-target-dot { transform: translate(20px, 15px); }
         @keyframes icon-jitter {
           0%, 100% { transform: translateX(0); }
           25% { transform: translateX(-2px); }
@@ -826,14 +911,14 @@ export default function Landing() {
         /* Card 3: Dashed → Solid + Packet */
         .icon-dashed-line { transition: stroke-dasharray 0.15s ease, stroke-width 0.15s ease; }
         .icon-packet { transition: transform 0.4s cubic-bezier(0.2,0.8,0.2,1) 0.1s, opacity 0.1s ease; }
-        .module-card-3:hover .icon-dashed-line { stroke-dasharray: 100; stroke-width: 2; }
-        .module-card-3:hover .icon-packet { opacity: 1; transform: translateX(28px); }
+        .module-card-3:hover .icon-dashed-line, .module-card-3.touched .icon-dashed-line { stroke-dasharray: 100; stroke-width: 2; }
+        .module-card-3:hover .icon-packet, .module-card-3.touched .icon-packet { opacity: 1; transform: translateX(28px); }
 
         /* Card 4: Arrow breaks wall */
         .icon-arrow-group { transition: transform 0.3s cubic-bezier(0.2,0.8,0.2,1); }
         .icon-wall { stroke-dasharray: none; transition: stroke-dasharray 0.15s ease 0.2s, stroke-dashoffset 0.15s ease 0.2s; }
-        .module-card-4:hover .icon-arrow-group { transform: translateX(24px); }
-        .module-card-4:hover .icon-wall { stroke-dasharray: 16 10 16; stroke-dashoffset: -14; }
+        .module-card-4:hover .icon-arrow-group, .module-card-4.touched .icon-arrow-group { transform: translateX(24px); }
+        .module-card-4:hover .icon-wall, .module-card-4.touched .icon-wall { stroke-dasharray: 16 10 16; stroke-dashoffset: -14; }
 
         /* Card 5: Dots → Constellation */
         .module-icon-5 line { stroke-dasharray: 50; stroke-dashoffset: 50; transition: stroke-dashoffset 0.5s cubic-bezier(0.2,0.8,0.2,1); }
@@ -842,13 +927,13 @@ export default function Landing() {
         .icon-line-d { transition-delay: 0.15s !important; }
         .icon-line-e { transition-delay: 0.2s !important; }
         .icon-line-f { transition-delay: 0.25s !important; }
-        .module-card-5:hover .module-icon-5 line { stroke-dashoffset: 0; }
+        .module-card-5:hover .module-icon-5 line, .module-card-5.touched .module-icon-5 line { stroke-dashoffset: 0; }
 
         /* Card 6: WiFi → NFC card */
         .icon-wifi { transition: opacity 0.25s ease, transform 0.25s ease; }
         .icon-nfc-card { opacity: 0; transform: translateY(16px); transition: opacity 0.3s cubic-bezier(0.2,0.8,0.2,1) 0.15s, transform 0.3s cubic-bezier(0.2,0.8,0.2,1) 0.15s; }
-        .module-card-6:hover .icon-wifi { opacity: 0; transform: translateY(10px); }
-        .module-card-6:hover .icon-nfc-card { opacity: 1; transform: translateY(0); }
+        .module-card-6:hover .icon-wifi, .module-card-6.touched .icon-wifi { opacity: 0; transform: translateY(10px); }
+        .module-card-6:hover .icon-nfc-card, .module-card-6.touched .icon-nfc-card { opacity: 1; transform: translateY(0); }
       `}</style>
 
       <HeroSection />
