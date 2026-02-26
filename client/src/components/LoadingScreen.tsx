@@ -40,7 +40,7 @@ export function LoadingScreen({ onComplete }: Props) {
         x: i * COL_SP,
         speed: 40 + Math.random() * 200,
         chars,
-        alpha: 0.12 + Math.random() * 0.35,
+        alpha: 0.2 + Math.random() * 0.45,
         scroll: 0,
         waveOff: Math.random() * 6.28,
       };
@@ -54,7 +54,7 @@ export function LoadingScreen({ onComplete }: Props) {
       ctx.fillStyle = "#FFF";
       ctx.fillRect(0, 0, w, h);
 
-      ctx.font = "13px 'JetBrains Mono',monospace";
+      ctx.font = "bold 14px 'JetBrains Mono',monospace";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       ctx.fillStyle = "rgb(0,229,255)";
