@@ -582,9 +582,22 @@ function ModulesSection() {
                 overflow: "hidden",
                 ...reveal(obs.visible, 0.06 * i),
               }}
-              onTouchStart={(e) => { (e.currentTarget as HTMLElement).classList.add("touched"); }}
-              onTouchEnd={(e) => { const el = e.currentTarget as HTMLElement; setTimeout(() => el?.classList.remove("touched"), 600); }}
-              onTouchCancel={(e) => { (e.currentTarget as HTMLElement).classList.remove("touched"); }}
+              onTouchStart={(e) => {
+                const el = e.currentTarget as HTMLElement;
+                el.classList.add("touched");
+                const id = window.setTimeout(() => el?.classList.remove("touched"), 1200);
+                el.dataset.touchTimer = String(id);
+              }}
+              onTouchEnd={(e) => {
+                const el = e.currentTarget as HTMLElement;
+                clearTimeout(Number(el.dataset.touchTimer));
+                window.setTimeout(() => el?.classList.remove("touched"), 800);
+              }}
+              onTouchCancel={(e) => {
+                const el = e.currentTarget as HTMLElement;
+                clearTimeout(Number(el.dataset.touchTimer));
+                el.classList.remove("touched");
+              }}
               data-testid={`card-module-${i}`}
             >
               <span
@@ -625,11 +638,11 @@ function ModulesSection() {
                 )}
                 {i === 2 && (
                   <svg viewBox="0 0 64 64" width="200" height="200" style={{ overflow: "visible" }}>
-                    <g className="icon-camera">
-                      <rect x="6" y="8" width="14" height="10" rx="2" fill="none" stroke="#000" strokeWidth="1.5" />
-                      <path d="M20 14L44 40M20 14L44 8" fill="none" stroke="#000" strokeWidth="1.5" strokeLinecap="round" opacity="0.4" />
-                    </g>
-                    <circle className="icon-target-dot" cx="34" cy="30" r="3" fill="#000" />
+                    <circle className="icon-radar-ring-1" cx="32" cy="32" r="24" fill="none" stroke="#000" strokeWidth="1" opacity="0.15" />
+                    <circle className="icon-radar-ring-2" cx="32" cy="32" r="16" fill="none" stroke="#000" strokeWidth="1" opacity="0.25" />
+                    <circle className="icon-radar-ring-3" cx="32" cy="32" r="8" fill="none" stroke="#000" strokeWidth="1" opacity="0.35" />
+                    <line className="icon-radar-sweep" x1="32" y1="32" x2="32" y2="8" stroke="#000" strokeWidth="1.5" opacity="0.3" />
+                    <circle className="icon-radar-dot" cx="38" cy="22" r="3" fill="#000" />
                   </svg>
                 )}
                 {i === 3 && (
@@ -932,16 +945,15 @@ export default function Landing() {
         .module-card-1:hover .icon-eye-outer path, .module-card-1.touched .icon-eye-outer path { stroke-dashoffset: 200; }
         .module-card-1:hover .icon-eye-pupil, .module-card-1.touched .icon-eye-pupil { transform: scale(0.15); opacity: 0.2; }
 
-        /* Card 2: Camera → Dot escapes */
-        .icon-camera { transition: opacity 0.3s ease; }
-        .icon-target-dot { transition: transform 0.35s cubic-bezier(0.2,0.8,0.2,1); }
-        .module-card-2:hover .icon-camera, .module-card-2.touched .icon-camera { opacity: 0.15; animation: icon-jitter 0.15s linear 3; }
-        .module-card-2:hover .icon-target-dot, .module-card-2.touched .icon-target-dot { transform: translate(20px, 15px); }
-        @keyframes icon-jitter {
-          0%, 100% { transform: translateX(0); }
-          25% { transform: translateX(-2px); }
-          75% { transform: translateX(2px); }
-        }
+        /* Card 2: Radar — dot disappears off radar */
+        .icon-radar-sweep { transform-origin: 32px 32px; transition: transform 0.8s ease-out; }
+        .icon-radar-dot { transition: opacity 0.5s ease 0.2s, transform 0.6s cubic-bezier(0.4,0,1,1) 0.1s, r 0.4s ease 0.3s; }
+        .icon-radar-ring-1, .icon-radar-ring-2, .icon-radar-ring-3 { transition: opacity 0.4s ease; }
+        .module-card-2:hover .icon-radar-sweep, .module-card-2.touched .icon-radar-sweep { transform: rotate(180deg); }
+        .module-card-2:hover .icon-radar-dot, .module-card-2.touched .icon-radar-dot { opacity: 0; transform: translate(14px, -10px) scale(0.2); }
+        .module-card-2:hover .icon-radar-ring-1, .module-card-2.touched .icon-radar-ring-1 { opacity: 0.08; }
+        .module-card-2:hover .icon-radar-ring-2, .module-card-2.touched .icon-radar-ring-2 { opacity: 0.12; }
+        .module-card-2:hover .icon-radar-ring-3, .module-card-2.touched .icon-radar-ring-3 { opacity: 0.15; }
 
         /* Card 3: Dashed → Solid + Packet */
         .icon-dashed-line { transition: stroke-dasharray 0.15s ease, stroke-width 0.15s ease; }
