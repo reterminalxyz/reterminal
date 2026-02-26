@@ -54,15 +54,13 @@ export function LoadingScreen({ onComplete }: Props) {
     const COL_SP = 12;
     const nCols = Math.min(Math.ceil(w / COL_SP), 60);
     const LH = 14;
-    const totalH = h + LH * 20;
-    const nRows = Math.ceil(totalH / LH) + 2;
+    const visRows = Math.ceil(h / LH) + 2;
     const cols = Array.from({ length: nCols }, (_, i) => ({
       x: i * COL_SP + (COL_SP / 2) + (Math.random() - 0.5) * 3,
-      y: -(Math.random() * h),
-      speed: 30 + Math.random() * 120,
-      chars: Array.from({ length: nRows }, () => CH[(Math.random() * CH.length) | 0]),
-      alpha: 0.06 + Math.random() * 0.22,
-      len: nRows,
+      scrollPx: 0,
+      speed: 50 + Math.random() * 180,
+      chars: Array.from({ length: visRows + 1 }, () => CH[(Math.random() * CH.length) | 0]),
+      alpha: 0.1 + Math.random() * 0.3,
     }));
 
     const sparks = Array.from({ length: 20 }, () => ({
@@ -124,19 +122,22 @@ export function LoadingScreen({ onComplete }: Props) {
       }
       ctx.globalAlpha = 1;
 
-      const colFade = Math.min(1, t / 0.1);
+      const colFade = Math.min(1, t / 0.08);
       ctx.font = "12px 'JetBrains Mono',monospace";
       ctx.fillStyle = `rgb(${C})`;
+      const stripH = visRows * LH;
       for (const col of cols) {
-        col.y += col.speed * dt;
-        for (let r = 0; r < col.len; r++) {
-          const py = col.y + r * LH;
+        col.scrollPx += col.speed * dt;
+        const off = col.scrollPx % LH;
+        for (let r = 0; r <= visRows; r++) {
+          const py = r * LH + off - LH;
           if (py < -LH || py > h + LH) continue;
-          const edgeFade = Math.min(1, py / (h * 0.15), (h - py) / (h * 0.15));
-          const wa = col.alpha * (0.6 + 0.4 * Math.sin(t * 1.8 + r * 0.25 + col.x * 0.01)) * colFade * Math.max(0, edgeFade);
+          const ci = ((r - Math.floor(col.scrollPx / LH)) % col.chars.length + col.chars.length) % col.chars.length;
+          const wave = 0.6 + 0.4 * Math.sin(t * 2.2 + r * 0.3 + col.x * 0.02);
+          const wa = col.alpha * wave * colFade;
           if (wa < 0.01) continue;
           ctx.globalAlpha = wa;
-          ctx.fillText(col.chars[r], col.x, py);
+          ctx.fillText(col.chars[ci], col.x, py);
         }
       }
       ctx.globalAlpha = 1;
