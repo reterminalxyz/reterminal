@@ -468,8 +468,8 @@ function HeroSection() {
   return (
     <section
       ref={obs.ref}
-      className="flex flex-col items-center justify-center"
-      style={{ minHeight: "100vh", paddingTop: "3vh", paddingBottom: "4vh" }}
+      className="flex flex-col items-center"
+      style={{ minHeight: "100vh", paddingTop: "6vh", paddingBottom: "4vh", justifyContent: "center" }}
       data-testid="section-hero"
     >
       <div className="w-full" style={{ maxWidth: 1000, margin: "0 auto", padding: "0 5vw" }}>
@@ -478,7 +478,7 @@ function HeroSection() {
             <GlitchTitle />
           </div>
           <div style={reveal(obs.visible, 0.15)}>
-            <p className="mt-3 text-center" style={{ fontFamily: FONT_MONO, fontSize: 12, letterSpacing: "0.25em", color: "#000", fontWeight: 500 }} data-testid="text-hero-subtitle">
+            <p className="mt-3 text-center" style={{ fontFamily: FONT_MONO, fontSize: "clamp(9px, 2.5vw, 12px)", letterSpacing: "0.2em", color: "#000", fontWeight: 500 }} data-testid="text-hero-subtitle">
               DIGITAL RESISTANCE STARTS HERE
             </p>
           </div>
@@ -800,7 +800,7 @@ function HowItWorksSection() {
             </div>
           ))}
           <div ref={costRef} className="tl-cost" data-testid="text-cost-highlight">
-            <p style={{ fontFamily: FONT_MONO, fontSize: "clamp(18px, 4vw, 32px)", fontWeight: 400 }}>Cost of onboarding: $1.50 per user</p>
+            <p style={{ fontFamily: FONT_MONO, fontSize: "clamp(14px, 3.5vw, 32px)", fontWeight: 400 }}>Cost of onboarding: $1.50 per user</p>
           </div>
         </div>
       </div>
@@ -837,7 +837,7 @@ export default function Landing() {
   const handleEnter = useCallback(() => setLocation("/activation"), [setLocation]);
 
   return (
-    <div className="relative" style={{ background: "#FFFFFF", minHeight: "100vh" }} data-testid="landing-page">
+    <div className="relative" style={{ background: "#FFFFFF", minHeight: "100vh", overflowX: "hidden" }} data-testid="landing-page">
       <GridGlow />
       <div className="relative" style={{ zIndex: 1 }}>
       <style>{`
@@ -864,9 +864,16 @@ export default function Landing() {
           position: relative;
           display: flex;
           flex-direction: column;
-          gap: 4rem;
-          padding-left: 3rem;
-          margin: 3rem 0 2rem;
+          gap: 2.5rem;
+          padding-left: 1.5rem;
+          margin: 2rem 0 1.5rem;
+        }
+        @media (min-width: 640px) {
+          .tl-container {
+            gap: 4rem;
+            padding-left: 3rem;
+            margin: 3rem 0 2rem;
+          }
         }
         .tl-track {
           position: absolute;
@@ -887,11 +894,14 @@ export default function Landing() {
         }
         .tl-step {
           display: flex;
-          gap: 2rem;
+          gap: 1rem;
           align-items: flex-start;
           color: #ccc;
           transform: translateX(-10px);
           transition: all 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        @media (min-width: 640px) {
+          .tl-step { gap: 2rem; }
         }
         .tl-step.tl-active {
           color: #000;
