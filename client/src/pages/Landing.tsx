@@ -461,12 +461,27 @@ function GlitchTitle() {
       <img
         src="/logo.jpg"
         alt="re_terminal"
-        style={{ width: "clamp(80px, 22vw, 160px)", height: "auto" }}
+        style={{ width: "clamp(60px, 16vw, 120px)", height: "auto", marginBottom: 12 }}
         draggable={false}
       />
-      {showSep && (
-        <span style={{ color: "#00e5ff", textShadow: "0 0 6px #00e5ff, 0 0 15px rgba(0,229,255,0.3)", fontFamily: FONT_MONO, fontSize: "clamp(10px, 2.5vw, 14px)", marginTop: 4 }}>{glyphs}</span>
-      )}
+      <h1
+        className="text-center"
+        style={{
+          fontFamily: FONT_MONO,
+          fontSize: "clamp(32px, 8vw, 64px)",
+          fontWeight: 400,
+          letterSpacing: "0.06em",
+          color: "#000",
+        }}
+      >
+        <span style={{ color: "#000" }}>re</span>
+        {showSep ? (
+          <span style={{ color: "#00e5ff", textShadow: "0 0 6px #00e5ff, 0 0 15px rgba(0,229,255,0.3)", fontSize: "0.85em" }}>{glyphs}</span>
+        ) : (
+          <span className="landing-blink" style={{ color: "#000" }}>_</span>
+        )}
+        <span style={{ color: "#000" }}>terminal</span>
+      </h1>
     </div>
   );
 }
