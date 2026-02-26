@@ -51,7 +51,7 @@ export function LoadingScreen({ onComplete }: Props) {
     }));
 
     const startTime = Date.now();
-    const SHOW_TITLE_AT = 1800;
+    const SHOW_TITLE_AT = 800;
 
     const draw = () => {
       const elapsed = Date.now() - startTime;
@@ -109,7 +109,7 @@ export function LoadingScreen({ onComplete }: Props) {
       const t = setTimeout(() => {
         completedRef.current = true;
         onComplete();
-      }, 1200);
+      }, 700);
       return () => clearTimeout(t);
     }
   }, [showTitle, onComplete]);
