@@ -83,9 +83,10 @@ The application features a distinct two-phase visual design:
 - API: POST /api/save-progress, POST /api/sync-user
 - localStorage keys: "liberta_token", "liberta_terminal_progress", "liberta_boot_dismissed"
 - Users table columns: id, token, xp, level, current_module_id, current_step_index, total_sats, independence_progress
-- Loading screen (LoadingScreen.tsx): multi-layer canvas animation — cyan grid spread from center, matrix rain columns, drips, sparks, scan lines, pulsing rings. ~3s total, white bg, "re_terminal" text fade-in with cyan accent. Grid nodes precomputed for performance.
+- Loading screen (LoadingScreen.tsx): multi-layer canvas animation — fast matrix rain columns, drips with gravity, sparks with glow, scan line, pulsing rings from center. ~3s total, white bg, cyan (#00e5ff). Global state for seamless Suspense→Home remount. resetLoadingScreen() called on each /activation visit.
 - Landing page (/): Pure minimalist scrollable page — Hero (re_terminal + YouTube video) → Problem (scroll-triggered) → Modules (horizontal carousel, 7 cards) → How It Works ("Deployment mechanics", 3 steps) → Footer ([ ENTER ] → /activation). White bg (#FFFFFF), black text, Inter + JetBrains Mono fonts, IntersectionObserver animations, GridGlow canvas overlay with drips/sparks.
-- GlitchTitle: recursive setTimeout (not setInterval) for reliability, cyan glitch chars between "re" and "terminal"
+- Logo: /logo.jpg (bracket+underscore image) used everywhere — Landing hero (GlitchTitle), BootScreen header (sepia/copper filter), TerminalChat header (24px, sepia/copper filter). Favicon also updated to logo.jpg.
+- GlitchTitle: logo image + recursive setTimeout glitch chars below it
 - /activation route: lazy-loaded via React.lazy(), Suspense fallback is LoadingScreen (eagerly imported, animation starts immediately)
 - App flow: Landing (/) → /activation: Loading Screen (3s) → Boot Screen (browser/app choice) → Phase 1 → Phase 2
 - Phase 1 "No" answer: shows "наверное это не для тебя" (notForYou) message, then redirects to Boot Screen after 2s

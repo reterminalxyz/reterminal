@@ -457,25 +457,17 @@ function GlitchTitle() {
   }, []);
 
   return (
-    <h1
-      className="text-center select-none"
-      style={{
-        fontFamily: FONT_MONO,
-        fontSize: "clamp(32px, 8vw, 64px)",
-        fontWeight: 400,
-        letterSpacing: "0.06em",
-        color: "#000",
-      }}
-      data-testid="text-hero-title"
-    >
-      <span style={{ color: "#000" }}>re</span>
-      {showSep ? (
-        <span style={{ color: "#00e5ff", textShadow: "0 0 6px #00e5ff, 0 0 15px rgba(0,229,255,0.3)", fontSize: "0.85em" }}>{glyphs}</span>
-      ) : (
-        <span className="landing-blink" style={{ color: "#000" }}>_</span>
+    <div className="flex flex-col items-center select-none" data-testid="text-hero-title">
+      <img
+        src="/logo.jpg"
+        alt="re_terminal"
+        style={{ width: "clamp(80px, 22vw, 160px)", height: "auto" }}
+        draggable={false}
+      />
+      {showSep && (
+        <span style={{ color: "#00e5ff", textShadow: "0 0 6px #00e5ff, 0 0 15px rgba(0,229,255,0.3)", fontFamily: FONT_MONO, fontSize: "clamp(10px, 2.5vw, 14px)", marginTop: 4 }}>{glyphs}</span>
       )}
-      <span style={{ color: "#000" }}>terminal</span>
-    </h1>
+    </div>
   );
 }
 

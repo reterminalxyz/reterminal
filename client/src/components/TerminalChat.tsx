@@ -955,11 +955,8 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
 
       <div className="flex-shrink-0 bg-[#111111] border-b-2 border-[#B87333]/60 z-50">
         <div className="flex items-center justify-between px-4 py-3">
-          <div className="flex items-center gap-3">
-            <div className="w-3 h-3 rounded-full bg-[#B87333]" />
-            <span className="text-[11px] tracking-[4px] font-bold text-[#B87333]">
-              re_terminal
-            </span>
+          <div className="flex items-center gap-2">
+            <img src="/logo.jpg" alt="re_terminal" style={{ width: 24, height: "auto", filter: "sepia(1) saturate(2) hue-rotate(-15deg) brightness(0.7)" }} draggable={false} />
           </div>
           <div className="flex items-center gap-3">
             <motion.button

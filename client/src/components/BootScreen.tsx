@@ -297,8 +297,9 @@ export function BootScreen({ onDismiss, onLangChange, lang = "IT" }: BootScreenP
             transition={{ delay: isShuttingDown ? 0 : 0.3, duration: isShuttingDown ? 0.3 : 0.6 }}
             className="mb-8 text-center"
           >
-            <div className="text-[#B87333] font-mono text-[11px] tracking-[4px] mb-4 opacity-60">
-              RE_TERMINAL v0.1
+            <div className="flex flex-col items-center mb-4">
+              <img src="/logo.jpg" alt="re_terminal" style={{ width: 56, height: "auto", filter: "sepia(1) saturate(2) hue-rotate(-15deg) brightness(0.7)" }} draggable={false} />
+              <span className="text-[#B87333] font-mono text-[9px] tracking-[4px] mt-1 opacity-60">v0.1</span>
             </div>
             <h1 className="text-[#B87333] font-mono text-[18px] font-bold leading-tight tracking-wide">
               {t.heroTitle}
