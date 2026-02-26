@@ -10,27 +10,15 @@ interface Drip { x: number; y: number; vy: number; alpha: number; length: number
 interface Spark { x: number; y: number; alpha: number; decay: number; radius: number; }
 interface Ring { r: number; alpha: number; speed: number; }
 
-let globalT0 = 0;
-let globalDone = false;
-let globalListeners: Array<() => void> = [];
+let globalStartTime = 0;
 
-export function onLoadingDone(cb: () => void) {
-  if (globalDone) { cb(); return; }
-  globalListeners.push(cb);
-  return () => { globalListeners = globalListeners.filter(l => l !== cb); };
-}
-
-function fireDone() {
-  if (globalDone) return;
-  globalDone = true;
-  globalListeners.forEach(cb => cb());
-  globalListeners = [];
+export function getLoadingElapsed() {
+  if (!globalStartTime) return 0;
+  return (performance.now() - globalStartTime) / 1000;
 }
 
 export function resetLoadingScreen() {
-  globalT0 = 0;
-  globalDone = false;
-  globalListeners = [];
+  globalStartTime = performance.now();
 }
 
 export function LoadingScreen() {
@@ -49,28 +37,31 @@ export function LoadingScreen() {
     if (!ctx) return;
     ctx.scale(dpr, dpr);
 
-    if (!globalT0) globalT0 = performance.now();
+    if (!globalStartTime) globalStartTime = performance.now();
 
     const nCols = Math.ceil(w / COL_SP) + 1;
     const nVisible = Math.ceil(h / LH) + 2;
     const nChars = nVisible + 1;
-    const cols = Array.from({ length: nCols }, (_, i) => ({
-      x: i * COL_SP,
-      speed: 120 + Math.random() * 380,
-      chars: Array.from({ length: nChars }, () => CH[(Math.random() * CH.length) | 0]),
-      alpha: 0.15 + Math.random() * 0.5,
-      scroll: ((performance.now() - globalT0) / 1000) * (120 + Math.random() * 380),
-    }));
+    const elapsed = getLoadingElapsed();
+    const cols = Array.from({ length: nCols }, (_, i) => {
+      const speed = 120 + Math.random() * 380;
+      return {
+        x: i * COL_SP,
+        speed,
+        chars: Array.from({ length: nChars }, () => CH[(Math.random() * CH.length) | 0]),
+        alpha: 0.15 + Math.random() * 0.5,
+        scroll: elapsed * speed,
+      };
+    });
 
     let prevNow = performance.now();
     const drips: Drip[] = [];
     const sparks: Spark[] = [];
     const rings: Ring[] = [];
-    let scanY = ((performance.now() - globalT0) / 1000 * 220) % (h + 40) - 20;
-    const elapsed0 = (performance.now() - globalT0) / 1000;
-    let nextDripTime = elapsed0;
-    let nextSparkTime = elapsed0;
-    let nextRingTime = elapsed0 + 0.5;
+    let scanY = (elapsed * 220) % (h + 40) - 20;
+    let nextDripTime = elapsed;
+    let nextSparkTime = elapsed;
+    let nextRingTime = elapsed + 0.5;
     const cx = w / 2;
     const cy = h / 2;
     const maxRing = Math.sqrt(cx * cx + cy * cy);
@@ -78,7 +69,7 @@ export function LoadingScreen() {
     const draw = (now: number) => {
       const dt = Math.min(0.05, (now - prevNow) / 1000);
       prevNow = now;
-      const t = (now - globalT0) / 1000;
+      const t = (now - globalStartTime) / 1000;
 
       ctx.fillStyle = "#FFF";
       ctx.fillRect(0, 0, w, h);
@@ -159,7 +150,7 @@ export function LoadingScreen() {
         ring.r += ring.speed * dt;
         ring.alpha -= 0.15 * dt;
         if (ring.r > maxRing || ring.alpha <= 0) { rings.splice(i, 1); continue; }
-        if (ring.r > 0) {
+        if (ring.r > 1) {
           ctx.globalAlpha = ring.alpha;
           ctx.strokeStyle = `rgb(${CYAN[0]},${CYAN[1]},${CYAN[2]})`;
           ctx.lineWidth = 1;
@@ -170,9 +161,6 @@ export function LoadingScreen() {
       }
 
       ctx.globalAlpha = 1;
-
-      if (t >= DURATION) fireDone();
-
       animRef.current = requestAnimationFrame(draw);
     };
 

@@ -10,10 +10,11 @@ import type { Lang } from "@/components/BootScreen";
 import { RU_PHASE1_QUESTIONS } from "@/lib/ru-texts";
 import { useCreateSession, useUpdateSession, useSession } from "@/hooks/use-sessions";
 import { useGrantSkill } from "@/hooks/use-skills";
-import { onLoadingDone } from "@/components/LoadingScreen";
+import { LoadingScreen, getLoadingElapsed, resetLoadingScreen } from "@/components/LoadingScreen";
 import { playClick, playError, playPhaseComplete } from "@/lib/sounds";
 import { trackEvent, getOrCreateSession } from "@/lib/analytics";
 
+const DURATION = 3;
 type Phase = "loading" | "boot" | "phase_1" | "phase_1_complete" | "chip_exit" | "phase_2";
 type QuestionId = 1 | 2 | 3 | 4;
 
@@ -394,8 +395,9 @@ export default function Home() {
 
   useEffect(() => {
     if (phase !== "loading") return;
-    const unsub = onLoadingDone(() => setLoadingAnimDone(true));
-    return unsub;
+    const remaining = Math.max(0, DURATION * 1000 - getLoadingElapsed() * 1000);
+    const timer = setTimeout(() => setLoadingAnimDone(true), remaining);
+    return () => clearTimeout(timer);
   }, [phase]);
 
   useEffect(() => {
@@ -414,7 +416,7 @@ export default function Home() {
   }, [phase]);
 
   if (phase === "loading") {
-    return null;
+    return <LoadingScreen />;
   }
 
   if (phase === "boot") {
