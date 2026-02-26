@@ -28,7 +28,7 @@ export function LoadingScreen({ onComplete }: Props) {
     const t0 = performance.now();
     let prevNow = t0;
 
-    const COL_SP = 13;
+    const COL_SP = 10;
     const LH = 15;
     const nCols = Math.ceil(w / COL_SP) + 1;
     const nVisible = Math.ceil(h / LH) + 2;
@@ -68,14 +68,13 @@ export function LoadingScreen({ onComplete }: Props) {
         for (let r = 0; r <= nVisible; r++) {
           const py = r * LH + pixOff - LH;
           const ci = ((r - charShift) % nChars + nChars) % nChars;
-          const wave = 0.55 + 0.45 * Math.sin(t * 2.0 + r * 0.2 + col.waveOff);
-          ctx.globalAlpha = col.alpha * wave;
+          ctx.globalAlpha = col.alpha;
           ctx.fillText(col.chars[ci], col.x, py);
         }
       }
       ctx.globalAlpha = 1;
 
-      if (t >= 1.8 && !titleRef.current) {
+      if (t >= 2.5 && !titleRef.current) {
         titleRef.current = true;
         setShowTitle(true);
       }
@@ -105,7 +104,7 @@ export function LoadingScreen({ onComplete }: Props) {
             fontWeight: 400,
             letterSpacing: "0.06em",
             color: "#000",
-            background: "radial-gradient(ellipse at center,rgba(255,255,255,.95) 0%,rgba(255,255,255,.7) 50%,transparent 80%)",
+            background: "rgba(255,255,255,0.85)",
             padding: "24px 48px",
             animation: "lsTitleIn .6s ease-out both",
           }}>
