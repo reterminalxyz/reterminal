@@ -51,16 +51,16 @@ export function LoadingScreen({ onComplete }: Props) {
       }
     }
 
-    const COL_SP = 14;
-    const nCols = Math.min(Math.ceil(w / COL_SP), 50);
-    const nRows = Math.ceil(h / 15) + 6;
+    const COL_SP = 12;
+    const nCols = Math.min(Math.ceil(w / COL_SP), 60);
+    const nRows = Math.ceil(h / 14) + 8;
     const cols = Array.from({ length: nCols }, (_, i) => ({
-      x: i * COL_SP + (COL_SP / 2) + (Math.random() - 0.5) * 4,
+      x: i * COL_SP + (COL_SP / 2) + (Math.random() - 0.5) * 3,
       offset: Math.random() * nRows,
       speed: 1.5 + Math.random() * 6,
       chars: Array.from({ length: nRows }, () => CH[(Math.random() * CH.length) | 0]),
-      alpha: 0.03 + Math.random() * 0.15,
-      headLen: 3 + Math.floor(Math.random() * 8),
+      alpha: 0.06 + Math.random() * 0.22,
+      headLen: 3 + Math.floor(Math.random() * 10),
     }));
 
     const sparks = Array.from({ length: 20 }, () => ({
@@ -91,6 +91,8 @@ export function LoadingScreen({ onComplete }: Props) {
       ctx.font = "bold 10px 'JetBrains Mono',monospace";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
+      ctx.strokeStyle = `rgb(${C})`;
+      ctx.fillStyle = `rgb(${C})`;
       for (let i = 0; i < nodes.length; i++) {
         const n = nodes[i];
         if (n.d > rR) continue;
@@ -100,8 +102,7 @@ export function LoadingScreen({ onComplete }: Props) {
 
         const ap = n.a * (0.7 + 0.3 * Math.sin(t * 2.2 + n.ph));
 
-        ctx.globalAlpha = ap * 0.35;
-        ctx.strokeStyle = `rgb(${C})`;
+        ctx.globalAlpha = ap * 0.12;
         ctx.beginPath();
         ctx.moveTo(n.x - stub, n.y);
         ctx.lineTo(n.x + stub, n.y);
@@ -109,41 +110,32 @@ export function LoadingScreen({ onComplete }: Props) {
         ctx.lineTo(n.x, n.y + stub);
         ctx.stroke();
 
-        ctx.globalAlpha = ap * 0.55;
-        ctx.fillStyle = `rgb(${C})`;
+        ctx.globalAlpha = ap * 0.2;
         ctx.beginPath();
         ctx.arc(n.x, n.y, n.s * ap, 0, 6.28);
         ctx.fill();
 
         if (n.sc && n.a > 0.4) {
-          ctx.globalAlpha = ap * 0.35;
+          ctx.globalAlpha = ap * 0.12;
           ctx.fillText(n.c, n.x + 10, n.y - 10);
         }
       }
       ctx.globalAlpha = 1;
 
-      const colFade = Math.min(1, t / 0.15);
-      ctx.font = "11px 'JetBrains Mono',monospace";
+      const colFade = Math.min(1, t / 0.1);
+      ctx.font = "12px 'JetBrains Mono',monospace";
       ctx.fillStyle = `rgb(${C})`;
       for (const col of cols) {
         col.offset += col.speed * dt;
-        if (col.offset > 1) {
-          col.offset -= 1;
-          col.chars.pop();
-          col.chars.unshift(CH[(Math.random() * CH.length) | 0]);
-        }
-        if (Math.random() < 0.03) {
-          col.chars[(Math.random() * col.chars.length) | 0] = CH[(Math.random() * CH.length) | 0];
-        }
-        const oY = (col.offset % 1) * 15;
+        const oY = (col.offset % 1) * 14;
         const headIdx = Math.floor(col.offset * col.chars.length) % col.chars.length;
         for (let r = 0; r < col.chars.length; r++) {
-          const py = oY + r * 15 - 15;
-          if (py < -15 || py > h + 15) continue;
+          const py = oY + r * 14 - 14;
+          if (py < -14 || py > h + 14) continue;
           const distFromHead = (r - headIdx + col.chars.length) % col.chars.length;
           const headGlow = distFromHead < col.headLen ? 1 - distFromHead / col.headLen : 0;
           const baseWave = 0.5 + 0.5 * Math.sin(t * 1.8 + r * 0.25 + col.x * 0.01);
-          const wa = (col.alpha * baseWave + headGlow * 0.2) * colFade;
+          const wa = (col.alpha * baseWave + headGlow * 0.3) * colFade;
           if (wa < 0.01) continue;
           ctx.globalAlpha = wa;
           ctx.fillText(col.chars[r], col.x, py);
