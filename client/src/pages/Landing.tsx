@@ -445,7 +445,7 @@ function GlitchTitle() {
       className="text-center select-none"
       style={{
         fontFamily: FONT_MONO,
-        fontSize: "clamp(32px, 8vw, 64px)",
+        fontSize: "clamp(42px, 12vw, 96px)",
         fontWeight: 400,
         letterSpacing: "0.06em",
         color: "#000",
@@ -952,10 +952,10 @@ export default function Landing() {
         .module-card-1:hover .icon-eye-pupil, .module-card-1.touched .icon-eye-pupil { transform: scale(0.15); opacity: 0.2; }
 
         /* Card 2: Radar — dot goes off radar */
-        .icon-radar-sweep { transform-origin: 32px 32px; transition: transform 0.8s ease-in-out; }
+        .icon-radar-sweep { transform-origin: 32px 32px; transition: transform 1.4s cubic-bezier(0.2,0.6,0.3,1); }
         .icon-radar-dot { transition: opacity 0.4s ease 0.15s, transform 0.5s cubic-bezier(0.4,0,1,1) 0.1s; }
         .icon-radar-dot-ping { animation: radar-ping 1.5s ease-out infinite; }
-        .module-card-2:hover .icon-radar-sweep, .module-card-2.touched .icon-radar-sweep { transform: rotate(270deg); }
+        .module-card-2:hover .icon-radar-sweep, .module-card-2.touched .icon-radar-sweep { transform: rotate(720deg); }
         .module-card-2:hover .icon-radar-dot, .module-card-2.touched .icon-radar-dot { opacity: 0; transform: translate(16px, -12px) scale(0); }
         .module-card-2:hover .icon-radar-dot-ping, .module-card-2.touched .icon-radar-dot-ping { animation: none; opacity: 0; }
         @keyframes radar-ping {
