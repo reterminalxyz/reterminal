@@ -10,7 +10,7 @@ import type { Lang } from "@/components/BootScreen";
 import { RU_PHASE1_QUESTIONS } from "@/lib/ru-texts";
 import { useCreateSession, useUpdateSession, useSession } from "@/hooks/use-sessions";
 import { useGrantSkill } from "@/hooks/use-skills";
-import { LoadingScreen, resetLoadingScreen } from "@/components/LoadingScreen";
+import { onLoadingDone } from "@/components/LoadingScreen";
 import { playClick, playError, playPhaseComplete } from "@/lib/sounds";
 import { trackEvent, getOrCreateSession } from "@/lib/analytics";
 
@@ -76,10 +76,7 @@ export default function Home() {
     } catch (_) {}
     return null;
   });
-  const [phase, setPhase] = useState<Phase>(() => {
-    resetLoadingScreen();
-    return "loading";
-  });
+  const [phase, setPhase] = useState<Phase>("loading");
   const [currentQuestion, setCurrentQuestion] = useState<QuestionId>(1);
   const [circuitReveal, setCircuitReveal] = useState(() => hasWalletRestore.current ? 100 : 0);
   const [totalSats, setTotalSats] = useState(() => hasWalletRestore.current ? 1000 : 0);
@@ -396,6 +393,12 @@ export default function Home() {
 
 
   useEffect(() => {
+    if (phase !== "loading") return;
+    const unsub = onLoadingDone(() => setLoadingAnimDone(true));
+    return unsub;
+  }, [phase]);
+
+  useEffect(() => {
     if (phase === "loading" && sessionReady && loadingAnimDone) {
       setPhase("boot");
     }
@@ -411,9 +414,7 @@ export default function Home() {
   }, [phase]);
 
   if (phase === "loading") {
-    return (
-      <LoadingScreen onComplete={() => setLoadingAnimDone(true)} />
-    );
+    return null;
   }
 
   if (phase === "boot") {
