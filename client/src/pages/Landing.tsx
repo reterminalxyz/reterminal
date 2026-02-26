@@ -75,12 +75,16 @@ function GridGlow() {
   const prevMouse = useRef({ x: -9999, y: -9999 });
   const drips = useRef<Drip[]>([]);
   const sparks = useRef<Spark[]>([]);
+  const lastInteraction = useRef(0);
+  const fadeOut = useRef(0);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     let raf: number;
     const dpr = window.devicePixelRatio || 1;
+    const IDLE_TIMEOUT = 3000;
+    const FADE_DURATION = 800;
 
     const resize = () => {
       canvas.width = window.innerWidth * dpr;
@@ -91,11 +95,14 @@ function GridGlow() {
     resize();
     window.addEventListener("resize", resize);
 
+    const markActive = () => { lastInteraction.current = Date.now(); fadeOut.current = 0; };
+
     const onMove = (e: MouseEvent) => {
       prevMouse.current.x = mouse.current.x;
       prevMouse.current.y = mouse.current.y;
       mouse.current.x = e.clientX;
       mouse.current.y = e.clientY;
+      markActive();
     };
     const onTouch = (e: TouchEvent) => {
       if (e.touches.length > 0) {
@@ -103,7 +110,12 @@ function GridGlow() {
         prevMouse.current.y = mouse.current.y;
         mouse.current.x = e.touches[0].clientX;
         mouse.current.y = e.touches[0].clientY;
+        markActive();
       }
+    };
+    const onTouchEnd = () => {
+      mouse.current.x = -9999;
+      mouse.current.y = -9999;
     };
     const onLeave = () => {
       mouse.current.x = -9999;
@@ -111,6 +123,7 @@ function GridGlow() {
     };
     window.addEventListener("mousemove", onMove, { passive: true });
     window.addEventListener("touchmove", onTouch, { passive: true });
+    window.addEventListener("touchend", onTouchEnd);
     window.addEventListener("mouseleave", onLeave);
 
     const draw = (_now: number) => {
@@ -123,6 +136,24 @@ function GridGlow() {
       const my = mouse.current.y;
       const w = window.innerWidth;
       const h = window.innerHeight;
+
+      const idleMs = lastInteraction.current > 0 ? Date.now() - lastInteraction.current : 0;
+      let globalAlpha = 1;
+      if (idleMs > IDLE_TIMEOUT) {
+        fadeOut.current = Math.min(1, (idleMs - IDLE_TIMEOUT) / FADE_DURATION);
+        globalAlpha = 1 - fadeOut.current;
+      }
+
+      if (globalAlpha <= 0) {
+        trailNodes.current = [];
+        trailSet.current.clear();
+        drips.current = [];
+        sparks.current = [];
+        raf = requestAnimationFrame(draw);
+        return;
+      }
+
+      ctx.globalAlpha = globalAlpha;
 
       if (mx > -999) {
         const scrollY = window.scrollY;
@@ -312,6 +343,7 @@ function GridGlow() {
         return true;
       });
 
+      ctx.globalAlpha = 1;
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       raf = requestAnimationFrame(draw);
     };
@@ -322,6 +354,7 @@ function GridGlow() {
       window.removeEventListener("resize", resize);
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("touchmove", onTouch);
+      window.removeEventListener("touchend", onTouchEnd);
       window.removeEventListener("mouseleave", onLeave);
     };
   }, []);
