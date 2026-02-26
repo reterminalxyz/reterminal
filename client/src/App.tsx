@@ -6,15 +6,20 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import Landing from "@/pages/Landing";
 import NotFound from "@/pages/not-found";
+import { LoadingScreen } from "@/components/LoadingScreen";
 
 const Home = lazy(() => import("@/pages/Home"));
+
+function LoadingFallback() {
+  return <LoadingScreen onComplete={() => {}} />;
+}
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Landing} />
       <Route path="/activation">
-        <Suspense fallback={<div style={{ background: "#FFFFFF", minHeight: "100vh" }} />}>
+        <Suspense fallback={<LoadingFallback />}>
           <Home />
         </Suspense>
       </Route>
