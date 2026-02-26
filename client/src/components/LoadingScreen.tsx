@@ -1,288 +1,211 @@
 import { useEffect, useRef, useState } from "react";
 
-const GRID = 48;
-const CYAN = [0, 229, 255];
-const GLITCH = "!@#$%^&*_+-=[]{}|;:.<>?/\\~01≡∆∑Ω";
+const G = 48;
+const CH = "⟨⟩∆∇◊○●□■▪▫▬▮▯░▒▓╳╲╱⊕⊗⊙⊚≡∞∑Ω";
+const C = "0,229,255";
 
 interface Props {
   onComplete: () => void;
 }
 
-interface Column {
-  x: number;
-  y: number;
-  speed: number;
-  chars: string[];
-  baseAlpha: number;
-}
-
-interface Drip {
-  x: number;
-  y: number;
-  vy: number;
-  r: number;
-  life: number;
-}
-
-interface Spark {
-  x: number;
-  y: number;
-  life: number;
-  maxLife: number;
-  size: number;
-  pulse: number;
-}
-
-interface ScanLine {
-  y: number;
-  speed: number;
-  alpha: number;
-}
-
-function rch() {
-  return GLITCH[Math.floor(Math.random() * GLITCH.length)];
-}
-
-function rgba(a: number) {
-  return `rgba(${CYAN[0]},${CYAN[1]},${CYAN[2]},${a})`;
-}
-
 export function LoadingScreen({ onComplete }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
-  const completedRef = useRef(false);
-  const titleShownRef = useRef(false);
+  const doneRef = useRef(false);
+  const titleRef = useRef(false);
   const [showTitle, setShowTitle] = useState(false);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const dpr = window.devicePixelRatio || 1;
+    const cvs = canvasRef.current;
+    if (!cvs) return;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
     const w = window.innerWidth;
     const h = window.innerHeight;
-    canvas.width = w * dpr;
-    canvas.height = h * dpr;
-
-    const ctx = canvas.getContext("2d");
+    cvs.width = w * dpr;
+    cvs.height = h * dpr;
+    const ctx = cvs.getContext("2d", { alpha: false });
     if (!ctx) return;
     ctx.scale(dpr, dpr);
 
-    const cx = w / 2;
-    const cy = h / 2;
-    const maxDist = Math.sqrt(cx * cx + cy * cy);
-    const STUB = GRID * 0.4;
-    const startTime = performance.now();
+    const cx = w / 2, cy = h / 2;
+    const maxD = Math.hypot(cx, cy);
+    const stub = G * 0.38;
+    const t0 = performance.now();
+    let prevNow = t0;
 
-    const gridCols = Math.ceil(w / GRID) + 1;
-    const gridRows = Math.ceil(h / GRID) + 1;
-    const gridNodes = new Array(gridCols * gridRows);
-    for (let r = 0; r < gridRows; r++) {
-      for (let c = 0; c < gridCols; c++) {
-        const gx = c * GRID;
-        const gy = r * GRID;
-        gridNodes[r * gridCols + c] = {
-          gx, gy,
-          dist: Math.sqrt((gx - cx) ** 2 + (gy - cy) ** 2),
-          dotSize: 1.5 + Math.random() * 1.5,
-          ch: rch(),
-          showChar: Math.random() < 0.15,
-        };
+    const gc = Math.ceil(w / G) + 1;
+    const gr = Math.ceil(h / G) + 1;
+    const nodes: { x: number; y: number; d: number; s: number; c: string; sc: boolean; a: number; ph: number }[] = [];
+    for (let r = 0; r < gr; r++) {
+      for (let c = 0; c < gc; c++) {
+        const x = c * G, y = r * G;
+        nodes.push({
+          x, y,
+          d: Math.hypot(x - cx, y - cy),
+          s: 1.2 + Math.random() * 1.8,
+          c: CH[(Math.random() * CH.length) | 0],
+          sc: Math.random() < 0.2,
+          a: 0,
+          ph: Math.random() * 6.28,
+        });
       }
     }
 
-    const colCount = Math.ceil(w / 16) + 2;
-    const rowCount = Math.ceil(h / 14) + 5;
-    const columns: Column[] = Array.from({ length: colCount }, (_, i) => ({
-      x: i * 16,
-      y: -Math.random() * h * 0.5,
-      speed: 80 + Math.random() * 200,
-      chars: Array.from({ length: rowCount }, () => rch()),
-      baseAlpha: 0.08 + Math.random() * 0.25,
+    const COL_SP = 20;
+    const nCols = Math.min(Math.ceil(w / COL_SP), 30);
+    const nRows = Math.ceil(h / 16) + 4;
+    const cols = Array.from({ length: nCols }, (_, i) => ({
+      x: i * COL_SP + (COL_SP / 2),
+      offset: Math.random() * nRows,
+      speed: 2 + Math.random() * 4,
+      chars: Array.from({ length: nRows }, () => CH[(Math.random() * CH.length) | 0]),
+      alpha: 0.04 + Math.random() * 0.12,
     }));
 
-    const drips: Drip[] = [];
-    const sparks: Spark[] = [];
-    const scanLines: ScanLine[] = [
-      { y: -20, speed: 300 + Math.random() * 200, alpha: 0.12 },
-      { y: h * 0.3, speed: 250 + Math.random() * 150, alpha: 0.08 },
-    ];
+    const sparks = Array.from({ length: 20 }, () => ({
+      x: Math.random() * w, y: Math.random() * h,
+      life: Math.random(), max: 2 + Math.random() * 3,
+      r: 1 + Math.random() * 2.5, ph: Math.random() * 6.28,
+    }));
 
-    let pulseRing = 0;
-    let pulseRing2 = -maxDist * 0.3;
-    let lastTime = startTime;
+    let ring1 = 0, ring2 = -maxD * 0.35, ring3 = -maxD * 0.7;
+    let scanY = -10;
 
-    for (let i = 0; i < 30; i++) {
-      sparks.push({
-        x: Math.random() * w,
-        y: Math.random() * h,
-        life: Math.random(),
-        maxLife: 1.5 + Math.random() * 2,
-        size: 1 + Math.random() * 3,
-        pulse: Math.random() * Math.PI * 2,
-      });
-    }
+    const glowGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxD * 0.6);
+    glowGrad.addColorStop(0, `rgba(${C},0.06)`);
+    glowGrad.addColorStop(1, `rgba(${C},0)`);
 
     const draw = (now: number) => {
-      const dt = Math.min(0.05, (now - lastTime) / 1000);
-      lastTime = now;
-      const elapsed = (now - startTime) / 1000;
+      const dt = Math.min(0.05, (now - prevNow) / 1000);
+      prevNow = now;
+      const t = (now - t0) / 1000;
+      const breathe = 0.5 + 0.5 * Math.sin(t * 1.8);
 
-      ctx.fillStyle = "#FFFFFF";
+      ctx.fillStyle = "#FFF";
       ctx.fillRect(0, 0, w, h);
 
-      const gridReveal = Math.min(1, elapsed / 1.2);
-      const revealR = gridReveal * gridReveal * (maxDist + 80);
+      const reveal = Math.min(1, t / 1.0);
+      const rR = reveal * reveal * (maxD + 100);
 
-      for (let i = 0; i < gridNodes.length; i++) {
-        const n = gridNodes[i];
-        if (n.dist > revealR) continue;
-        const intensity = Math.min(1, (revealR - n.dist) / 100);
-        const a = intensity * intensity;
-
-        ctx.strokeStyle = rgba(a * 0.4);
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.moveTo(n.gx - STUB, n.gy);
-        ctx.lineTo(n.gx + STUB, n.gy);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(n.gx, n.gy - STUB);
-        ctx.lineTo(n.gx, n.gy + STUB);
-        ctx.stroke();
-
-        ctx.beginPath();
-        ctx.arc(n.gx, n.gy, n.dotSize * a, 0, Math.PI * 2);
-        ctx.fillStyle = rgba(a * 0.6);
-        ctx.fill();
-
-        if (a > 0.5 && n.showChar) {
-          ctx.font = "bold 11px 'JetBrains Mono',monospace";
-          ctx.textAlign = "center";
-          ctx.textBaseline = "middle";
-          ctx.fillStyle = rgba(a * 0.4);
-          ctx.fillText(n.ch, n.gx + 9, n.gy - 9);
-        }
-      }
-
-      ctx.font = "12px 'JetBrains Mono','Courier New',monospace";
+      ctx.lineWidth = 1;
+      ctx.font = "bold 10px 'JetBrains Mono',monospace";
       ctx.textAlign = "center";
-      const fadeInCols = Math.min(1, elapsed / 0.3);
-      for (const col of columns) {
-        col.y += col.speed * dt;
-        if (col.y > 14) {
-          col.y -= 14;
-          col.chars.pop();
-          col.chars.unshift(rch());
-        }
-        if (Math.random() < 0.06) {
-          col.chars[Math.floor(Math.random() * col.chars.length)] = rch();
-        }
-        const baseY = col.y % 14;
-        for (let r = 0; r < col.chars.length; r++) {
-          const cy2 = baseY + r * 14 - 14;
-          if (cy2 < -14 || cy2 > h + 14) continue;
-          const rowFade = 0.3 + (r / col.chars.length) * 0.7;
-          const a = col.baseAlpha * rowFade * fadeInCols;
-          if (a < 0.01) continue;
-          ctx.fillStyle = rgba(a);
-          ctx.fillText(col.chars[r], col.x, cy2);
-        }
-      }
+      ctx.textBaseline = "middle";
+      for (let i = 0; i < nodes.length; i++) {
+        const n = nodes[i];
+        if (n.d > rR) continue;
+        const raw = Math.min(1, (rR - n.d) / 120);
+        n.a += (raw * raw - n.a) * 0.12;
+        if (n.a < 0.01) continue;
 
-      pulseRing += dt * 250;
-      pulseRing2 += dt * 180;
-      if (pulseRing > maxDist + 100) pulseRing = 0;
-      if (pulseRing2 > maxDist + 100) pulseRing2 = -maxDist * 0.2;
-      if (pulseRing > 0) {
-        const ringA = Math.max(0, 0.2 - (pulseRing / maxDist) * 0.2);
-        ctx.strokeStyle = rgba(ringA);
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        ctx.arc(cx, cy, pulseRing, 0, Math.PI * 2);
-        ctx.stroke();
-      }
-      if (pulseRing2 > 0) {
-        const ringA = Math.max(0, 0.15 - (pulseRing2 / maxDist) * 0.15);
-        ctx.strokeStyle = rgba(ringA);
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.arc(cx, cy, pulseRing2, 0, Math.PI * 2);
-        ctx.stroke();
-      }
+        const ap = n.a * (0.7 + 0.3 * Math.sin(t * 2.2 + n.ph));
 
-      for (const sl of scanLines) {
-        sl.y += sl.speed * dt;
-        if (sl.y > h + 20) sl.y = -20;
-        ctx.strokeStyle = rgba(sl.alpha);
-        ctx.lineWidth = 1;
+        ctx.globalAlpha = ap * 0.35;
+        ctx.strokeStyle = `rgb(${C})`;
         ctx.beginPath();
-        ctx.moveTo(0, sl.y);
-        ctx.lineTo(w, sl.y);
+        ctx.moveTo(n.x - stub, n.y);
+        ctx.lineTo(n.x + stub, n.y);
+        ctx.moveTo(n.x, n.y - stub);
+        ctx.lineTo(n.x, n.y + stub);
         ctx.stroke();
-        const grad = ctx.createLinearGradient(0, sl.y - 8, 0, sl.y + 8);
-        grad.addColorStop(0, rgba(0));
-        grad.addColorStop(0.5, rgba(sl.alpha * 0.5));
-        grad.addColorStop(1, rgba(0));
-        ctx.fillStyle = grad;
-        ctx.fillRect(0, sl.y - 8, w, 16);
-      }
 
-      if (elapsed > 0.2 && drips.length < 40) {
-        if (Math.random() < 0.3) {
-          drips.push({
-            x: Math.random() * w,
-            y: Math.random() * h * 0.3,
-            vy: 40 + Math.random() * 100,
-            r: 1 + Math.random() * 3,
-            life: 1,
-          });
-        }
-      }
-      for (let i = drips.length - 1; i >= 0; i--) {
-        const d = drips[i];
-        d.life -= dt * 0.3;
-        d.y += d.vy * dt;
-        d.vy += 50 * dt;
-        d.r *= 0.998;
-        if (d.life <= 0 || d.r < 0.3 || d.y > h + 20) {
-          drips.splice(i, 1);
-          continue;
-        }
-        const a = d.life * d.life * 0.5;
+        ctx.globalAlpha = ap * 0.55;
+        ctx.fillStyle = `rgb(${C})`;
         ctx.beginPath();
-        ctx.arc(d.x, d.y, d.r, 0, Math.PI * 2);
-        ctx.fillStyle = rgba(a);
+        ctx.arc(n.x, n.y, n.s * ap, 0, 6.28);
         ctx.fill();
-        if (d.r > 1.5) {
-          ctx.beginPath();
-          ctx.arc(d.x, d.y + d.r * 2, d.r * 0.4, 0, Math.PI * 2);
-          ctx.fillStyle = rgba(a * 0.3);
-          ctx.fill();
+
+        if (n.sc && n.a > 0.4) {
+          ctx.globalAlpha = ap * 0.35;
+          ctx.fillText(n.c, n.x + 10, n.y - 10);
         }
       }
+      ctx.globalAlpha = 1;
 
+      const colFade = Math.min(1, t / 0.2);
+      ctx.font = "11px 'JetBrains Mono',monospace";
+      for (const col of cols) {
+        col.offset += col.speed * dt;
+        if (col.offset > 1) {
+          col.offset -= 1;
+          col.chars.pop();
+          col.chars.unshift(CH[(Math.random() * CH.length) | 0]);
+        }
+        const oY = (col.offset % 1) * 16;
+        for (let r = 0; r < col.chars.length; r++) {
+          const py = oY + r * 16 - 16;
+          if (py < -16 || py > h + 16) continue;
+          const wa = col.alpha * (1 - (r / col.chars.length) * 0.6) * colFade * (0.6 + 0.4 * Math.sin(t * 1.5 + r * 0.3));
+          if (wa < 0.01) continue;
+          ctx.globalAlpha = wa;
+          ctx.fillStyle = `rgb(${C})`;
+          ctx.fillText(col.chars[r], col.x, py);
+        }
+      }
+      ctx.globalAlpha = 1;
+
+      ring1 += dt * 200;
+      ring2 += dt * 140;
+      ring3 += dt * 100;
+      if (ring1 > maxD + 80) ring1 = 0;
+      if (ring2 > maxD + 80) ring2 = 0;
+      if (ring3 > maxD + 80) ring3 = 0;
+
+      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = `rgb(${C})`;
+      if (ring1 > 0) {
+        const ra = Math.max(0, 0.18 - (ring1 / maxD) * 0.18) * breathe;
+        if (ra > 0.01) { ctx.globalAlpha = ra; ctx.beginPath(); ctx.arc(cx, cy, ring1, 0, 6.28); ctx.stroke(); }
+      }
+      if (ring2 > 0) {
+        const ra = Math.max(0, 0.18 - (ring2 / maxD) * 0.18) * breathe;
+        if (ra > 0.01) { ctx.globalAlpha = ra; ctx.beginPath(); ctx.arc(cx, cy, ring2, 0, 6.28); ctx.stroke(); }
+      }
+      if (ring3 > 0) {
+        const ra = Math.max(0, 0.18 - (ring3 / maxD) * 0.18) * breathe;
+        if (ra > 0.01) { ctx.globalAlpha = ra; ctx.beginPath(); ctx.arc(cx, cy, ring3, 0, 6.28); ctx.stroke(); }
+      }
+      ctx.globalAlpha = 1;
+
+      if (t > 0.3) {
+        ctx.globalAlpha = Math.min(0.06, (t - 0.3) * 0.03) * breathe;
+        ctx.fillStyle = glowGrad;
+        ctx.fillRect(0, 0, w, h);
+        ctx.globalAlpha = 1;
+      }
+
+      scanY += dt * 180;
+      if (scanY > h + 40) scanY = -40;
+      const scanA = 0.06 * breathe;
+      ctx.globalAlpha = scanA;
+      ctx.fillStyle = `rgb(${C})`;
+      ctx.fillRect(0, scanY - 1, w, 2);
+      ctx.globalAlpha = scanA * 0.3;
+      ctx.fillRect(0, scanY - 15, w, 30);
+      ctx.globalAlpha = 1;
+
+      ctx.fillStyle = `rgb(${C})`;
       for (const s of sparks) {
-        s.life -= dt / s.maxLife;
-        s.pulse += dt * 4;
+        s.life -= dt / s.max;
+        s.ph += dt * 5;
         if (s.life <= 0) {
           s.x = Math.random() * w;
           s.y = Math.random() * h;
           s.life = 1;
-          s.maxLife = 1.5 + Math.random() * 2;
-          s.size = 1 + Math.random() * 3;
+          s.max = 2 + Math.random() * 3;
+          s.r = 1 + Math.random() * 2.5;
         }
-        const brightness = (0.5 + 0.5 * Math.sin(s.pulse)) * s.life;
-        const a = brightness * 0.6;
-        if (a < 0.02) continue;
+        const b = (0.5 + 0.5 * Math.sin(s.ph)) * s.life * breathe;
+        if (b < 0.03) continue;
+        ctx.globalAlpha = b * 0.5;
         ctx.beginPath();
-        ctx.arc(s.x, s.y, s.size * brightness, 0, Math.PI * 2);
-        ctx.fillStyle = rgba(a);
+        ctx.arc(s.x, s.y, s.r * b, 0, 6.28);
         ctx.fill();
       }
+      ctx.globalAlpha = 1;
 
-      if (elapsed >= 1.8 && !titleShownRef.current) {
-        titleShownRef.current = true;
+      if (t >= 1.8 && !titleRef.current) {
+        titleRef.current = true;
         setShowTitle(true);
       }
 
@@ -294,58 +217,34 @@ export function LoadingScreen({ onComplete }: Props) {
   }, []);
 
   useEffect(() => {
-    if (showTitle && !completedRef.current) {
-      const t = setTimeout(() => {
-        completedRef.current = true;
-        onComplete();
-      }, 1200);
-      return () => clearTimeout(t);
+    if (showTitle && !doneRef.current) {
+      const tm = setTimeout(() => { doneRef.current = true; onComplete(); }, 1200);
+      return () => clearTimeout(tm);
     }
   }, [showTitle, onComplete]);
 
   return (
-    <div
-      className="fixed inset-0 overflow-hidden"
-      style={{ background: "#FFFFFF", zIndex: 9999, width: "100vw", height: "100vh" }}
-      data-testid="loading-screen"
-    >
-      <canvas
-        ref={canvasRef}
-        className="absolute"
-        style={{ top: 0, left: 0, width: "100%", height: "100%" }}
-      />
-
+    <div className="fixed inset-0 overflow-hidden" style={{ background: "#FFF", zIndex: 9999 }} data-testid="loading-screen">
+      <canvas ref={canvasRef} className="absolute inset-0" style={{ width: "100%", height: "100%" }} />
       {showTitle && (
-        <div
-          className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none"
-          data-testid="loading-screen-final"
-        >
-          <div
-            style={{
-              fontFamily: "'JetBrains Mono', monospace",
-              fontSize: "clamp(22px, 7vw, 36px)",
-              fontWeight: 400,
-              letterSpacing: "0.06em",
-              color: "#000",
-              background: "radial-gradient(ellipse at center, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.7) 50%, transparent 80%)",
-              padding: "24px 48px",
-              animation: "lsTitleIn 0.6s ease-out both",
-            }}
-          >
+        <div className="absolute inset-0 flex items-center justify-center z-10 pointer-events-none" data-testid="loading-screen-final">
+          <div style={{
+            fontFamily: "'JetBrains Mono',monospace",
+            fontSize: "clamp(22px,7vw,36px)",
+            fontWeight: 400,
+            letterSpacing: "0.06em",
+            color: "#000",
+            background: "radial-gradient(ellipse at center,rgba(255,255,255,.95) 0%,rgba(255,255,255,.7) 50%,transparent 80%)",
+            padding: "24px 48px",
+            animation: "lsTitleIn .6s ease-out both",
+          }}>
             <span>re</span>
-            <span style={{ color: "#00e5ff", textShadow: "0 0 6px #00e5ff" }}>_</span>
+            <span style={{ color: "#00e5ff", textShadow: "0 0 8px #00e5ff" }}>_</span>
             <span>terminal</span>
           </div>
         </div>
       )}
-
-      <style>{`
-        @keyframes lsTitleIn {
-          0% { opacity: 0; transform: scale(0.92); filter: blur(4px); }
-          60% { opacity: 1; transform: scale(1.02); filter: blur(0px); }
-          100% { opacity: 1; transform: scale(1); filter: blur(0px); }
-        }
-      `}</style>
+      <style>{`@keyframes lsTitleIn{0%{opacity:0;transform:scale(.92);filter:blur(4px)}60%{opacity:1;transform:scale(1.02);filter:blur(0)}to{opacity:1;transform:scale(1);filter:blur(0)}}`}</style>
     </div>
   );
 }
