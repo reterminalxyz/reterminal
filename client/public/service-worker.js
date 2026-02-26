@@ -1,4 +1,4 @@
-const CACHE_NAME = 're-terminal-v6';
+const CACHE_NAME = 're-terminal-v7';
 
 const PRECACHE_URLS = [
   '/',
