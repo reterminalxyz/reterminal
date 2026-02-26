@@ -638,11 +638,17 @@ function ModulesSection() {
                 )}
                 {i === 2 && (
                   <svg viewBox="0 0 64 64" width="200" height="200" style={{ overflow: "visible" }}>
-                    <circle className="icon-radar-ring-1" cx="32" cy="32" r="24" fill="none" stroke="#000" strokeWidth="1" opacity="0.15" />
-                    <circle className="icon-radar-ring-2" cx="32" cy="32" r="16" fill="none" stroke="#000" strokeWidth="1" opacity="0.25" />
-                    <circle className="icon-radar-ring-3" cx="32" cy="32" r="8" fill="none" stroke="#000" strokeWidth="1" opacity="0.35" />
-                    <line className="icon-radar-sweep" x1="32" y1="32" x2="32" y2="8" stroke="#000" strokeWidth="1.5" opacity="0.3" />
-                    <circle className="icon-radar-dot" cx="38" cy="22" r="3" fill="#000" />
+                    <circle cx="32" cy="32" r="24" fill="none" stroke="#000" strokeWidth="1" opacity="0.12" />
+                    <circle cx="32" cy="32" r="16" fill="none" stroke="#000" strokeWidth="1" opacity="0.2" />
+                    <circle cx="32" cy="32" r="8" fill="none" stroke="#000" strokeWidth="1" opacity="0.3" />
+                    <line x1="8" y1="32" x2="56" y2="32" stroke="#000" strokeWidth="0.5" opacity="0.1" />
+                    <line x1="32" y1="8" x2="32" y2="56" stroke="#000" strokeWidth="0.5" opacity="0.1" />
+                    <g className="icon-radar-sweep">
+                      <line x1="32" y1="32" x2="32" y2="8" stroke="#000" strokeWidth="1.5" opacity="0.5" />
+                      <path d="M32 32 L26 10 A24 24 0 0 1 32 8 Z" fill="#000" opacity="0.06" />
+                    </g>
+                    <circle className="icon-radar-dot" cx="40" cy="20" r="4" fill="#000" />
+                    <circle className="icon-radar-dot-ping" cx="40" cy="20" r="4" fill="none" stroke="#000" strokeWidth="1" opacity="0.4" />
                   </svg>
                 )}
                 {i === 3 && (
@@ -945,15 +951,18 @@ export default function Landing() {
         .module-card-1:hover .icon-eye-outer path, .module-card-1.touched .icon-eye-outer path { stroke-dashoffset: 200; }
         .module-card-1:hover .icon-eye-pupil, .module-card-1.touched .icon-eye-pupil { transform: scale(0.15); opacity: 0.2; }
 
-        /* Card 2: Radar — dot disappears off radar */
-        .icon-radar-sweep { transform-origin: 32px 32px; transition: transform 0.8s ease-out; }
-        .icon-radar-dot { transition: opacity 0.5s ease 0.2s, transform 0.6s cubic-bezier(0.4,0,1,1) 0.1s, r 0.4s ease 0.3s; }
-        .icon-radar-ring-1, .icon-radar-ring-2, .icon-radar-ring-3 { transition: opacity 0.4s ease; }
-        .module-card-2:hover .icon-radar-sweep, .module-card-2.touched .icon-radar-sweep { transform: rotate(180deg); }
-        .module-card-2:hover .icon-radar-dot, .module-card-2.touched .icon-radar-dot { opacity: 0; transform: translate(14px, -10px) scale(0.2); }
-        .module-card-2:hover .icon-radar-ring-1, .module-card-2.touched .icon-radar-ring-1 { opacity: 0.08; }
-        .module-card-2:hover .icon-radar-ring-2, .module-card-2.touched .icon-radar-ring-2 { opacity: 0.12; }
-        .module-card-2:hover .icon-radar-ring-3, .module-card-2.touched .icon-radar-ring-3 { opacity: 0.15; }
+        /* Card 2: Radar — dot goes off radar */
+        .icon-radar-sweep { transform-origin: 32px 32px; transition: transform 0.8s ease-in-out; }
+        .icon-radar-dot { transition: opacity 0.4s ease 0.15s, transform 0.5s cubic-bezier(0.4,0,1,1) 0.1s; }
+        .icon-radar-dot-ping { animation: radar-ping 1.5s ease-out infinite; }
+        .module-card-2:hover .icon-radar-sweep, .module-card-2.touched .icon-radar-sweep { transform: rotate(270deg); }
+        .module-card-2:hover .icon-radar-dot, .module-card-2.touched .icon-radar-dot { opacity: 0; transform: translate(16px, -12px) scale(0); }
+        .module-card-2:hover .icon-radar-dot-ping, .module-card-2.touched .icon-radar-dot-ping { animation: none; opacity: 0; }
+        @keyframes radar-ping {
+          0% { r: 4; opacity: 0.4; }
+          70% { r: 10; opacity: 0; }
+          100% { r: 10; opacity: 0; }
+        }
 
         /* Card 3: Dashed → Solid + Packet */
         .icon-dashed-line { transition: stroke-dasharray 0.15s ease, stroke-width 0.15s ease; }
