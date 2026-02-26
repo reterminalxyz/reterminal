@@ -53,14 +53,16 @@ export function LoadingScreen({ onComplete }: Props) {
 
     const COL_SP = 12;
     const nCols = Math.min(Math.ceil(w / COL_SP), 60);
-    const nRows = Math.ceil(h / 14) + 8;
+    const LH = 14;
+    const totalH = h + LH * 20;
+    const nRows = Math.ceil(totalH / LH) + 2;
     const cols = Array.from({ length: nCols }, (_, i) => ({
       x: i * COL_SP + (COL_SP / 2) + (Math.random() - 0.5) * 3,
-      offset: Math.random() * nRows,
-      speed: 1.5 + Math.random() * 6,
+      y: -(Math.random() * h),
+      speed: 30 + Math.random() * 120,
       chars: Array.from({ length: nRows }, () => CH[(Math.random() * CH.length) | 0]),
       alpha: 0.06 + Math.random() * 0.22,
-      headLen: 3 + Math.floor(Math.random() * 10),
+      len: nRows,
     }));
 
     const sparks = Array.from({ length: 20 }, () => ({
@@ -126,16 +128,12 @@ export function LoadingScreen({ onComplete }: Props) {
       ctx.font = "12px 'JetBrains Mono',monospace";
       ctx.fillStyle = `rgb(${C})`;
       for (const col of cols) {
-        col.offset += col.speed * dt;
-        const oY = (col.offset % 1) * 14;
-        const headIdx = Math.floor(col.offset * col.chars.length) % col.chars.length;
-        for (let r = 0; r < col.chars.length; r++) {
-          const py = oY + r * 14 - 14;
-          if (py < -14 || py > h + 14) continue;
-          const distFromHead = (r - headIdx + col.chars.length) % col.chars.length;
-          const headGlow = distFromHead < col.headLen ? 1 - distFromHead / col.headLen : 0;
-          const baseWave = 0.5 + 0.5 * Math.sin(t * 1.8 + r * 0.25 + col.x * 0.01);
-          const wa = (col.alpha * baseWave + headGlow * 0.3) * colFade;
+        col.y += col.speed * dt;
+        for (let r = 0; r < col.len; r++) {
+          const py = col.y + r * LH;
+          if (py < -LH || py > h + LH) continue;
+          const edgeFade = Math.min(1, py / (h * 0.15), (h - py) / (h * 0.15));
+          const wa = col.alpha * (0.6 + 0.4 * Math.sin(t * 1.8 + r * 0.25 + col.x * 0.01)) * colFade * Math.max(0, edgeFade);
           if (wa < 0.01) continue;
           ctx.globalAlpha = wa;
           ctx.fillText(col.chars[r], col.x, py);
