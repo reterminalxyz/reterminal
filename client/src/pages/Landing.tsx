@@ -736,7 +736,9 @@ function HowItWorksSection() {
           }
         });
 
-        const fillProgress = Math.min(100, Math.max(0, ((trigger - containerTop) / containerH) * 100));
+        const scrolledInto = trigger - containerTop;
+        const totalScrollable = containerH + trigger - window.innerHeight;
+        const fillProgress = Math.min(100, Math.max(0, (scrolledInto / (totalScrollable > 0 ? totalScrollable : containerH)) * 100));
         fill.style.height = fillProgress + "%";
 
         if (cost && !cost.classList.contains("tl-cost-active")) {
