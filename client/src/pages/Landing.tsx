@@ -702,7 +702,7 @@ function HowItWorksSection() {
   const obs = useInView();
 
   const steps = [
-    { num: "01", title: "Tap physical object", sub: "Card / Figure / Sticker" },
+    { num: "01", title: "Tap physical object or click the link", sub: "Card / Figure / Sticker" },
     { num: "02", title: "Learn and earn", sub: "Gamified modules → Earn $SATS" },
     { num: "03", title: "Peer-to-peer growth", sub: "Share cards → Network expands" },
   ];
