@@ -1,26 +1,18 @@
-import { useEffect, useRef, useState, useMemo } from "react";
+import { useEffect, useRef, useState } from "react";
 
-const CHARS = ">/≡$#[]_XYZ01{}|\\~@!%^&*+=<>?;≠±∆∑∫Ω".split("");
+const GRID_SIZE = 48;
+const GLITCH_CHARS = "!@#$%^&*_+-=[]{}|;:',.<>?/\\~`01";
 
 interface Props {
   onComplete: () => void;
-}
-
-function rndChar() {
-  return CHARS[Math.floor(Math.random() * CHARS.length)];
 }
 
 export function LoadingScreen({ onComplete }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animRef = useRef<number>(0);
   const completedRef = useRef(false);
-  const phaseRef = useRef<1 | 2>(1);
+  const titleShownRef = useRef(false);
   const [showTitle, setShowTitle] = useState(false);
-
-  const colCount = useMemo(() => {
-    if (typeof window === "undefined") return 30;
-    return Math.max(25, Math.floor(window.innerWidth / 15));
-  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -28,7 +20,7 @@ export function LoadingScreen({ onComplete }: Props) {
 
     const dpr = window.devicePixelRatio || 1;
     const w = window.innerWidth;
-    const h = Math.max(window.innerHeight, document.documentElement.clientHeight, screen.height || 0) + 100;
+    const h = window.innerHeight;
     canvas.width = w * dpr;
     canvas.height = h * dpr;
 
@@ -36,63 +28,96 @@ export function LoadingScreen({ onComplete }: Props) {
     if (!ctx) return;
     ctx.scale(dpr, dpr);
 
-    ctx.fillStyle = "#FFFFFF";
-    ctx.fillRect(0, 0, w, h);
+    const cx = w / 2;
+    const cy = h / 2;
+    const maxDist = Math.sqrt(cx * cx + cy * cy);
 
-    const fontSize = Math.max(14, Math.floor(w / colCount));
-    const rowsNeeded = Math.ceil(h / fontSize) + 10;
-    const colW = w / colCount;
+    const cols = Math.ceil(w / GRID_SIZE) + 2;
+    const rows = Math.ceil(h / GRID_SIZE) + 2;
 
-    const columns = Array.from({ length: colCount }, () => ({
-      y: Math.random() * h * 1.5,
-      speed: 1.5 + Math.random() * 5,
-      chars: Array.from({ length: rowsNeeded }, () => rndChar()),
-      baseOpacity: 0.25 + Math.random() * 0.65,
-    }));
+    interface GridNode {
+      gx: number;
+      gy: number;
+      dist: number;
+      alpha: number;
+      ch: string;
+      dotSize: number;
+    }
+
+    const nodes: GridNode[] = [];
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        const gx = c * GRID_SIZE;
+        const gy = r * GRID_SIZE;
+        const dx = gx - cx;
+        const dy = gy - cy;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        nodes.push({
+          gx, gy, dist, alpha: 0,
+          ch: GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)],
+          dotSize: 1.5 + Math.random() * 3,
+        });
+      }
+    }
 
     const startTime = Date.now();
+    const SPREAD_DURATION = 1600;
     const SHOW_TITLE_AT = 1800;
+    const STUB = GRID_SIZE * 0.4;
 
     const draw = () => {
       const elapsed = Date.now() - startTime;
+      const spreadProgress = Math.min(1, elapsed / SPREAD_DURATION);
+      const revealRadius = spreadProgress * spreadProgress * (maxDist + 60);
 
-      ctx.fillStyle = "rgba(255,255,255,0.1)";
+      ctx.fillStyle = "#FFFFFF";
       ctx.fillRect(0, 0, w, h);
 
-      ctx.font = `bold ${fontSize}px 'Roboto Mono','Courier New',monospace`;
-      ctx.textAlign = "center";
+      for (let i = 0; i < nodes.length; i++) {
+        const n = nodes[i];
+        const targetAlpha = n.dist < revealRadius ? Math.min(1, (revealRadius - n.dist) / 80) : 0;
+        n.alpha += (targetAlpha - n.alpha) * 0.08;
 
-      for (let i = 0; i < colCount; i++) {
-        const col = columns[i];
+        if (n.alpha < 0.01) continue;
+        const a = n.alpha;
 
-        col.y += col.speed;
-        if (col.y > fontSize * 2) {
-          col.y -= fontSize;
-          col.chars.pop();
-          col.chars.unshift(rndChar());
-        }
+        ctx.strokeStyle = `rgba(0, 229, 255, ${a * 0.5})`;
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(n.gx - STUB, n.gy);
+        ctx.lineTo(n.gx + STUB, n.gy);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(n.gx, n.gy - STUB);
+        ctx.lineTo(n.gx, n.gy + STUB);
+        ctx.stroke();
 
-        if (Math.random() < 0.04) {
-          col.chars[Math.floor(Math.random() * col.chars.length)] = rndChar();
-        }
+        ctx.beginPath();
+        ctx.arc(n.gx, n.gy, n.dotSize * a, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0, 229, 255, ${a * 0.7})`;
+        ctx.fill();
 
-        const x = colW * i + colW / 2;
-        const baseY = col.y % fontSize;
-
-        for (let r = 0; r < col.chars.length; r++) {
-          const cy = baseY + r * fontSize - fontSize;
-          if (cy < -fontSize || cy > h + fontSize) continue;
-
-          const alpha = col.baseOpacity * (0.2 + (r / col.chars.length) * 0.8);
-          if (alpha < 0.02) continue;
-
-          ctx.fillStyle = `rgba(0,0,0,${alpha})`;
-          ctx.fillText(col.chars[r], x, cy);
+        if (a > 0.3) {
+          ctx.font = "bold 12px 'JetBrains Mono', monospace";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillStyle = `rgba(0, 229, 255, ${a * 0.5})`;
+          ctx.fillText(n.ch, n.gx + 10, n.gy - 10);
         }
       }
 
-      if (elapsed >= SHOW_TITLE_AT && phaseRef.current === 1) {
-        phaseRef.current = 2;
+      if (spreadProgress > 0.15) {
+        const ringAlpha = Math.min(0.15, spreadProgress * 0.15);
+        ctx.strokeStyle = `rgba(0, 229, 255, ${ringAlpha})`;
+        ctx.lineWidth = 1;
+        const ringR = revealRadius * 0.85;
+        ctx.beginPath();
+        ctx.arc(cx, cy, ringR, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      if (elapsed >= SHOW_TITLE_AT && !titleShownRef.current) {
+        titleShownRef.current = true;
         setShowTitle(true);
       }
 
@@ -100,9 +125,8 @@ export function LoadingScreen({ onComplete }: Props) {
     };
 
     animRef.current = requestAnimationFrame(draw);
-
     return () => cancelAnimationFrame(animRef.current);
-  }, [colCount]);
+  }, []);
 
   useEffect(() => {
     if (showTitle && !completedRef.current) {
@@ -116,7 +140,8 @@ export function LoadingScreen({ onComplete }: Props) {
 
   return (
     <div
-      className="fixed inset-0 overflow-hidden ls-container"
+      className="fixed inset-0 overflow-hidden"
+      style={{ background: "#FFFFFF", zIndex: 9999, width: "100vw", height: "100vh" }}
       data-testid="loading-screen"
     >
       <canvas
@@ -132,39 +157,28 @@ export function LoadingScreen({ onComplete }: Props) {
         >
           <div
             style={{
-              fontFamily: "'Roboto Mono','Courier New',monospace",
+              fontFamily: "'JetBrains Mono', monospace",
               fontSize: "clamp(22px, 7vw, 36px)",
-              fontWeight: 700,
-              letterSpacing: "0.3em",
+              fontWeight: 400,
+              letterSpacing: "0.06em",
               color: "#000",
-              background: "radial-gradient(ellipse at center, rgba(255,255,255,0.92) 0%, rgba(255,255,255,0.7) 50%, transparent 80%)",
+              background: "radial-gradient(ellipse at center, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.7) 50%, transparent 80%)",
               padding: "24px 48px",
               animation: "lsTitleIn 0.6s ease-out both",
             }}
           >
-            <span>RE</span>
-            <span style={{ animation: "lsBlink 800ms step-end infinite" }}>_</span>
-            <span>TERMINAL</span>
+            <span>re</span>
+            <span style={{ color: "#00e5ff", textShadow: "0 0 6px #00e5ff" }}>_</span>
+            <span>terminal</span>
           </div>
         </div>
       )}
 
       <style>{`
-        .ls-container {
-          background: #FFFFFF;
-          z-index: 9999;
-          width: 100vw;
-          height: 100vh;
-          height: 100dvh;
-        }
         @keyframes lsTitleIn {
           0% { opacity: 0; transform: scale(0.92); filter: blur(4px); }
           60% { opacity: 1; transform: scale(1.02); filter: blur(0px); }
           100% { opacity: 1; transform: scale(1); filter: blur(0px); }
-        }
-        @keyframes lsBlink {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0; }
         }
       `}</style>
     </div>

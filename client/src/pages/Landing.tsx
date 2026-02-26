@@ -417,27 +417,43 @@ function GlitchTitle() {
   const [glyphs, setGlyphs] = useState("_");
 
   useEffect(() => {
-    let flickerTimer: ReturnType<typeof setInterval> | null = null;
-    const interval = setInterval(() => {
-      setShowSep(true);
-      const flicks = 2 + Math.floor(Math.random() * 5);
-      let count = 0;
-      flickerTimer = setInterval(() => {
-        const numChars = 2 + Math.floor(Math.random() * 3);
-        let chars = "";
-        for (let i = 0; i < numChars; i++) {
-          chars += GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
-        }
-        setGlyphs(chars);
-        count++;
-        if (count >= flicks) {
-          if (flickerTimer) clearInterval(flickerTimer);
-          flickerTimer = null;
-          setTimeout(() => { setShowSep(false); setGlyphs("_"); }, 100 + Math.random() * 200);
-        }
-      }, 52 + Math.random() * 40);
-    }, 780 + Math.random() * 1560);
-    return () => { clearInterval(interval); if (flickerTimer) clearInterval(flickerTimer); };
+    let cancelled = false;
+    let flickerTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const scheduleNext = () => {
+      if (cancelled) return;
+      const delay = 780 + Math.random() * 1560;
+      flickerTimer = setTimeout(() => {
+        if (cancelled) return;
+        setShowSep(true);
+        const flicks = 2 + Math.floor(Math.random() * 5);
+        let count = 0;
+        const runFlicker = () => {
+          if (cancelled) return;
+          const numChars = 2 + Math.floor(Math.random() * 3);
+          let chars = "";
+          for (let i = 0; i < numChars; i++) {
+            chars += GLITCH_CHARS[Math.floor(Math.random() * GLITCH_CHARS.length)];
+          }
+          setGlyphs(chars);
+          count++;
+          if (count >= flicks) {
+            flickerTimer = setTimeout(() => {
+              if (cancelled) return;
+              setShowSep(false);
+              setGlyphs("_");
+              scheduleNext();
+            }, 100 + Math.random() * 200);
+          } else {
+            flickerTimer = setTimeout(runFlicker, 52 + Math.random() * 40);
+          }
+        };
+        flickerTimer = setTimeout(runFlicker, 52 + Math.random() * 40);
+      }, delay);
+    };
+
+    scheduleNext();
+    return () => { cancelled = true; if (flickerTimer) clearTimeout(flickerTimer); };
   }, []);
 
   return (
@@ -800,7 +816,7 @@ function HowItWorksSection() {
             </div>
           ))}
           <div ref={costRef} className="tl-cost" data-testid="text-cost-highlight">
-            <p style={{ fontFamily: FONT_MONO, fontSize: "clamp(14px, 3.5vw, 32px)", fontWeight: 400 }}>Cost of onboarding: $1.50 per user</p>
+            <p style={{ fontFamily: FONT_MONO, fontSize: "clamp(14px, 3.5vw, 32px)", fontWeight: 400 }}>Cost of onboarding:{"\u00a0"}$1.50{"\u00a0"}per{"\u00a0"}user</p>
           </div>
         </div>
       </div>

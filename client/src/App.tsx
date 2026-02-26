@@ -14,7 +14,7 @@ function Router() {
     <Switch>
       <Route path="/" component={Landing} />
       <Route path="/activation">
-        <Suspense fallback={<div style={{ background: "#0a0a0a", minHeight: "100vh" }} />}>
+        <Suspense fallback={<div style={{ background: "#FFFFFF", minHeight: "100vh" }} />}>
           <Home />
         </Suspense>
       </Route>

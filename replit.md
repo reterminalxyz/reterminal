@@ -83,8 +83,10 @@ The application features a distinct two-phase visual design:
 - API: POST /api/save-progress, POST /api/sync-user
 - localStorage keys: "liberta_token", "liberta_terminal_progress", "liberta_boot_dismissed"
 - Users table columns: id, token, xp, level, current_module_id, current_step_index, total_sats, independence_progress
-- Loading screen (LoadingScreen.tsx): 2-phase canvas animation (falling character cascade → RE_TERMINAL fade-in), ~3s total, white bg, black monospace text
-- Landing page (/): Pure minimalist scrollable page — Hero (re_terminal + YouTube video) → Problem ("The Surveillance Trap", scroll-triggered) → Modules (horizontal carousel, 7 cards) → How It Works ("Deployment Mechanics", 3 steps) → Footer ([ ENTER ] → /activation). White bg (#FFFFFF), black text, Inter + monospace fonts, IntersectionObserver animations.
+- Loading screen (LoadingScreen.tsx): cyan grid spread animation from center outward (matches landing page GridGlow aesthetic), ~3s total, white bg, "re_terminal" text fade-in with cyan accent
+- Landing page (/): Pure minimalist scrollable page — Hero (re_terminal + YouTube video) → Problem (scroll-triggered) → Modules (horizontal carousel, 7 cards) → How It Works ("Deployment mechanics", 3 steps) → Footer ([ ENTER ] → /activation). White bg (#FFFFFF), black text, Inter + JetBrains Mono fonts, IntersectionObserver animations, GridGlow canvas overlay with drips/sparks.
+- GlitchTitle: recursive setTimeout (not setInterval) for reliability, cyan glitch chars between "re" and "terminal"
+- /activation route: lazy-loaded via React.lazy(), Suspense fallback is white div (matches loading screen bg)
 - App flow: Landing (/) → /activation: Loading Screen (3s) → Boot Screen (browser/app choice) → Phase 1 → Phase 2
 - Phase 1 "No" answer: shows "наверное это не для тебя" (notForYou) message, then redirects to Boot Screen after 2s
 - PWA install: shared global module (client/src/lib/pwa-install.ts) captures beforeinstallprompt early, used by both BootScreen and TerminalChat
