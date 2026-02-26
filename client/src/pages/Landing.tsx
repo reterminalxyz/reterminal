@@ -961,11 +961,11 @@ export default function Landing() {
         .module-card-3:hover .icon-dashed-line, .module-card-3.touched .icon-dashed-line { stroke-dasharray: 100; stroke-width: 2; }
         .module-card-3:hover .icon-packet, .module-card-3.touched .icon-packet { opacity: 1; transform: translateX(28px); }
 
-        /* Card 4: Arrow breaks wall */
-        .icon-arrow-group { transition: transform 0.3s cubic-bezier(0.2,0.8,0.2,1); }
-        .icon-wall { stroke-dasharray: none; transition: stroke-dasharray 0.15s ease 0.2s, stroke-dashoffset 0.15s ease 0.2s; }
-        .module-card-4:hover .icon-arrow-group, .module-card-4.touched .icon-arrow-group { transform: translateX(24px); }
-        .module-card-4:hover .icon-wall, .module-card-4.touched .icon-wall { stroke-dasharray: 16 10 16; stroke-dashoffset: -14; }
+        /* Card 4: Arrow breaks through wall */
+        .icon-arrow-group { transition: transform 0.4s cubic-bezier(0.2,0.8,0.2,1) 0.1s; }
+        .icon-wall { stroke-dasharray: none; transition: stroke-dasharray 0.2s ease, stroke-dashoffset 0.2s ease, opacity 0.3s ease 0.15s; }
+        .module-card-4:hover .icon-arrow-group, .module-card-4.touched .icon-arrow-group { transform: translateX(30px); }
+        .module-card-4:hover .icon-wall, .module-card-4.touched .icon-wall { stroke-dasharray: 12 14 12; stroke-dashoffset: -16; opacity: 0.25; }
 
         /* Card 5: Dots → Constellation */
         .module-icon-5 line { stroke-dasharray: 50; stroke-dashoffset: 50; transition: stroke-dashoffset 0.5s cubic-bezier(0.2,0.8,0.2,1); }
