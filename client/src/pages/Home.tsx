@@ -10,7 +10,7 @@ import type { Lang } from "@/components/BootScreen";
 import { RU_PHASE1_QUESTIONS } from "@/lib/ru-texts";
 import { useCreateSession, useUpdateSession, useSession } from "@/hooks/use-sessions";
 import { useGrantSkill } from "@/hooks/use-skills";
-import { LoadingScreen } from "@/components/LoadingScreen";
+import { LoadingScreen, resetLoadingScreen } from "@/components/LoadingScreen";
 import { playClick, playError, playPhaseComplete } from "@/lib/sounds";
 import { trackEvent, getOrCreateSession } from "@/lib/analytics";
 
@@ -77,6 +77,7 @@ export default function Home() {
     return null;
   });
   const [phase, setPhase] = useState<Phase>(() => {
+    resetLoadingScreen();
     return "loading";
   });
   const [currentQuestion, setCurrentQuestion] = useState<QuestionId>(1);

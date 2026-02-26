@@ -5,29 +5,12 @@ const COL_SP = 10;
 const LH = 15;
 const DURATION = 3;
 
-let globalState: {
-  cols: { x: number; speed: number; chars: string[]; alpha: number; scroll: number }[];
-  t0: number;
-  w: number;
-  h: number;
-  nVisible: number;
-  nChars: number;
-} | null = null;
-
-function initState(w: number, h: number) {
-  const nCols = Math.ceil(w / COL_SP) + 1;
-  const nVisible = Math.ceil(h / LH) + 2;
-  const nChars = nVisible + 1;
-  const cols = Array.from({ length: nCols }, (_, i) => ({
-    x: i * COL_SP,
-    speed: 40 + Math.random() * 200,
-    chars: Array.from({ length: nChars }, () => CH[(Math.random() * CH.length) | 0]),
-    alpha: 0.2 + Math.random() * 0.45,
-    scroll: 0,
-  }));
-  globalState = { cols, t0: performance.now(), w, h, nVisible, nChars };
-  return globalState;
-}
+let cachedCols: { x: number; speed: number; chars: string[]; alpha: number; scroll: number }[] | null = null;
+let cachedW = 0;
+let cachedH = 0;
+let cachedNVisible = 0;
+let cachedNChars = 0;
+let globalT0 = 0;
 
 interface Props {
   onComplete: () => void;
@@ -50,13 +33,32 @@ export function LoadingScreen({ onComplete }: Props) {
     if (!ctx) return;
     ctx.scale(dpr, dpr);
 
-    const st = (globalState && globalState.w === w && globalState.h === h) ? globalState : initState(w, h);
+    const needsInit = !cachedCols || cachedW !== w || cachedH !== h;
+    if (needsInit) {
+      const nCols = Math.ceil(w / COL_SP) + 1;
+      cachedNVisible = Math.ceil(h / LH) + 2;
+      cachedNChars = cachedNVisible + 1;
+      cachedW = w;
+      cachedH = h;
+      cachedCols = Array.from({ length: nCols }, (_, i) => ({
+        x: i * COL_SP,
+        speed: 100 + Math.random() * 350,
+        chars: Array.from({ length: cachedNChars }, () => CH[(Math.random() * CH.length) | 0]),
+        alpha: 0.2 + Math.random() * 0.45,
+        scroll: 0,
+      }));
+      globalT0 = performance.now();
+    }
+
+    const cols = cachedCols!;
+    const nVis = cachedNVisible;
+    const nCh = cachedNChars;
     let prevNow = performance.now();
 
     const draw = (now: number) => {
       const dt = Math.min(0.05, (now - prevNow) / 1000);
       prevNow = now;
-      const t = (now - st.t0) / 1000;
+      const t = (now - globalT0) / 1000;
 
       ctx.fillStyle = "#FFF";
       ctx.fillRect(0, 0, w, h);
@@ -66,16 +68,16 @@ export function LoadingScreen({ onComplete }: Props) {
       ctx.textBaseline = "middle";
       ctx.fillStyle = "rgb(0,229,255)";
 
-      for (let c = 0; c < st.cols.length; c++) {
-        const col = st.cols[c];
+      for (let c = 0; c < cols.length; c++) {
+        const col = cols[c];
         col.scroll += col.speed * dt;
         const pixOff = col.scroll % LH;
         const charShift = Math.floor(col.scroll / LH);
 
-        for (let r = 0; r <= st.nVisible; r++) {
+        ctx.globalAlpha = col.alpha;
+        for (let r = 0; r <= nVis; r++) {
           const py = r * LH + pixOff - LH;
-          const ci = ((r - charShift) % st.nChars + st.nChars) % st.nChars;
-          ctx.globalAlpha = col.alpha;
+          const ci = ((r - charShift) % nCh + nCh) % nCh;
           ctx.fillText(col.chars[ci], col.x, py);
         }
       }
@@ -98,4 +100,9 @@ export function LoadingScreen({ onComplete }: Props) {
       <canvas ref={canvasRef} className="absolute inset-0" style={{ width: "100%", height: "100%" }} />
     </div>
   );
+}
+
+export function resetLoadingScreen() {
+  cachedCols = null;
+  globalT0 = 0;
 }
