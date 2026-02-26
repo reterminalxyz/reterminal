@@ -274,7 +274,7 @@ function GridGlow() {
 
       const scrollY4 = window.scrollY;
 
-      ctx.font = "9px 'JetBrains Mono', monospace";
+      ctx.font = "bold 14px 'JetBrains Mono', monospace";
       ctx.textAlign = "center";
       ctx.textBaseline = "middle";
       trailNodes.current = trailNodes.current.filter(n => {
@@ -287,8 +287,8 @@ function GridGlow() {
         if (sy < -60 || sy > window.innerHeight + 60) return true;
         const a = n.life * n.life;
 
-        ctx.strokeStyle = `rgba(0, 229, 255, ${a * 0.6})`;
-        ctx.lineWidth = 1;
+        ctx.strokeStyle = `rgba(0, 229, 255, ${a * 0.75})`;
+        ctx.lineWidth = 1.5;
         ctx.beginPath();
         ctx.moveTo(n.gx - STUB, sy);
         ctx.lineTo(n.gx + STUB, sy);
@@ -299,12 +299,12 @@ function GridGlow() {
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.arc(n.gx, sy, 2.5, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(0, 229, 255, ${a * 0.8})`;
+        ctx.arc(n.gx, sy, 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(0, 229, 255, ${a * 0.9})`;
         ctx.fill();
 
-        ctx.fillStyle = `rgba(0, 229, 255, ${a * 0.5})`;
-        ctx.fillText(n.ch, n.gx + 7, sy - 7);
+        ctx.fillStyle = `rgba(0, 229, 255, ${a * 0.85})`;
+        ctx.fillText(n.ch, n.gx + 10, sy - 10);
         return true;
       });
 
