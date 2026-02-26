@@ -9,7 +9,7 @@ The project is building on phygital principles (physical + digital). One of the 
 
 Month 0-1(done):
 
-MVP launched, translation on 3 languages (EN/IT/RU), censorship-resistant mobile app, the prototype of educational module 1 (onboarding to financial freedom), fully functional BTC LN onboarding flow (10-15 minutes), live economic engine, analytics and statistics.
+MVP launched, translation on 3 languages (EN/IT/RU), censorship-resistant mobile app, the prototype of educational module 1 (onboarding to financial freedom), fully functional BTC LN onboarding flow (10-15 minutes), live economic engine
 
 
 ---
