@@ -445,7 +445,7 @@ function GlitchTitle() {
       className="text-center select-none"
       style={{
         fontFamily: FONT_MONO,
-        fontSize: "clamp(42px, 12vw, 96px)",
+        fontSize: "clamp(32px, 8vw, 64px)",
         fontWeight: 400,
         letterSpacing: "0.06em",
         color: "#000",
@@ -469,7 +469,7 @@ function HeroSection() {
     <section
       ref={obs.ref}
       className="flex flex-col items-center justify-center"
-      style={{ minHeight: "100vh", paddingTop: "8vh", paddingBottom: "4vh" }}
+      style={{ minHeight: "100vh", paddingTop: "14vh", paddingBottom: "4vh" }}
       data-testid="section-hero"
     >
       <div className="w-full" style={{ maxWidth: 1000, margin: "0 auto", padding: "0 5vw" }}>
@@ -478,8 +478,8 @@ function HeroSection() {
             <GlitchTitle />
           </div>
           <div style={reveal(obs.visible, 0.15)}>
-            <p className="mt-3 text-center" style={{ fontFamily: FONT_BODY, fontSize: "clamp(13px, 3vw, 17px)", color: "#333" }} data-testid="text-hero-subtitle">
-              digital resistance starts here
+            <p className="mt-3 text-center" style={{ fontFamily: FONT_MONO, fontSize: 12, letterSpacing: "0.25em", color: "#000", fontWeight: 500 }} data-testid="text-hero-subtitle">
+              DIGITAL RESISTANCE STARTS HERE
             </p>
           </div>
           <LazyYouTube videoId="05LWu5BJUTA" visible={obs.visible} />
@@ -544,7 +544,7 @@ function ModulesSection() {
   return (
     <section style={{ padding: "2vh 0" }} data-testid="section-modules">
       <div ref={obs.ref} style={{ maxWidth: 1000, margin: "0 auto", padding: "0 5vw", marginBottom: 20, ...reveal(obs.visible) }}>
-        <h2 className="text-center" style={{ fontFamily: FONT_MONO, fontSize: "clamp(28px, 7vw, 48px)", fontWeight: 400, color: "#000", letterSpacing: "0.04em" }} data-testid="text-modules-title">
+        <h2 className="text-center" style={{ fontFamily: FONT_MONO, fontSize: "clamp(20px, 4vw, 32px)", fontWeight: 400, color: "#000" }} data-testid="text-modules-title">
           Modules
         </h2>
       </div>
@@ -721,7 +721,7 @@ function HowItWorksSection() {
   const obs = useInView();
 
   const steps = [
-    { num: "01", title: "Tap physical object or click the link", sub: "Card / Figure / Sticker" },
+    { num: "01", title: "Tap object / click link", sub: "Card / Figure / Sticker" },
     { num: "02", title: "Learn and earn", sub: "Gamified modules → Earn $SATS" },
     { num: "03", title: "Peer-to-peer growth", sub: "Share info → Network expands" },
   ];
@@ -778,7 +778,7 @@ function HowItWorksSection() {
       <div style={{ maxWidth: 1000, margin: "0 auto", padding: "0 5vw" }}>
         <div ref={obs.ref}>
           <h2 style={{ fontFamily: FONT_MONO, fontSize: "clamp(20px, 4vw, 32px)", fontWeight: 400, color: "#000", marginBottom: 0, ...reveal(obs.visible) }} data-testid="text-hiw-title">
-            Deployment Mechanics
+            Deployment mechanics
           </h2>
         </div>
         <div ref={containerRef} className="tl-container">
