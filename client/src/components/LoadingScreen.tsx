@@ -51,15 +51,16 @@ export function LoadingScreen({ onComplete }: Props) {
       }
     }
 
-    const COL_SP = 20;
-    const nCols = Math.min(Math.ceil(w / COL_SP), 30);
-    const nRows = Math.ceil(h / 16) + 4;
+    const COL_SP = 14;
+    const nCols = Math.min(Math.ceil(w / COL_SP), 50);
+    const nRows = Math.ceil(h / 15) + 6;
     const cols = Array.from({ length: nCols }, (_, i) => ({
-      x: i * COL_SP + (COL_SP / 2),
+      x: i * COL_SP + (COL_SP / 2) + (Math.random() - 0.5) * 4,
       offset: Math.random() * nRows,
-      speed: 2 + Math.random() * 4,
+      speed: 1.5 + Math.random() * 6,
       chars: Array.from({ length: nRows }, () => CH[(Math.random() * CH.length) | 0]),
-      alpha: 0.04 + Math.random() * 0.12,
+      alpha: 0.03 + Math.random() * 0.15,
+      headLen: 3 + Math.floor(Math.random() * 8),
     }));
 
     const sparks = Array.from({ length: 20 }, () => ({
@@ -68,7 +69,6 @@ export function LoadingScreen({ onComplete }: Props) {
       r: 1 + Math.random() * 2.5, ph: Math.random() * 6.28,
     }));
 
-    let ring1 = 0, ring2 = -maxD * 0.35, ring3 = -maxD * 0.7;
     let scanY = -10;
 
     const glowGrad = ctx.createRadialGradient(cx, cy, 0, cx, cy, maxD * 0.6);
@@ -122,8 +122,9 @@ export function LoadingScreen({ onComplete }: Props) {
       }
       ctx.globalAlpha = 1;
 
-      const colFade = Math.min(1, t / 0.2);
+      const colFade = Math.min(1, t / 0.15);
       ctx.font = "11px 'JetBrains Mono',monospace";
+      ctx.fillStyle = `rgb(${C})`;
       for (const col of cols) {
         col.offset += col.speed * dt;
         if (col.offset > 1) {
@@ -131,39 +132,22 @@ export function LoadingScreen({ onComplete }: Props) {
           col.chars.pop();
           col.chars.unshift(CH[(Math.random() * CH.length) | 0]);
         }
-        const oY = (col.offset % 1) * 16;
+        if (Math.random() < 0.03) {
+          col.chars[(Math.random() * col.chars.length) | 0] = CH[(Math.random() * CH.length) | 0];
+        }
+        const oY = (col.offset % 1) * 15;
+        const headIdx = Math.floor(col.offset * col.chars.length) % col.chars.length;
         for (let r = 0; r < col.chars.length; r++) {
-          const py = oY + r * 16 - 16;
-          if (py < -16 || py > h + 16) continue;
-          const wa = col.alpha * (1 - (r / col.chars.length) * 0.6) * colFade * (0.6 + 0.4 * Math.sin(t * 1.5 + r * 0.3));
+          const py = oY + r * 15 - 15;
+          if (py < -15 || py > h + 15) continue;
+          const distFromHead = (r - headIdx + col.chars.length) % col.chars.length;
+          const headGlow = distFromHead < col.headLen ? 1 - distFromHead / col.headLen : 0;
+          const baseWave = 0.5 + 0.5 * Math.sin(t * 1.8 + r * 0.25 + col.x * 0.01);
+          const wa = (col.alpha * baseWave + headGlow * 0.2) * colFade;
           if (wa < 0.01) continue;
           ctx.globalAlpha = wa;
-          ctx.fillStyle = `rgb(${C})`;
           ctx.fillText(col.chars[r], col.x, py);
         }
-      }
-      ctx.globalAlpha = 1;
-
-      ring1 += dt * 200;
-      ring2 += dt * 140;
-      ring3 += dt * 100;
-      if (ring1 > maxD + 80) ring1 = 0;
-      if (ring2 > maxD + 80) ring2 = 0;
-      if (ring3 > maxD + 80) ring3 = 0;
-
-      ctx.lineWidth = 1.5;
-      ctx.strokeStyle = `rgb(${C})`;
-      if (ring1 > 0) {
-        const ra = Math.max(0, 0.18 - (ring1 / maxD) * 0.18) * breathe;
-        if (ra > 0.01) { ctx.globalAlpha = ra; ctx.beginPath(); ctx.arc(cx, cy, ring1, 0, 6.28); ctx.stroke(); }
-      }
-      if (ring2 > 0) {
-        const ra = Math.max(0, 0.18 - (ring2 / maxD) * 0.18) * breathe;
-        if (ra > 0.01) { ctx.globalAlpha = ra; ctx.beginPath(); ctx.arc(cx, cy, ring2, 0, 6.28); ctx.stroke(); }
-      }
-      if (ring3 > 0) {
-        const ra = Math.max(0, 0.18 - (ring3 / maxD) * 0.18) * breathe;
-        if (ra > 0.01) { ctx.globalAlpha = ra; ctx.beginPath(); ctx.arc(cx, cy, ring3, 0, 6.28); ctx.stroke(); }
       }
       ctx.globalAlpha = 1;
 
