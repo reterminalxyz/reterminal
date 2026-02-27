@@ -1271,7 +1271,7 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
               {uiTexts.downloadApp}
             </motion.button>
             <motion.a
-              href="https://primal.net/p/npub1qlkwmzmrhzpuak7c2g9afdcstamqrfmxkpjkgy3wjfagxtjqs2xqnxshjp"
+              href="https://x.com/reterminalxyz"
               target="_blank"
               rel="noopener noreferrer"
               initial={{ opacity: 0, y: 6 }}
@@ -1280,23 +1280,9 @@ export function TerminalChat({ onBack, onProgressUpdate, onSatsUpdate, totalSats
               className="block w-full px-4 py-3 text-left text-[12px] font-mono font-bold tracking-[1px]
                        border border-[#00e5ff]/30 bg-[#00e5ff]/5 text-[#00e5ff]
                        hover:bg-[#00e5ff]/10 transition-all duration-200"
-              data-testid="link-nostr-founder"
+              data-testid="link-follow-x"
             >
-              {uiTexts.founderNostr}
-            </motion.a>
-            <motion.a
-              href="https://t.me/yeg0r"
-              target="_blank"
-              rel="noopener noreferrer"
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7 }}
-              className="block w-full px-4 py-3 text-left text-[12px] font-mono font-bold tracking-[1px]
-                       border border-[#00e5ff]/30 bg-[#00e5ff]/5 text-[#00e5ff]
-                       hover:bg-[#00e5ff]/10 transition-all duration-200"
-              data-testid="link-telegram-contact"
-            >
-              Telegram @yeg0r ({lang === "RU" ? "\u0432\u0440\u0435\u043c\u0435\u043d\u043d\u0430\u044f \u043c\u0435\u0440\u0430" : lang === "EN" ? "temporary" : "temporaneo"})
+              {uiTexts.followX}
             </motion.a>
           </div>
         )}
