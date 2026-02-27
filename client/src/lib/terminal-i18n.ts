@@ -206,7 +206,7 @@ export const UI_TEXTS = {
   EN: {
     skillNotification: "+SKILL",
     followQuestion: "How to follow project updates?",
-    followResponse: "You can download the app—it can't be removed from app stores because it's built censorship-resistant.\n\nSecond option—follow us on X and stay up to date with all the news there.",
+    followResponse: "You can download the app—it can't be removed from app stores because it's built censorship-resistant.\n\nSecond option—follow us on X and stay up to date with all the news there.\n\nThird option—subscribe to the founder on Nostr, a decentralized social network. We'll study this network in upcoming blocks.",
     waitMessage: "complete the first block first, all questions later",
     moduleLabel: "MODULE",
     troubleshootingButton: "TROUBLESHOOTING",
@@ -218,6 +218,7 @@ export const UI_TEXTS = {
     installInstructionsAndroid: "Tap menu (three dots top right), then choose \"Install app\" or \"Add to home screen\"",
     installInstructionsFallback: "Add this site to home screen through browser menu",
     followX: "FOLLOW X",
+    founderNostr: "FOUNDER ON NOSTR",
     inputPlaceholder: "Enter answer...",
     satsClaimedButton: "SATS CLAIMED",
     receiveAgainButton: "RECEIVE 1000 SATS AGAIN",
@@ -225,7 +226,7 @@ export const UI_TEXTS = {
   IT: {
     skillNotification: "+SKILL",
     followQuestion: "Come seguire gli aggiornamenti del progetto?",
-    followResponse: "Puoi scaricare l'app\u2014non può essere rimossa dagli app store perché è costruita resistente alla censura.\n\nSeconda opzione—seguici su X e resta aggiornato su tutte le novità.",
+    followResponse: "Puoi scaricare l'app—non può essere rimossa dagli app store perché è costruita resistente alla censura.\n\nSeconda opzione—seguici su X e resta aggiornato su tutte le novità.\n\nTerza opzione—iscriviti al founder su Nostr, un social network decentralizzato. Studieremo questa rete nei prossimi blocchi.",
     waitMessage: "completa prima il primo blocco, tutte le domande dopo",
     moduleLabel: "MODULO",
     troubleshootingButton: "TROUBLESHOOTING",
@@ -237,6 +238,7 @@ export const UI_TEXTS = {
     installInstructionsAndroid: "Tocca menu (tre puntini in alto a destra), poi scegli \"Installa app\" o \"Aggiungi a schermata home\"",
     installInstructionsFallback: "Aggiungi questo sito alla schermata home attraverso il menu del browser",
     followX: "FOLLOW X",
+    founderNostr: "FOUNDER SU NOSTR",
     inputPlaceholder: "Inserisci risposta...",
     satsClaimedButton: "SATS RICEVUTI",
     receiveAgainButton: "RICEVI 1000 SATS DI NUOVO",
