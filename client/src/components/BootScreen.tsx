@@ -376,7 +376,7 @@ export function BootScreen({ onDismiss, onLangChange, lang = "IT" }: BootScreenP
                 />
               </button>
               <span
-                className="absolute -top-[6px] -right-[6px] z-20 font-mono text-[8px] font-bold tracking-[1.5px] uppercase"
+                className="absolute -bottom-[6px] -right-[6px] z-20 font-mono text-[8px] font-bold tracking-[1.5px] uppercase"
                 style={{
                   background: "linear-gradient(135deg, #B87333, #D4956A)",
                   color: "#0a0a0a",
