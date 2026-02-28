@@ -594,3 +594,8 @@ button, a, label, nav, header, [role="button"] {
   background-color: rgba(184, 115, 51, 0.15);
   box-shadow: 0 0 20px rgba(184, 115, 51, 0.2), inset 0 0 20px rgba(184, 115, 51, 0.05);
 }
+
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}

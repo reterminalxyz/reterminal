@@ -15,6 +15,7 @@ const TRANSLATIONS = {
     heroSubtitle: "For permanent access and censorship resistance, install the app on your phone",
     stayBrowser: "Stay in browser",
     installTerminal: "Install app",
+    offlineGuide: "Download offline guide",
     shuttingDown: "SHUTTING DOWN...",
     terminalInstalled: "APP INSTALLED",
     openApp: "Open the app from your home screen",
@@ -24,6 +25,7 @@ const TRANSLATIONS = {
     heroSubtitle: "Per accesso permanente e resistenza alla censura, installa l'app sul telefono",
     stayBrowser: "Resta nel browser",
     installTerminal: "Installa app",
+    offlineGuide: "Scarica guida offline",
     shuttingDown: "SPEGNIMENTO...",
     terminalInstalled: "APP INSTALLATA",
     openApp: "Apri l'app dalla schermata home",
@@ -351,6 +353,32 @@ export function BootScreen({ onDismiss, onLangChange, lang = "IT" }: BootScreenP
               <span className="relative z-10">{t.installTerminal}</span>
               <div className="absolute inset-0 bg-[#B87333]/5 animate-pulse" />
             </button>
+
+            <div className="relative w-full">
+              <button
+                type="button"
+                disabled
+                className="relative w-full py-4 font-mono text-[13px] font-bold tracking-[3px] uppercase text-[#F5F5F5] opacity-50 cursor-not-allowed overflow-hidden"
+                style={{
+                  background: "linear-gradient(135deg, #333 0%, #555 40%, #666 60%, #555 80%, #333 100%)",
+                  boxShadow: "0 0 12px rgba(100, 100, 100, 0.2), inset 0 1px 1px rgba(255,255,255,0.1)",
+                  border: "1px solid rgba(150, 150, 150, 0.3)",
+                }}
+                data-testid="button-offline-guide"
+              >
+                <span className="relative z-10">{t.offlineGuide}</span>
+                <div
+                  className="absolute inset-0 z-0"
+                  style={{
+                    background: "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.06) 50%, transparent 100%)",
+                    animation: "shimmer 2.5s ease-in-out infinite",
+                  }}
+                />
+              </button>
+              <span className="absolute -bottom-[14px] right-3 font-mono text-[9px] tracking-[2px] text-[#666] uppercase">
+                (soon)
+              </span>
+            </div>
           </motion.div>
 
           {isShuttingDown && (
