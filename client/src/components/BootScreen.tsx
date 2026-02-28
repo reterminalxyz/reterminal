@@ -354,7 +354,7 @@ export function BootScreen({ onDismiss, onLangChange, lang = "IT" }: BootScreenP
               <div className="absolute inset-0 bg-[#B87333]/5 animate-pulse" />
             </button>
 
-            <div className="relative w-full">
+            <div className="relative w-full overflow-visible">
               <button
                 type="button"
                 disabled
@@ -375,8 +375,17 @@ export function BootScreen({ onDismiss, onLangChange, lang = "IT" }: BootScreenP
                   }}
                 />
               </button>
-              <span className="absolute -bottom-[14px] right-3 font-mono text-[9px] tracking-[2px] text-[#666] uppercase">
-                (soon)
+              <span
+                className="absolute -top-[6px] -right-[6px] z-20 font-mono text-[8px] font-bold tracking-[1.5px] uppercase"
+                style={{
+                  background: "linear-gradient(135deg, #B87333, #D4956A)",
+                  color: "#0a0a0a",
+                  padding: "2px 8px",
+                  transform: "rotate(12deg)",
+                  boxShadow: "0 1px 4px rgba(0,0,0,0.4)",
+                }}
+              >
+                SOON
               </span>
             </div>
           </motion.div>
