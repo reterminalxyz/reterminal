@@ -513,7 +513,7 @@ function HeroSection() {
         style={{ ...reveal(obs.visible, 0.6) }}
         data-testid="scroll-indicator"
       >
-        <span style={{ fontFamily: FONT_MONO, fontSize: 12, letterSpacing: "0.25em", color: "#000", marginBottom: 10, fontWeight: 500 }}>
+        <span style={{ fontFamily: FONT_MONO, fontSize: "clamp(9px, 2.5vw, 12px)", letterSpacing: "0.2em", color: "#000", marginBottom: 10, fontWeight: 500 }}>
           SCROLL
         </span>
         <div className="landing-scroll-line" />
