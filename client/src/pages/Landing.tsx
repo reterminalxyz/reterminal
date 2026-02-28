@@ -492,7 +492,7 @@ function HeroSection() {
     <section
       ref={obs.ref}
       className="flex flex-col items-center"
-      style={{ minHeight: "100vh", paddingTop: "6vh", paddingBottom: "4vh", justifyContent: "center" }}
+      style={{ minHeight: "100vh", paddingTop: "4vh", paddingBottom: "4vh", justifyContent: "center" }}
       data-testid="section-hero"
     >
       <div className="w-full" style={{ maxWidth: 1000, margin: "0 auto", padding: "0 5vw" }}>
@@ -726,11 +726,7 @@ function ModulesSection() {
         </div>
       </div>
       <div style={{ display: "flex", justifyContent: "center", marginTop: 16, ...reveal(obs.visible, 0.3) }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <div className="landing-scroll-line-h" style={{ width: 32, height: 1, background: "#000" }} />
-          <span style={{ fontFamily: FONT_MONO, fontSize: 11, letterSpacing: "0.15em", color: "#999" }}>SCROLL</span>
-          <div className="landing-scroll-line-h" style={{ width: 32, height: 1, background: "#000" }} />
-        </div>
+        <div className="landing-scroll-line-horiz" />
       </div>
     </section>
   );
@@ -952,12 +948,14 @@ export default function Landing() {
           0%, 100% { opacity: 1; }
           50% { opacity: 0; }
         }
-        .landing-scroll-line-h {
-          animation: landing-line-pulse 2.5s ease-in-out infinite;
+        .landing-scroll-line-horiz {
+          width: 60px; height: 2px; background: #000;
+          animation: landing-scroll-pulse-h 2s ease-in-out infinite;
+          transform-origin: center;
         }
-        @keyframes landing-line-pulse {
-          0%, 100% { opacity: 0.3; transform: scaleX(0.6); transform-origin: left; }
-          50% { opacity: 1; transform: scaleX(1); transform-origin: left; }
+        @keyframes landing-scroll-pulse-h {
+          0%, 100% { transform: scaleX(0.3); opacity: 0.3; }
+          50% { transform: scaleX(1); opacity: 1; }
         }
 
         /* Card 0: Dollar → Bitcoin */
