@@ -501,7 +501,7 @@ function HeroSection() {
             <GlitchTitle />
           </div>
           <div style={reveal(obs.visible, 0.15)}>
-            <p className="mt-3 text-center" style={{ fontFamily: FONT_MONO, fontSize: "clamp(9px, 2.5vw, 12px)", letterSpacing: "0.2em", color: "#000", fontWeight: 500 }} data-testid="text-hero-subtitle">
+            <p className="mt-3 text-center" style={{ fontFamily: FONT_MONO, fontSize: "clamp(11px, 3vw, 14px)", letterSpacing: "0.2em", color: "#000", fontWeight: 500 }} data-testid="text-hero-subtitle">
               DIGITAL RESISTANCE STARTS HERE
             </p>
           </div>
@@ -513,7 +513,7 @@ function HeroSection() {
         style={{ ...reveal(obs.visible, 0.6) }}
         data-testid="scroll-indicator"
       >
-        <span style={{ fontFamily: FONT_MONO, fontSize: "clamp(9px, 2.5vw, 12px)", letterSpacing: "0.2em", color: "#000", marginBottom: 10, fontWeight: 500 }}>
+        <span style={{ fontFamily: FONT_MONO, fontSize: "clamp(11px, 3vw, 14px)", letterSpacing: "0.2em", color: "#000", marginBottom: 10, fontWeight: 500 }}>
           SCROLL
         </span>
         <div className="landing-scroll-line" />
@@ -951,7 +951,7 @@ export default function Landing() {
         .landing-scroll-line-horiz {
           width: 60px; height: 2px; background: #000;
           animation: landing-scroll-pulse-h 2s ease-in-out infinite;
-          transform-origin: center;
+          transform-origin: left center;
         }
         @keyframes landing-scroll-pulse-h {
           0%, 100% { transform: scaleX(0.3); opacity: 0.3; }
